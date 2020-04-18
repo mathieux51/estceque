@@ -1,61 +1,69 @@
 import React from "react"
 import styled from "styled-components"
+import RecordRTC from "recordrtc"
+import Mic from './components/Mic'
+import MicOff from './components/MicOff'
 
-const Container = styled.div``
-const Button = styled.button``
+const Container = styled.div`
+  height: 100vh;
+  width: 100vw;
+  background: #ffb732;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+`
+const A = styled.a`
+  width: 8rem;
+  height: 8rem;
+  cursor: pointer;
+`
+
+const StyledMic = styled(Mic)`
+  & path {
+    fill: crimson;
+  }
+`
 
 function App() {
-  const audioRef = React.createRef(null)
   const [isRecording, setIsRecording] = React.useState(false)
-  const [mediaRec, setMediaRec] = React.useState(null)
-
-  if (mediaRec) {
-    let samples = []
-    mediaRec.ondataavailable = (evt) => {
-      samples.push(evt.data)
-      if (mediaRec.state === "inactive") {
-        const blob = new Blob(samples, { type: "audio/mpeg-3" })
-        const u = URL.createObjectURL(blob)
-        audioRef.current.src = u
-        audioRef.current.controls = true
-        audioRef.current.autoplay = true
-        setMediaRec(null)
-        const a = document.createElement("a")
-        a.href = u
-        a.download = "test.mpg3"
-        a.click()
-        window.URL.revokeObjectURL(u)
-      }
-    }
-  }
+  const [recorder, setRecorder] = React.useState(null)
 
   React.useEffect(() => {
     navigator.mediaDevices
       .getUserMedia({ audio: true })
       .then((stream) => {
-        if (!mediaRec) {
-          setMediaRec(new MediaRecorder(stream))
+        if (!recorder) {
+          const recorder = RecordRTC(stream, {
+            recorderType: RecordRTC.StereoAudioRecorder,
+            mimeType: "audio/wav",
+          })
+
+          setRecorder(recorder)
         }
       })
       .catch((error) => console.error(error))
-  }, [mediaRec])
+  }, [recorder])
 
   const handleClick = (evt) => {
     if (!isRecording) {
       setIsRecording(true)
-      mediaRec.start()
+      recorder.startRecording()
       return
     }
 
     setIsRecording(false)
-    mediaRec.stop()
+    recorder.stopRecording(() => {
+      let blob = recorder.getBlob()
+      RecordRTC.invokeSaveAsDialog(blob)
+      setRecorder(null)
+    })
   }
 
   return (
     <Container>
-      <h1>Direct podcast</h1>
-      <Button onClick={handleClick}>Record</Button>
-      <audio ref={audioRef} />
+      <A onClick={handleClick}>
+      {isRecording ? <StyledMic /> : <MicOff />}
+        </A>
     </Container>
   )
 }
