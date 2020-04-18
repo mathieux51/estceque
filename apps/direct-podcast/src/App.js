@@ -1,10 +1,9 @@
 import React from "react"
 import styled, { createGlobalStyle } from "styled-components"
-import { normalize } from 'polished'
+import { normalize } from "polished"
 import RecordRTC from "recordrtc"
-import Mic from './components/Mic'
-import MicOff from './components/MicOff'
-
+import Mic from "./components/Mic"
+import MicOff from "./components/MicOff"
 
 const GlobalStyle = createGlobalStyle`
   ${normalize()}
@@ -61,19 +60,32 @@ function App() {
     setIsRecording(false)
     recorder.stopRecording(() => {
       let blob = recorder.getBlob()
-      RecordRTC.invokeSaveAsDialog(blob)
+
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement("a")
+      a.style.display = "none"
+      a.href = url
+
+      a.download = `${Date.now()}.wav`
+      document.body.appendChild(a)
+      a.click()
+
+      setTimeout(() => {
+        window.URL.revokeObjectURL(url)
+        document.body.removeChild(a)
+      }, 1000)
+
+      // RecordRTC.invokeSaveAsDialog(blob)
       setRecorder(null)
     })
   }
 
   return (
     <>
-    <GlobalStyle />
-    <Container>
-      <A onClick={handleClick}>
-      {isRecording ? <StyledMic /> : <MicOff />}
-        </A>
-    </Container>
+      <GlobalStyle />
+      <Container>
+        <A onClick={handleClick}>{isRecording ? <StyledMic /> : <MicOff />}</A>
+      </Container>
     </>
   )
 }
