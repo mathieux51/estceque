@@ -1,8 +1,15 @@
 import React from "react"
-import styled from "styled-components"
+import styled, { createGlobalStyle } from "styled-components"
+import { normalize } from 'polished'
 import RecordRTC from "recordrtc"
 import Mic from './components/Mic'
 import MicOff from './components/MicOff'
+
+
+const GlobalStyle = createGlobalStyle`
+  ${normalize()}
+
+`
 
 const Container = styled.div`
   height: 100vh;
@@ -60,11 +67,14 @@ function App() {
   }
 
   return (
+    <>
+    <GlobalStyle />
     <Container>
       <A onClick={handleClick}>
       {isRecording ? <StyledMic /> : <MicOff />}
         </A>
     </Container>
+    </>
   )
 }
 
