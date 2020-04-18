@@ -1,7 +1,9 @@
 # direct-postcast
 
-## Documentation 
+## Getting started
 
-- [Record audio](https://codepen.io/jeremyagottfried/pen/bMqyNZ)
-- [encode to mp3 with JS](https://github.com/zhuker/lamejs)
+```sh
+npm i 
+npm start
+```
 
