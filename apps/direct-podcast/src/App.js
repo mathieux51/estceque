@@ -1,14 +1,16 @@
 import React from "react"
-import { createGlobalStyle } from "styled-components"
+import { createGlobalStyle, ThemeProvider } from "styled-components"
 import { normalize } from "polished"
+import theme from "./theme"
 import Main from "./components/Main"
 import ErrorBoundary from "./components/ErrorBoundary"
 
 const GlobalStyle = createGlobalStyle`
   ${normalize()}
-  * {
-    font-family: 'Open Sans', sans-serif;
-  }
+    * {
+      font-family: 'Open sans', sans-serif;
+    }
+
   button {
     background-color: transparent;
     border: none;
@@ -27,12 +29,12 @@ const GlobalStyle = createGlobalStyle`
 
 function App() {
   return (
-    <>
+    <ThemeProvider theme={theme}>
       <GlobalStyle />
       <ErrorBoundary>
         <Main />
       </ErrorBoundary>
-    </>
+    </ThemeProvider>
   )
 }
 
