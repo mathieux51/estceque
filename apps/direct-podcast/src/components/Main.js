@@ -13,7 +13,7 @@ const Container = styled.div`
   justify-content: center;
   align-items: center;
 `
-const A = styled.a`
+const Button = styled.button`
   width: 8rem;
   height: 8rem;
   cursor: pointer;
@@ -98,7 +98,7 @@ function Main() {
       data-browser={adapter.browserDetails.browser}
       data-version={adapter.browserDetails.version}
     >
-      <A onClick={handleClick}>{isRecording ? <StyledMic /> : <MicOff />}</A>
+      <Button onClick={handleClick}>{isRecording ? <StyledMic /> : <MicOff />}</Button>
     </Container>
   )
 }

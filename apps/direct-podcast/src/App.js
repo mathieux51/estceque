@@ -9,6 +9,20 @@ const GlobalStyle = createGlobalStyle`
   * {
     font-family: 'Open Sans', sans-serif;
   }
+  button {
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    text-decoration: underline;
+    display: inline;
+    margin: 0;
+    padding: 0;
+  }
+
+  button:hover,
+  button:focus {
+    text-decoration: none;
+  }
 `
 
 function App() {

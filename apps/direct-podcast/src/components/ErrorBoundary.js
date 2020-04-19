@@ -18,6 +18,7 @@ const TextContainer = styled.div`
 `
 
 const Details = styled.details`
+  margin-top: 1rem;
   cursor: pointer;
   width: 60vw;
   max-width: 960px;
@@ -30,7 +31,6 @@ const Pre = styled.pre`
 
 const EventID = styled.pre`
   display: inline;
-  cursor: pointer;
 `
 
 class ErrorBoundary extends React.Component {
@@ -70,9 +70,9 @@ class ErrorBoundary extends React.Component {
             </h2>
             <span>
               Numéro de l'incident :{" "}
-              <a onClick={this.handleClick}>
+              <button onClick={this.handleClick}>
                 <EventID>{this.state.eventID}</EventID>
-              </a>
+              </button>
             </span>
           </TextContainer>
           <Details>
