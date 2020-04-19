@@ -72,6 +72,9 @@ function Main() {
   }, [recorder, isRecording])
 
   const handleClick = (evt) => {
+    evt.preventDefault()
+    evt.stopPropagation()
+
     if (!isRecording) {
       setIsRecording(true)
       if (recorder) {
