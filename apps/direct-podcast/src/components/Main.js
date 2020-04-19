@@ -4,25 +4,50 @@ import RecordRTC from "recordrtc"
 import adapter from "webrtc-adapter"
 import Mic from "./Mic"
 import MicOff from "./MicOff"
+import Timer from "./Timer"
+
+const getFilename = () => {
+  const now = new Date()
+  const d = now.getDate()
+  const m = now.getMonth()
+  const y = now.getFullYear()
+  const h = now.getHours()
+  const min = now.getMinutes()
+  const s = now.getSeconds()
+
+  return `${d}${m}${y}${h}${min}${s}.wav`
+}
 
 const Container = styled.div`
   height: 100vh;
   width: 100vw;
-  background: #ffb732;
+  background: ${(props) => props.theme.blue};
   display: flex;
   justify-content: center;
   align-items: center;
+  flex-direction: column;
 `
 const Button = styled.button`
-  width: 8rem;
-  height: 8rem;
+  width: 12rem;
+  height: 12rem;
   cursor: pointer;
 `
 
 const StyledMic = styled(Mic)`
   & path {
-    fill: crimson;
+    fill: ${(props) => props.theme.red};
   }
+`
+
+const StyledMicOff = styled(MicOff)`
+  & path {
+    fill: ${(props) => props.theme.white};
+  }
+`
+
+const Text = styled.span`
+  color: ${(props) => props.theme.grey};
+  font-size: 24px;
 `
 
 const handleStopRecording = (recorder, setRecorder) => () => {
@@ -32,7 +57,7 @@ const handleStopRecording = (recorder, setRecorder) => () => {
   a.style.display = "none"
   a.href = url
 
-  a.download = `${Date.now()}.wav`
+  a.download = getFilename()
   document.body.appendChild(a)
   a.click()
 
@@ -98,7 +123,10 @@ function Main() {
       data-browser={adapter.browserDetails.browser}
       data-version={adapter.browserDetails.version}
     >
-      <Button onClick={handleClick}>{isRecording ? <StyledMic /> : <MicOff />}</Button>
+      <Button onClick={handleClick}>
+        {isRecording ? <StyledMic /> : <StyledMicOff />}
+      </Button>
+      {isRecording ? <Timer /> : <Text>00:00:00</Text>}
     </Container>
   )
 }
