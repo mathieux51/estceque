@@ -1,36 +1,56 @@
-import React from 'react'
+import React from "react"
+import styled from 'styled-components'
 
-class ErrorBoundary extends React.PureComponent {
+const Container = styled.div`
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: #ffb732;
+  height: 100vh;
+  width: 100vw;
+`
+
+const Details = styled.details`
+  cursor: pointer;
+  width: 80vw;
+  max-width: 960px;
+`
+
+const Pre = styled.pre`
+  white-space: pre-wrap;
+`
+
+class ErrorBoundary extends React.Component {
   constructor(props) {
-    super(props);
-    this.state = { error: null, errorInfo: null };
+    super(props)
+    this.state = { error: null, errorInfo: null }
   }
 
   componentDidCatch(error, errorInfo) {
-    // Catch errors in any components below and re-render with error message
     this.setState({
       error: error,
-      errorInfo: errorInfo
+      errorInfo: errorInfo,
     })
-    // You can also log error messages to an error reporting service here
   }
 
   render() {
     if (this.state.errorInfo) {
-      // Error path
       return (
-        <div>
-          <h2><span role='img' aria-label='robot'>🤖</span> Quelque chose a mal tourné.</h2>
-          <details style={{ whiteSpace: 'pre-wrap' }}>
-            {this.state.error && this.state.error.toString()}
-            <br />
-            {this.state.errorInfo.componentStack}
-          </details>
-        </div>
-      );
+        <Container>
+          <h2>
+            <span role="img" aria-label="robot">
+              🤖
+            </span>{" "}
+            Quelque chose a mal tourné.
+          </h2>
+          <Details>
+            <Pre>{this.state.error && this.state.error.toString()}</Pre>
+          </Details>
+        </Container>
+      )
     }
-    // Normally, just render children
-    return this.props.children;
+    return this.props.children
   }
 }
 
