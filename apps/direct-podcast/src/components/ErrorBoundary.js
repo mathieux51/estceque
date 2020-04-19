@@ -20,6 +20,7 @@ const TextContainer = styled.div`
 const Text = styled.span`
   color: ${(props) => props.theme.white};
 `
+
 const Button = styled.button`
   color: ${(props) => props.theme.white};
 `
@@ -40,6 +41,10 @@ const Pre = styled.pre`
 
 const EventID = styled.pre`
   display: inline;
+`
+
+const Emo = styled.span`
+  font-size: 48px;
 `
 
 class ErrorBoundary extends React.Component {
@@ -72,10 +77,10 @@ class ErrorBoundary extends React.Component {
         <Container>
           <TextContainer>
             <h2>
-              <span role="img" aria-label="robot">
+              <Emo role="img" aria-label="robot">
                 🤖
-              </span>{" "}
-              <Text>Quelque chose a mal tourné.</Text>
+              </Emo>{" "}
+              <Text>Quelque chose a mal tourné...</Text>
             </h2>
             <span>
               <Text>Numéro de l'incident : </Text>
