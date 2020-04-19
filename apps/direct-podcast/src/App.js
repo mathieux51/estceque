@@ -2,8 +2,10 @@ import React from "react"
 import styled, { createGlobalStyle } from "styled-components"
 import { normalize } from "polished"
 import RecordRTC from "recordrtc"
+import adapter from "webrtc-adapter"
 import Mic from "./components/Mic"
 import MicOff from "./components/MicOff"
+import ErrorBoundary from './components/ErrorBoundary'
 
 const GlobalStyle = createGlobalStyle`
   ${normalize()}
@@ -81,12 +83,15 @@ function App() {
   }
 
   return (
-    <>
+    <ErrorBoundary>
       <GlobalStyle />
-      <Container>
+      <Container
+        data-browser={adapter.browserDetails.browser}
+        data-version={adapter.browserDetails.version}
+      >
         <A onClick={handleClick}>{isRecording ? <StyledMic /> : <MicOff />}</A>
       </Container>
-    </>
+    </ErrorBoundary>
   )
 }
 

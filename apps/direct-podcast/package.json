@@ -12,7 +12,8 @@
     "react-dom": "^16.13.1",
     "react-scripts": "3.4.1",
     "recordrtc": "^5.5.9",
-    "styled-components": "^5.1.0"
+    "styled-components": "^5.1.0",
+    "webrtc-adapter": "^7.5.1"
   },
   "scripts": {
     "start": "react-scripts start",
