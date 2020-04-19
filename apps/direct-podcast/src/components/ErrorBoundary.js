@@ -68,12 +68,12 @@ class ErrorBoundary extends React.Component {
               </span>{" "}
               Quelque chose a mal tourné.
             </h2>
-            <p>
+            <span>
               Numéro de l'incident :{" "}
               <a onClick={this.handleClick}>
                 <EventID>{this.state.eventID}</EventID>
               </a>
-            </p>
+            </span>
           </TextContainer>
           <Details>
             <Pre>{this.state.error && this.state.error.toString()}</Pre>
