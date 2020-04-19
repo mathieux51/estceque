@@ -3,7 +3,6 @@
 ## Getting started
 
 ```sh
-npm i 
+npm i
 npm start
 ```
-
