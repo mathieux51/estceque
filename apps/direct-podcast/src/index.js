@@ -12,11 +12,16 @@ if (process.env.NODE_ENV !== "development") {
   })
 }
 
-Sentry.configureScope(function(scope) {
-  scope.setExtra("adapter.browserDetails.browser", adapter.browserDetails.browser);
-  scope.setExtra("adapter.browserDetails.version", adapter.browserDetails.version);
-});
-
+Sentry.configureScope(function (scope) {
+  scope.setExtra(
+    "adapter.browserDetails.browser",
+    adapter.browserDetails.browser
+  )
+  scope.setExtra(
+    "adapter.browserDetails.version",
+    adapter.browserDetails.version
+  )
+})
 
 ReactDOM.render(
   <React.StrictMode>
