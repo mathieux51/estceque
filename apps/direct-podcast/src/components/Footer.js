@@ -3,6 +3,7 @@ import styled from "styled-components"
 import CommonCreative from "./CommonCreative"
 import Help from "./Help"
 import Mail from "./Mail"
+import Tooltip from "./Tooltip"
 
 const Container = styled.div`
   display: flex;
@@ -28,16 +29,22 @@ const StyledMail = styled(Mail)`
   }
 `
 
-const Footer = ({ className }) => (
-  <Container className={className}>
-    <button>
-      <StyledHelp />
-    </button>
-    <CommonCreative />
-    <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
-      <StyledMail />
-    </a>
-  </Container>
-)
+const Footer = ({ className }) => {
+  const [isVisible, setIsVisible] = React.useState(false)
+  const handleClick = () => setIsVisible(!isVisible)
+  return (
+    <Container className={className}>
+      <Tooltip isVisible={isVisible}>
+        <button onClick={handleClick}>
+          <StyledHelp />
+        </button>
+      </Tooltip>
+      <CommonCreative />
+      <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
+        <StyledMail />
+      </a>
+    </Container>
+  )
+}
 
 export default Footer
