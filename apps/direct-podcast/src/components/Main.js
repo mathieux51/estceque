@@ -40,17 +40,7 @@ const TopContainer = styled.div`
 `
 
 const StyledFooter = styled(Footer)`
-  height: 10%;
-`
-
-const BottomNote = styled.span`
-  height: 10%;
-  width: 100%;
-  color: ${(props) => props.theme.grey};
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 10px;
+  height: 20%;
 `
 
 const StyledMic = styled(Mic)`
@@ -152,7 +142,6 @@ function Main() {
         {isRecording ? <Timer /> : <Text>00:00:00</Text>}
       </TopContainer>
       <StyledFooter />
-      <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
   )
 }

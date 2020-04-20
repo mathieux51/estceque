@@ -1,15 +1,22 @@
 import React from "react"
 import styled from "styled-components"
 import * as Sentry from "@sentry/browser"
+import Footer from "./Footer"
 
 const Container = styled.div`
   display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
   height: 100vh;
   width: 100vw;
   background: ${(props) => props.theme.blue};
+`
+
+const SubContainer = styled.div`
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
 `
 
 const TextContainer = styled.div`
@@ -47,6 +54,10 @@ const Emo = styled.span`
   font-size: 48px;
 `
 
+const StyledFooter = styled(Footer)`
+  height: 20%;
+`
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -75,23 +86,26 @@ class ErrorBoundary extends React.Component {
     if (this.state.errorInfo) {
       return (
         <Container>
-          <TextContainer>
-            <h2>
-              <Emo role="img" aria-label="robot">
-                🤖
-              </Emo>{" "}
-              <Text>Quelque chose a mal tourné...</Text>
-            </h2>
-            <span>
-              <Text>Numéro de l'incident : </Text>
-              <Button onClick={this.handleClick}>
-                <EventID>{this.state.eventID}</EventID>
-              </Button>
-            </span>
-          </TextContainer>
-          <Details>
-            <Pre>{this.state.error && this.state.error.toString()}</Pre>
-          </Details>
+          <SubContainer>
+            <TextContainer>
+              <h2>
+                <Emo role="img" aria-label="robot">
+                  🤖
+                </Emo>{" "}
+                <Text>Quelque chose a mal tourné...</Text>
+              </h2>
+              <span>
+                <Text>Numéro de l'incident : </Text>
+                <Button onClick={this.handleClick}>
+                  <EventID>{this.state.eventID}</EventID>
+                </Button>
+              </span>
+            </TextContainer>
+            <Details>
+              <Pre>{this.state.error && this.state.error.toString()}</Pre>
+            </Details>
+          </SubContainer>
+          <StyledFooter />
         </Container>
       )
     }

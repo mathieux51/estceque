@@ -7,6 +7,12 @@ import Tooltip from "./Tooltip"
 
 const Container = styled.div`
   display: flex;
+  flex-direction: column;
+`
+
+const SubContainer = styled.div`
+  width: 100%;
+  display: flex;
   justify-content: space-between;
   max-width: 960px;
   align-items: center;
@@ -29,20 +35,32 @@ const StyledMail = styled(Mail)`
   }
 `
 
+const BottomNote = styled.span`
+  width: 100%;
+  color: ${(props) => props.theme.grey};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
+`
+
 const Footer = ({ className }) => {
   const [isVisible, setIsVisible] = React.useState(false)
   const handleClick = () => setIsVisible(!isVisible)
   return (
     <Container className={className}>
-      <Tooltip isVisible={isVisible}>
-        <button onClick={handleClick}>
-          <StyledHelp />
-        </button>
-      </Tooltip>
-      <CommonCreative />
-      <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
-        <StyledMail />
-      </a>
+      <SubContainer>
+        <Tooltip isVisible={isVisible}>
+          <button onClick={handleClick}>
+            <StyledHelp />
+          </button>
+        </Tooltip>
+        <CommonCreative />
+        <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
+          <StyledMail />
+        </a>
+      </SubContainer>
+      <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
   )
 }
