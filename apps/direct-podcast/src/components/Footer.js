@@ -4,6 +4,7 @@ import CommonCreative from "./CommonCreative"
 import Help from "./Help"
 import Mail from "./Mail"
 import Tooltip from "./Tooltip"
+import useClickOutside from '../hooks/useClickOutside'
 
 const Container = styled.div`
   display: flex;
@@ -19,8 +20,11 @@ const SubContainer = styled.div`
   margin: 0 auto;
 `
 
-const StyledHelp = styled(Help)`
+const Button = styled.button`
   margin-left: 1rem;
+`
+
+const StyledHelp = styled(Help)`
   width: 70px;
   & path {
     fill: ${(props) => props.theme.grey};
@@ -45,15 +49,28 @@ const BottomNote = styled.span`
 `
 
 const Footer = ({ className }) => {
+  const buttonRef = React.createRef()
   const [isVisible, setIsVisible] = React.useState(false)
-  const handleClick = () => setIsVisible(!isVisible)
+  const handleClick = (evt) => {
+    evt.preventDefault()
+    evt.stopPropagation()
+    if (!isVisible) {
+      buttonRef.current.focus()
+      setIsVisible(true)
+      return
+    }
+    setIsVisible(false)
+  }
+
+  useClickOutside(buttonRef, () => setIsVisible(false))
+
   return (
     <Container className={className}>
       <SubContainer>
         <Tooltip isVisible={isVisible}>
-          <button onClick={handleClick}>
+          <Button onClick={handleClick} ref={buttonRef}>
             <StyledHelp />
-          </button>
+          </Button>
         </Tooltip>
         <CommonCreative />
         <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
