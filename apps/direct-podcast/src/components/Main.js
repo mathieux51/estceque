@@ -5,6 +5,7 @@ import adapter from "webrtc-adapter"
 import Mic from "./Mic"
 import MicOff from "./MicOff"
 import Timer from "./Timer"
+import Footer from "./Footer"
 
 const getFilename = () => {
   const now = new Date()
@@ -22,15 +23,34 @@ const Container = styled.div`
   height: 100vh;
   width: 100vw;
   background: ${(props) => props.theme.blue};
-  display: flex;
-  justify-content: center;
-  align-items: center;
   flex-direction: column;
 `
 const Button = styled.button`
   width: 12rem;
   height: 12rem;
   cursor: pointer;
+`
+
+const TopContainer = styled.div`
+  height: 80%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+`
+
+const StyledFooter = styled(Footer)`
+  height: 10%;
+`
+
+const BottomNote = styled.span`
+  height: 10%;
+  width: 100%;
+  color: ${(props) => props.theme.grey};
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 10px;
 `
 
 const StyledMic = styled(Mic)`
@@ -83,6 +103,8 @@ const handleGetUserMedia = async ({ recorder, setRecorder, setError }) => {
       setRecorder(recorder)
     }
   } catch (error) {
+    const constraints = navigator.mediaDevices.getSupportedConstraints()
+    error.constraints += constraints
     setError(error)
   }
 }
@@ -123,10 +145,14 @@ function Main() {
       data-browser={adapter.browserDetails.browser}
       data-version={adapter.browserDetails.version}
     >
-      <Button onClick={handleClick}>
-        {isRecording ? <StyledMic /> : <StyledMicOff />}
-      </Button>
-      {isRecording ? <Timer /> : <Text>00:00:00</Text>}
+      <TopContainer>
+        <Button onClick={handleClick}>
+          {isRecording ? <StyledMic /> : <StyledMicOff />}
+        </Button>
+        {isRecording ? <Timer /> : <Text>00:00:00</Text>}
+      </TopContainer>
+      <StyledFooter />
+      <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
   )
 }
