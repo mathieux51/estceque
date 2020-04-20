@@ -1,7 +1,6 @@
 import React from "react"
 import styled from "styled-components"
 import RecordRTC from "recordrtc"
-import adapter from "webrtc-adapter"
 import Mic from "./Mic"
 import MicOff from "./MicOff"
 import Timer from "./Timer"
@@ -83,7 +82,7 @@ const handleStopRecording = (recorder, setRecorder) => () => {
 
 const handleGetUserMedia = async ({ recorder, setRecorder, setError }) => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true })
+    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
     if (!recorder) {
       const recorder = RecordRTC(stream, {
         recorderType: RecordRTC.StereoAudioRecorder,
@@ -93,8 +92,6 @@ const handleGetUserMedia = async ({ recorder, setRecorder, setError }) => {
       setRecorder(recorder)
     }
   } catch (error) {
-    const constraints = navigator.mediaDevices.getSupportedConstraints()
-    error.constraints += constraints
     setError(error)
   }
 }
@@ -131,10 +128,7 @@ function Main() {
   }
 
   return (
-    <Container
-      data-browser={adapter.browserDetails.browser}
-      data-version={adapter.browserDetails.version}
-    >
+    <Container>
       <TopContainer>
         <Button onClick={handleClick}>
           {isRecording ? <StyledMic /> : <StyledMicOff />}
