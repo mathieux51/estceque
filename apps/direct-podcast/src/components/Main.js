@@ -30,7 +30,7 @@ const Button = styled.button`
   cursor: pointer;
 `
 
-const TopContainer = styled.div`
+const Form = styled.form`
   height: 80%;
   display: flex;
   justify-content: center;
@@ -80,11 +80,27 @@ const handleStopRecording = (recorder, setRecorder) => () => {
   setRecorder(null)
 }
 
-const handleGetUserMedia = async ({ recorder, setRecorder, setError }) => {
+const handleSetStream = async ({ setError, setStream }) => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false })
-    if (!recorder) {
-      const recorder = RecordRTC(stream, {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+      video: false,
+    })
+    setStream(stream)
+  } catch (error) {
+    setError(error)
+  }
+}
+
+const handleGetUserMedia = async ({
+  recorder,
+  setRecorder,
+  setError,
+  stream,
+}) => {
+  try {
+    if (stream && !recorder) {
+      const recorder = RecordRTC(stream.clone(), {
         recorderType: RecordRTC.StereoAudioRecorder,
         mimeType: "audio/wav",
       })
@@ -99,13 +115,18 @@ const handleGetUserMedia = async ({ recorder, setRecorder, setError }) => {
 function Main() {
   const [isRecording, setIsRecording] = React.useState(false)
   const [recorder, setRecorder] = React.useState(null)
+  const [stream, setStream] = React.useState(null)
   const [error, setError] = React.useState(null)
 
   React.useEffect(() => {
-    handleGetUserMedia({ recorder, setRecorder, setError })
-  }, [recorder, isRecording])
+    handleSetStream({ setStream, setError })
+  }, [])
 
-  const handleClick = (evt) => {
+  React.useEffect(() => {
+    handleGetUserMedia({ recorder, setRecorder, setError, stream })
+  }, [recorder, isRecording, stream])
+
+  const handleSubmit = (evt) => {
     evt.preventDefault()
     evt.stopPropagation()
 
@@ -129,12 +150,12 @@ function Main() {
 
   return (
     <Container>
-      <TopContainer>
-        <Button onClick={handleClick}>
+      <Form onSubmit={handleSubmit}>
+        <Button type='submit'>
           {isRecording ? <StyledMic /> : <StyledMicOff />}
         </Button>
         {isRecording ? <Timer /> : <Text>00:00:00</Text>}
-      </TopContainer>
+          </Form>
       <StyledFooter />
     </Container>
   )
