@@ -151,7 +151,7 @@ function Main() {
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <Button type='submit'>
+        <Button type='submit' aria-label='enregistrer'>
           {isRecording ? <StyledMic /> : <StyledMicOff />}
         </Button>
         {isRecording ? <Timer /> : <Text>00:00:00</Text>}

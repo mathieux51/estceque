@@ -68,12 +68,12 @@ const Footer = ({ className }) => {
     <Container className={className}>
       <SubContainer>
         <Tooltip isVisible={isVisible}>
-          <Button onClick={handleClick} ref={buttonRef}>
+          <Button onClick={handleClick} ref={buttonRef} aria-label='Aide'>
             <StyledHelp />
           </Button>
         </Tooltip>
         <CommonCreative />
-        <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr">
+        <a href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr" aria-label='courriel contact@directpodcast.fr'>
           <StyledMail />
         </a>
       </SubContainer>
