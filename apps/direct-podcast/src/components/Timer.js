@@ -1,9 +1,10 @@
 import React from "react"
 import styled from "styled-components"
 
-const Text = styled.span`
+export const TimerText = styled.span`
   color: ${(props) => props.theme.white};
   font-size: 24px;
+  font-family: 'Antipasto', sans-serif;
 `
 
 function toHHMMSS(seconds) {
@@ -35,7 +36,7 @@ const Timer = () => {
     return () => cancelAnimationFrame(requestRef.current)
   }, [animate])
 
-  return <Text>{toHHMMSS(Math.round(count))}</Text>
+  return <TimerText>{toHHMMSS(Math.round(count))}</TimerText>
 }
 
 export default Timer

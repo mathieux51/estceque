@@ -8,7 +8,7 @@ import ErrorBoundary from "./components/ErrorBoundary"
 const GlobalStyle = createGlobalStyle`
   ${normalize()}
     * {
-      font-family: 'Antipasto', sans-serif;
+      font-family: 'Roboto', sans-serif;
     }
 
   button {

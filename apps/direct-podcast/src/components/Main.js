@@ -3,19 +3,21 @@ import styled from "styled-components"
 import RecordRTC from "recordrtc"
 import Mic from "./Mic"
 import MicOff from "./MicOff"
-import Timer from "./Timer"
+import Timer, { TimerText } from "./Timer"
 import Footer from "./Footer"
+
+const addZero = str => str.length === 1 ? `0${str}` : str
 
 const getFilename = () => {
   const now = new Date()
-  const d = now.getDate()
-  const m = now.getMonth()
+  const d = addZero(now.getDate().toString())
+  const m = addZero(now.getMonth().toString())
   const y = now.getFullYear()
-  const h = now.getHours()
-  const min = now.getMinutes()
-  const s = now.getSeconds()
+  const h = addZero(now.getHours().toString())
+  const min = addZero(now.getMinutes().toString())
+  const s = addZero(now.getSeconds().toString())
 
-  return `${d}${m}${y}${h}${min}${s}.wav`
+  return `${d}.${m}.${y}-${h}.${min}.${s}.wav`
 }
 
 const Container = styled.div`
@@ -52,11 +54,6 @@ const StyledMicOff = styled(MicOff)`
   & path {
     fill: ${(props) => props.theme.white};
   }
-`
-
-const Text = styled.span`
-  color: ${(props) => props.theme.grey};
-  font-size: 24px;
 `
 
 const handleStopRecording = (recorder, setRecorder) => () => {
@@ -154,7 +151,7 @@ function Main() {
         <Button type="submit" aria-label="enregistrer">
           {isRecording ? <StyledMic /> : <StyledMicOff />}
         </Button>
-        {isRecording ? <Timer /> : <Text>00:00:00</Text>}
+        {isRecording ? <Timer /> : <TimerText>00:00:00</TimerText>}
       </Form>
       <StyledFooter />
     </Container>
