@@ -13,7 +13,7 @@ class ErrorBoundary extends React.Component {
     if (error instanceof GetUserMediaError) {
       this.setState({
         component: (
-          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporter par directpodcast.fr" />
+          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr" />
         ),
       })
       return
