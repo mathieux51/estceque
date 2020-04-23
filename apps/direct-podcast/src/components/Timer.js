@@ -1,10 +1,10 @@
 import React from "react"
 import styled from "styled-components"
 
-export const TimerText = styled.span`
+const CounterText = styled.span`
   color: ${(props) => props.theme.white};
   font-size: 24px;
-  font-family: 'Antipasto', sans-serif;
+  font-family: "Antipasto", sans-serif;
 `
 
 function toHHMMSS(seconds) {
@@ -15,7 +15,7 @@ function toHHMMSS(seconds) {
   return [hours, minutes, seconds % 60].map(format).join(":")
 }
 
-const Timer = () => {
+const Counter = () => {
   const [count, setCount] = React.useState(0)
 
   const requestRef = React.useRef()
@@ -36,7 +36,10 @@ const Timer = () => {
     return () => cancelAnimationFrame(requestRef.current)
   }, [animate])
 
-  return <TimerText>{toHHMMSS(Math.round(count))}</TimerText>
+  return <CounterText>{toHHMMSS(Math.round(count))}</CounterText>
 }
+
+const Timer = ({ isRecording }) =>
+  isRecording ? <Counter /> : <CounterText>00:00:00</CounterText>
 
 export default Timer

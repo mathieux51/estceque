@@ -3,10 +3,11 @@ import styled from "styled-components"
 import RecordRTC from "recordrtc"
 import Mic from "./Mic"
 import MicOff from "./MicOff"
-import Timer, { TimerText } from "./Timer"
+import Timer from "./Timer"
 import Footer from "./Footer"
+import usePrevious from "../hooks/usePrevious"
 
-const addZero = str => str.length === 1 ? `0${str}` : str
+const addZero = (str) => (str.length === 1 ? `0${str}` : str)
 
 const getFilename = () => {
   const now = new Date()
@@ -56,14 +57,15 @@ const StyledMicOff = styled(MicOff)`
   }
 `
 
-const handleStopRecording = (recorder, setRecorder) => () => {
+const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
   const blob = recorder.getBlob()
   const url = window.URL.createObjectURL(blob)
   const a = document.createElement("a")
   a.style.display = "none"
   a.href = url
-
   a.download = getFilename()
+  a.target = " _blank"
+  a.onclick = "return false"
   document.body.appendChild(a)
   a.click()
 
@@ -77,19 +79,19 @@ const handleStopRecording = (recorder, setRecorder) => () => {
   setRecorder(null)
 }
 
-const handleSetStream = async ({ setError, setStream }) => {
+const handleSetStream = async ({ stream, setError, setStream }) => {
   try {
-    const stream = await navigator.mediaDevices.getUserMedia({
+    const _stream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: false,
     })
-    setStream(stream)
+    setStream(_stream)
   } catch (error) {
     setError(error)
   }
 }
 
-const handleGetUserMedia = async ({
+const handleSetRecorder = async ({
   recorder,
   setRecorder,
   setError,
@@ -100,6 +102,7 @@ const handleGetUserMedia = async ({
       const recorder = RecordRTC(stream.clone(), {
         recorderType: RecordRTC.StereoAudioRecorder,
         mimeType: "audio/wav",
+        disableLogs: true,
       })
 
       setRecorder(recorder)
@@ -109,36 +112,73 @@ const handleGetUserMedia = async ({
   }
 }
 
+const handleRecord = async ({
+  isRecording,
+  setIsRecording,
+  recorder,
+  setRecorder,
+  a,
+}) => {
+  if (!isRecording && recorder) {
+    setIsRecording(true)
+    recorder.startRecording()
+    return
+  }
+
+  setIsRecording(false)
+  if (recorder) {
+    recorder.stopRecording(handleStopRecording({ recorder, setRecorder, a }))
+  }
+}
+
 function Main() {
+  const anchorRef = React.createRef()
   const [isRecording, setIsRecording] = React.useState(false)
   const [recorder, setRecorder] = React.useState(null)
   const [stream, setStream] = React.useState(null)
   const [error, setError] = React.useState(null)
+  const recorderState = recorder && recorder.state
+  const prevRecorderState = usePrevious(recorderState)
 
   React.useEffect(() => {
-    handleSetStream({ setStream, setError })
-  }, [])
+    if (
+      recorderState !== "stopped" &&
+      !(recorderState === null && prevRecorderState === "stopped")
+    ) {
+      handleSetRecorder({ recorder, setRecorder, setError, stream })
+    }
+  }, [recorder, isRecording, stream, recorderState, prevRecorderState])
 
   React.useEffect(() => {
-    handleGetUserMedia({ recorder, setRecorder, setError, stream })
-  }, [recorder, isRecording, stream])
+    if (recorderState === "inactive" && prevRecorderState === null) {
+      handleRecord({
+        isRecording,
+        setIsRecording,
+        recorder,
+        setRecorder,
+        a: anchorRef.current,
+      })
+    }
+  }, [anchorRef, isRecording, prevRecorderState, recorder, recorderState])
 
   const handleSubmit = (evt) => {
     evt.preventDefault()
     evt.stopPropagation()
 
-    if (!isRecording) {
-      setIsRecording(true)
-      if (recorder) {
-        recorder.startRecording()
-      }
+    // This is broken
+    if (!stream) {
+      handleSetStream({ stream, setStream, setError })
       return
     }
 
-    setIsRecording(false)
-    if (recorder) {
-      recorder.stopRecording(handleStopRecording(recorder, setRecorder))
-    }
+    handleSetRecorder({ recorder, setRecorder, setError, stream })
+    handleRecord({
+      isRecording,
+      setIsRecording,
+      recorder,
+      setRecorder,
+      a: anchorRef.current,
+    })
   }
 
   if (error) {
@@ -151,7 +191,7 @@ function Main() {
         <Button type="submit" aria-label="enregistrer">
           {isRecording ? <StyledMic /> : <StyledMicOff />}
         </Button>
-        {isRecording ? <Timer /> : <TimerText>00:00:00</TimerText>}
+        <Timer isRecording={isRecording} />
       </Form>
       <StyledFooter />
     </Container>
