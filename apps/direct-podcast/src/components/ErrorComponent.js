@@ -1,6 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import Footer from "./Footer"
+import media from "../media"
 
 const Container = styled.div`
   display: flex;
@@ -20,11 +21,17 @@ const SubContainer = styled.div`
 
 const TextContainer = styled.div`
   width: 60vw;
+  ${media.down("md")} {
+    width: 90vw;
+  }
   max-width: 960px;
 `
 
 const Text = styled.span`
   color: ${(props) => props.theme.white};
+  ${media.down("md")} {
+    font-size: 1.5rem;
+  }
 `
 
 const Button = styled.button`
@@ -49,41 +56,40 @@ const EventID = styled.pre`
   display: inline;
 `
 
-const Emo = styled.span`
-  font-size: 48px;
-`
-
 const StyledFooter = styled(Footer)`
   height: 20%;
 `
 
-const ErrorComponent = ({ className, text, eventID, error, onClick }) => (
-  <Container className={className}>
-    <SubContainer>
-      <TextContainer>
-        <h2>
-          <Emo role="img" aria-label="robot">
-            🤖
-          </Emo>{" "}
-          <Text>{text}</Text>
-        </h2>
-        {eventID && (
-          <span>
-            <Text>Numéro de l'incident : </Text>
-            <Button onClick={onClick}>
-              <EventID>{eventID}</EventID>
-            </Button>
-          </span>
+const ErrorComponent = ({ className, text, eventID, error, onClick }) => {
+  const emojiStyle = { fontsize: 48 }
+  return (
+    <Container className={className}>
+      <SubContainer>
+        <TextContainer>
+          <h2>
+            <span role="img" aria-label="error" style={emojiStyle}>
+              🤖
+            </span>
+            <Text> : "{text}"</Text>
+          </h2>
+          {eventID && (
+            <span>
+              <Text>Numéro de l'incident : </Text>
+              <Button onClick={onClick}>
+                <EventID>{eventID}</EventID>
+              </Button>
+            </span>
+          )}
+        </TextContainer>
+        {error && (
+          <Details>
+            <Pre>{error.toString()}</Pre>{" "}
+          </Details>
         )}
-      </TextContainer>
-      {error && (
-        <Details>
-          <Pre>{error.toString()}</Pre>{" "}
-        </Details>
-      )}
-    </SubContainer>
-    <StyledFooter />
-  </Container>
-)
+      </SubContainer>
+      <StyledFooter />
+    </Container>
+  )
+}
 
 export default ErrorComponent
