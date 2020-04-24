@@ -55,7 +55,9 @@ const Tooltip = ({ className, children, isVisible }) => (
     {children}
     <Right>
       <p>
-        Je clique --> J'autorise l'accès à mon micro --> Je parle --> Lorsque j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement --> Le fichier sonore se télécharge automatiquement.
+        Je clique --> J'autorise l'accès à mon micro --> Je parle --> Lorsque
+        j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement
+        --> Le fichier sonore se télécharge automatiquement.
       </p>
       <I></I>
     </Right>
