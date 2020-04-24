@@ -25,12 +25,13 @@ const TextContainer = styled.div`
     width: 90vw;
   }
   max-width: 960px;
+  position: relative;
 `
 
 const Text = styled.span`
   color: ${(props) => props.theme.white};
   ${media.down("md")} {
-    font-size: 1.5rem;
+    font-size: 20px;
   }
 `
 
@@ -60,18 +61,52 @@ const StyledFooter = styled(Footer)`
   height: 20%;
 `
 
+const Bubble = styled(Text)`
+  margin-bottom: 1rem;
+  max-width: 500px;
+  font-weight: normal;
+
+  color: ${(props) => props.theme.white};
+  background: ${(props) => props.theme.blue};
+  border-radius: 1rem;
+  z-index: 1;
+  border: 1px solid ${(props) => props.theme.white};
+  transition: opacity 0.8s;
+  padding: 1rem;
+  position: relative;
+
+  &::before {
+    content: "";
+    position: absolute;
+    width: 0;
+    height: 0;
+    bottom: 0;
+    left: 80px;
+    border: 0.75rem solid transparent;
+    border-top: none;
+    transform: rotate(180deg) translate3d(0, -100%, 0);
+    border-bottom-color: ${(props) => props.theme.white};
+  }
+`
+
+const Title = styled.h2`
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+`
+
 const ErrorComponent = ({ className, text, eventID, error, onClick }) => {
-  const emojiStyle = { fontsize: 48 }
+  const emojiStyle = { fontSize: 80, paddingLeft: "3rem" }
   return (
     <Container className={className}>
       <SubContainer>
         <TextContainer>
-          <h2>
+          <Title>
+            <Bubble>{text}</Bubble>
             <span role="img" aria-label="error" style={emojiStyle}>
               🤖
             </span>
-            <Text> : "{text}"</Text>
-          </h2>
+          </Title>
           {eventID && (
             <span>
               <Text>Numéro de l'incident : </Text>
