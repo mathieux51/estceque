@@ -22,7 +22,7 @@ class ErrorBoundary extends React.Component {
     if (error.name === "NotAllowedError") {
       this.setState({
         component: (
-          <ErrorComponent text="directpodcast.fr a besoin d'autorisation pour enregister" />
+          <ErrorComponent text="Pour utiliser directpodcast.fr, il faut autoriser l'activation du micro." />
         ),
       })
       return
