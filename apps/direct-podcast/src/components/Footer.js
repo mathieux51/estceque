@@ -48,6 +48,10 @@ const BottomNote = styled.span`
   font-size: 15px;
 `
 
+const B = styled.b`
+  font-weight: normal;
+`
+
 const Footer = ({ className }) => {
   const buttonRef = React.createRef()
   const [isVisible, setIsVisible] = React.useState(false)
@@ -80,7 +84,9 @@ const Footer = ({ className }) => {
           <StyledMail />
         </a>
       </SubContainer>
-      <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
+      <BottomNote>
+        D’après une idée originale de <B>Blandine Schmidt</B>
+      </BottomNote>
     </Container>
   )
 }
