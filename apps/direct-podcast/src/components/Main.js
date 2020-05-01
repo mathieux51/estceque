@@ -6,6 +6,7 @@ import MicOff from "./MicOff"
 import Timer from "./Timer"
 import Footer from "./Footer"
 import usePrevious from "../hooks/usePrevious"
+import elementInvisible from "../style/elementInvisible"
 
 const addZero = (str) => (str.length === 1 ? `0${str}` : str)
 
@@ -55,6 +56,14 @@ const StyledMicOff = styled(MicOff)`
   & path {
     fill: ${(props) => props.theme.white};
   }
+`
+
+const H1 = styled.h1`
+  ${elementInvisible}
+`
+
+const H2 = styled.h2`
+  ${elementInvisible}
 `
 
 const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
@@ -187,6 +196,8 @@ function Main() {
 
   return (
     <Container>
+      <H1>direct podcast</H1>
+      <H2>Blandine Schmidt</H2>
       <Form onSubmit={handleSubmit}>
         <Button type="submit" aria-label="enregistrer">
           {isRecording ? <StyledMic /> : <StyledMicOff />}
