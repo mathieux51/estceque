@@ -1,5 +1,6 @@
 import React from "react"
 import styled from "styled-components"
+import elementInvisible from "../style/elementInvisible"
 
 const Right = styled.span`
   width: 70vw;
@@ -24,8 +25,7 @@ const Container = styled.div`
   position: relative;
   text-align: left;
   & ${Right} {
-    visibility: ${(props) => (props.isVisible ? "visible" : "hidden")};
-    opacity: ${(props) => (props.isVisible ? 1 : 0)};
+    ${(props) => (props.isVisible ? "" : elementInvisible)};
   }
 `
 
