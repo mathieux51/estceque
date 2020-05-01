@@ -1,22 +1,31 @@
 import React from "react"
 import styled from "styled-components"
+import CreativeCommonIcon from "./CreativeCommonIcon"
 
 const Container = styled.div`
   color: ${(props) => props.theme.white};
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
 
 const A = styled.a`
   color: ${(props) => props.theme.white};
 `
 
+const StyledCreativeCommonIcon = styled(CreativeCommonIcon)`
+  width: 80px;
+  height: 15px;
+`
+
 const CommonCreative = ({ className }) => (
   <Container className={className}>
-    <A rel="license" href="http://creativecommons.org/licenses/by-nc-nd/4.0/">
-      <img
-        alt="Licence Creative Commons"
-        style={{ borderWidth: 0 }}
-        src="https://i.creativecommons.org/l/by-nc-nd/4.0/80x15.png"
-      />
+    <A
+      rel="license"
+      href="http://creativecommons.org/licenses/by-nc-nd/4.0/"
+      target="_blank"
+    >
+      <StyledCreativeCommonIcon />
     </A>
   </Container>
 )
