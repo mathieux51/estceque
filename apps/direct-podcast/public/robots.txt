@@ -1,3 +1,4 @@
-# https://www.robotstxt.org/robotstxt.html
-User-agent: *
+User-Agent: *
 Disallow:
+
+Sitemap: https://directpodcast.fr/sitemap.xml
