@@ -39,17 +39,15 @@ const StyledMail = styled(Mail)`
   }
 `
 
-const BottomNote = styled.span`
+const BottomNote = styled.h1`
   width: 100%;
   color: ${(props) => props.theme.grey};
   display: flex;
   justify-content: center;
   align-items: center;
   font-size: 15px;
-`
-
-const B = styled.b`
   font-weight: normal;
+  margin: 0;
 `
 
 const Footer = ({ className }) => {
@@ -84,9 +82,7 @@ const Footer = ({ className }) => {
           <StyledMail />
         </a>
       </SubContainer>
-      <BottomNote>
-        D’après une idée originale de <B>Blandine Schmidt</B>
-      </BottomNote>
+      <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
   )
 }

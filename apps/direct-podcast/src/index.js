@@ -8,7 +8,7 @@ import * as serviceWorker from "./serviceWorker"
 
 if (process.env.NODE_ENV !== "development") {
   Sentry.init({
-    release: 'direct-podcast@' + process.env.npm_package_version,
+    release: "v1.0.5",
     dsn:
       "https://d1fd979948f14a358a8b2695c5df3abe@o381364.ingest.sentry.io/5208585",
   })
