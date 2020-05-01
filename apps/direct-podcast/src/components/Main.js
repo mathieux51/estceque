@@ -1,6 +1,7 @@
 import React from "react"
 import styled from "styled-components"
 import RecordRTC from "recordrtc"
+import { saveAs } from 'file-saver'
 import Mic from "./Mic"
 import MicOff from "./MicOff"
 import Timer from "./Timer"
@@ -68,23 +69,7 @@ const H2 = styled.h2`
 
 const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
   const blob = recorder.getBlob()
-  const url = window.URL.createObjectURL(blob)
-  const a = document.createElement("a")
-  a.style.display = "none"
-  a.href = url
-  a.download = getFilename()
-  a.target = " _blank"
-  a.onclick = "return false"
-  document.body.appendChild(a)
-  a.click()
-
-  setTimeout(() => {
-    window.URL.revokeObjectURL(url)
-    document.body.removeChild(a)
-  }, 1000)
-
-  // bug on Safari iOS
-  // RecordRTC.invokeSaveAsDialog(blob)
+  saveAs(blob, getFilename())
   setRecorder(null)
 }
 
