@@ -1,0 +1,18 @@
+name: deploy to production
+on:
+  push:
+    branches:
+      - master
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: install node_modules
+        run: npm ci
+      - name: deploy to directpodcast.fr
+        env:
+          NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
+          RECAPTCHA_CLIENT_SIDE: ${{ secrets.RECAPTCHA_CLIENT_SIDE }}
+          RECAPTCHA_SERVER_SIDE: ${{ secrets.RECAPTCHA_SERVER_SIDE }}
+        run: npm run deploy
