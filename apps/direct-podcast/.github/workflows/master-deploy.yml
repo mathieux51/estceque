@@ -15,4 +15,6 @@ jobs:
           NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
           RECAPTCHA_CLIENT_SIDE: ${{ secrets.RECAPTCHA_CLIENT_SIDE }}
           RECAPTCHA_SERVER_SIDE: ${{ secrets.RECAPTCHA_SERVER_SIDE }}
+          NOW_ORG_ID: ${{ secrets.NOW_ORG_ID }}
+          NOW_PROJECT_ID: ${{ secrets.NOW_PROJECT_ID }}
         run: npm run deploy
