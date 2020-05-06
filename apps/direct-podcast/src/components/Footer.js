@@ -67,10 +67,8 @@ const Footer = ({ className }) => {
 
   useClickOutside(buttonRef, () => setIsVisible(false))
   const [token, setToken] = React.useState("")
-  const handleOnVerify = (t) => {
-    console.log('token', token, t)
-    setToken(t)
-  }
+  const handleOnVerify = (t) => setToken(t)
+  const email = token ? "contact@directpodcast.fr" : ""
 
   return (
     <Container className={className}>
@@ -82,14 +80,12 @@ const Footer = ({ className }) => {
         </Tooltip>
         <CommonCreative />
         <GoogleReCaptcha onVerify={handleOnVerify} />
-        {token && (
-          <a
-            href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr"
-            aria-label="courriel contact@directpodcast.fr"
-          >
-            <StyledMail />
-          </a>
-        )}
+        <a
+          href={`mailto:${email}?Subject=directpodcast.fr`}
+          aria-label={`courriel ${token}`}
+        >
+          <StyledMail />
+        </a>
       </SubContainer>
       <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>

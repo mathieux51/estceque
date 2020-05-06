@@ -36,8 +36,9 @@ function App() {
         <GoogleReCaptchaProvider
           reCaptchaKey={process.env.REACT_APP_RECAPTCHA_CLIENT_SIDE}
           language="fr"
-        ></GoogleReCaptchaProvider>
-        <Main />
+        >
+          <Main />
+        </GoogleReCaptchaProvider>
       </ErrorBoundary>
     </ThemeProvider>
   )
