@@ -10,7 +10,7 @@ jobs:
       - uses: actions/checkout@master
       - name: install node_modules
         run: npm ci
-      - name: deploy to directpodcast.fr
+      - name: build and deploy to directpodcast.fr
         env:
           NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
           RECAPTCHA_CLIENT_SIDE: ${{ secrets.RECAPTCHA_CLIENT_SIDE }}
