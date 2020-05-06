@@ -67,7 +67,10 @@ const Footer = ({ className }) => {
 
   useClickOutside(buttonRef, () => setIsVisible(false))
   const [token, setToken] = React.useState("")
-  const handleOnVerify = (t) => setToken(t)
+  const handleOnVerify = (t) => {
+    console.log('token', token, t)
+    setToken(t)
+  }
 
   return (
     <Container className={className}>
