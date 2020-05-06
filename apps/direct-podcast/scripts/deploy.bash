@@ -7,7 +7,7 @@ npx now \
   --no-clipboard \
   -t ${NOW_TOKEN} \
   -m commit=${GITHUB_SHA} -m branch=${GITHUB_REF} \
-  -b RECAPTCHA_CLIENT_SIDE=${RECAPTCHA_CLIENT_SIDE} \
+  -b REACT_APP_RECAPTCHA_CLIENT_SIDE=${REACT_APP_RECAPTCHA_CLIENT_SIDE} \
   --prod
 
 npx now \
