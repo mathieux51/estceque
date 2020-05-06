@@ -10,5 +10,7 @@ npx now \
   -b RECAPTCHA_CLIENT_SIDE=${RECAPTCHA_CLIENT_SIDE} \
   --prod
 
-now alias direct-podcast.now.sh directpodcast.fr
+npx now \
+  -t ${NOW_TOKEN} \
+  alias direct-podcast.now.sh directpodcast.fr
 
