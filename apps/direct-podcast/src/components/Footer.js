@@ -1,5 +1,6 @@
 import React from "react"
 import styled from "styled-components"
+import { GoogleReCaptcha } from "react-google-recaptcha-v3"
 import CommonCreative from "./CommonCreative"
 import Help from "./Help"
 import Mail from "./Mail"
@@ -65,6 +66,8 @@ const Footer = ({ className }) => {
   }
 
   useClickOutside(buttonRef, () => setIsVisible(false))
+  const [token, setToken] = React.useState("")
+  const handleOnVerify = (t) => setToken(t)
 
   return (
     <Container className={className}>
@@ -75,12 +78,15 @@ const Footer = ({ className }) => {
           </Button>
         </Tooltip>
         <CommonCreative />
-        <a
-          href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr"
-          aria-label="courriel contact@directpodcast.fr"
-        >
-          <StyledMail />
-        </a>
+        <GoogleReCaptcha onVerify={handleOnVerify} />
+        {token && (
+          <a
+            href="mailto:contact@directpodcast.fr?Subject=directpodcast.fr"
+            aria-label="courriel contact@directpodcast.fr"
+          >
+            <StyledMail />
+          </a>
+        )}
       </SubContainer>
       <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>

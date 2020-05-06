@@ -1,6 +1,7 @@
 import React from "react"
 import { createGlobalStyle, ThemeProvider } from "styled-components"
 import { normalize } from "polished"
+import { GoogleReCaptchaProvider } from "react-google-recaptcha-v3"
 import theme from "./theme"
 import Main from "./components/Main"
 import ErrorBoundary from "./components/ErrorBoundary"
@@ -32,6 +33,10 @@ function App() {
     <ThemeProvider theme={theme}>
       <GlobalStyle />
       <ErrorBoundary>
+        <GoogleReCaptchaProvider
+          reCaptchaKey={process.env.RECAPTCHA_CLIENT_SIDE}
+          language='fr'
+        ></GoogleReCaptchaProvider>
         <Main />
       </ErrorBoundary>
     </ThemeProvider>
