@@ -19,7 +19,10 @@ class ErrorBoundary extends React.Component {
       return
     }
 
-    if (error.message && error.message.match("NotAllowedError")) {
+    if (
+      (error.message && error.message.match("NotAllowedError")) ||
+      (error.name && error.name.match("NotAllowedError"))
+    ) {
       this.setState({
         component: (
           <ErrorComponent text="Pour utiliser directpodcast.fr, il faut autoriser l'activation du micro." />
@@ -28,6 +31,8 @@ class ErrorBoundary extends React.Component {
       return
     }
     Sentry.withScope((scope) => {
+      scope.setExtras("error.message", error.message)
+      scope.setExtras("error.name", error.name)
       scope.setExtras(errorInfo)
       const eventID = Sentry.captureException(error)
       this.setState({
