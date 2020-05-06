@@ -8,7 +8,7 @@ import * as serviceWorker from "./serviceWorker"
 
 if (process.env.NODE_ENV !== "development") {
   Sentry.init({
-    release: "v1.0.7",
+    release: "v1.0.8",
     dsn:
       "https://d1fd979948f14a358a8b2695c5df3abe@o381364.ingest.sentry.io/5208585",
   })
