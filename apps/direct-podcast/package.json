@@ -1,6 +1,6 @@
 {
   "name": "direct-podcast",
-  "version": "1.0.4",
+  "version": "1.0.7",
   "private": true,
   "dependencies": {
     "@sentry/browser": "^5.15.4",

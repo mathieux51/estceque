@@ -31,9 +31,9 @@ class ErrorBoundary extends React.Component {
       return
     }
     Sentry.withScope((scope) => {
-      scope.setExtras("error.message", error.message)
-      scope.setExtras("error.name", error.name)
-      scope.setExtras(errorInfo)
+      scope.setExtra("error.message", error.message)
+      scope.setExtra("error.name", error.name)
+      scope.setExtra("errorInfo", errorInfo)
       const eventID = Sentry.captureException(error)
       this.setState({
         error: error,
