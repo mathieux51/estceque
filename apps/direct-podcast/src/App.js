@@ -34,8 +34,8 @@ function App() {
       <GlobalStyle />
       <ErrorBoundary>
         <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.RECAPTCHA_CLIENT_SIDE}
-          language='fr'
+          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_CLIENT_SIDE}
+          language="fr"
         ></GoogleReCaptchaProvider>
         <Main />
       </ErrorBoundary>
