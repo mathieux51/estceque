@@ -26,6 +26,9 @@ const GlobalStyle = createGlobalStyle`
   button:focus {
     text-decoration: none;
   }
+  .grecaptcha-badge {
+    display: none;
+  }
 `
 
 function App() {
