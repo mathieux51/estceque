@@ -19,6 +19,15 @@ class ErrorBoundary extends React.Component {
       return
     }
 
+    if (error.name && error.name.match("NotAllowedError")) {
+      this.setState({
+        component: (
+          <ErrorComponent text="directpodcast.fr n'a pas trouvé de microphone" />
+        ),
+      })
+      return
+    }
+
     if (
       (error.message && error.message.match("NotAllowedError")) ||
       (error.name && error.name.match("NotAllowedError"))

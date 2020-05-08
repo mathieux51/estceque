@@ -6,7 +6,7 @@ const useClickOutide = (ref, callback) => {
 
   const handleClick = React.useCallback(
     (evt) => {
-      if (!ref.current.contains(evt.target)) {
+      if (ref.current && evt.target && !ref.current.contains(evt.target)) {
         callbackRef.current(evt)
       }
     },
