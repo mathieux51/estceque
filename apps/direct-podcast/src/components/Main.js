@@ -7,7 +7,7 @@ import MicOff from "./MicOff"
 import Timer from "./Timer"
 import Footer from "./Footer"
 import usePrevious from "../hooks/usePrevious"
-import elementInvisible from "../style/elementInvisible"
+// import elementInvisible from "../style/elementInvisible"
 
 const addZero = (str) => (str.length === 1 ? `0${str}` : str)
 
@@ -62,6 +62,7 @@ const StyledMicOff = styled(MicOff)`
 const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
   const blob = recorder.getBlob()
   saveAs(blob, getFilename())
+  // recorder.destroy()
   setRecorder(null)
 }
 
