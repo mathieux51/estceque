@@ -7,6 +7,11 @@ npm i
 npm start
 ```
 
+# To do
+
+- [ ] Use indexedDB
+
+
 ## Related
 
 - [Guide to Safari webrtc](https://webrtchacks.com/guide-to-safari-webrtc/)
