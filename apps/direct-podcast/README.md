@@ -9,8 +9,8 @@ npm start
 
 # To do
 
-- [ ] Use indexedDB
-
+- [ ] Use [DiskStorage](https://recordrtc.org/global.html#DiskStorage) or block recording after 45mins
+- [ ] Vu meter
 
 ## Related
 
