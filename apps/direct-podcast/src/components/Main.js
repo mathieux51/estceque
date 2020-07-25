@@ -85,7 +85,6 @@ const handleSetRecorder = async ({
   stream,
 }) => {
   try {
-    console.log(stream)
     if (stream && !recorder) {
       const recorder = RecordRTC(stream.clone(), {
         recorderType: RecordRTC.StereoAudioRecorder,
