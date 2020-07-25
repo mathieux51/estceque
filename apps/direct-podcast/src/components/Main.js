@@ -62,7 +62,7 @@ const StyledMicOff = styled(MicOff)`
 const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
   const blob = recorder.getBlob()
   saveAs(blob, getFilename())
-  // recorder.destroy()
+  recorder.destroy()
   setRecorder(null)
 }
 
@@ -85,6 +85,7 @@ const handleSetRecorder = async ({
   stream,
 }) => {
   try {
+    console.log(stream)
     if (stream && !recorder) {
       const recorder = RecordRTC(stream.clone(), {
         recorderType: RecordRTC.StereoAudioRecorder,
