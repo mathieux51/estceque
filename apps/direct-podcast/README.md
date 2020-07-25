@@ -7,6 +7,11 @@ npm i
 npm start
 ```
 
+# To do
+
+- [ ] Use [DiskStorage](https://recordrtc.org/global.html#DiskStorage) or block recording after 45mins
+- [ ] Vu meter
+
 ## Related
 
 - [Guide to Safari webrtc](https://webrtchacks.com/guide-to-safari-webrtc/)
