@@ -3,6 +3,14 @@ import * as Sentry from "@sentry/browser"
 import { GetUserMediaError } from "../errors"
 import ErrorComponent from "./ErrorComponent"
 
+function inIframe() {
+  try {
+    return window.self !== window.top
+  } catch (error) {
+    return true
+  }
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -10,10 +18,19 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
+    if (inIframe()) {
+      this.setState({
+        component: (
+          <ErrorComponent text="Pour utiliser directpodcast.fr, il faut l'ouvrir dans sa propre page." />
+        ),
+      })
+      return
+    }
+
     if (error instanceof GetUserMediaError) {
       this.setState({
         component: (
-          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr" />
+          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr." />
         ),
       })
       return
@@ -22,7 +39,7 @@ class ErrorBoundary extends React.Component {
     if (error.name && error.name.match("NotFoundError")) {
       this.setState({
         component: (
-          <ErrorComponent text="directpodcast.fr n'a pas trouvé de microphone" />
+          <ErrorComponent text="directpodcast.fr n'a pas trouvé de microphone." />
         ),
       })
       return
