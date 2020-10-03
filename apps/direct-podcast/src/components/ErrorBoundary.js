@@ -11,6 +11,13 @@ function inIframe() {
   }
 }
 
+function isFacebook() {
+  return (
+    navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
+    navigator.userAgent.match(/FBAV/i)
+  )
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -18,7 +25,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    if (inIframe()) {
+    if (inIframe() || isFacebook()) {
       this.setState({
         component: (
           <ErrorComponent text="Pour utiliser directpodcast.fr, il faut l'ouvrir dans sa propre page." />
