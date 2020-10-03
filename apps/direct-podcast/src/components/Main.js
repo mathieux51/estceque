@@ -14,7 +14,7 @@ const addZero = (str) => (str.length === 1 ? `0${str}` : str)
 const getFilename = () => {
   const now = new Date()
   const d = addZero(now.getDate().toString())
-  const m = addZero(now.getMonth().toString())
+  const m = addZero((now.getMonth() + 1).toString())
   const y = now.getFullYear()
   const h = addZero(now.getHours().toString())
   const min = addZero(now.getMinutes().toString())
