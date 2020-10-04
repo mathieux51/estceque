@@ -2,6 +2,7 @@ import React from "react"
 import * as Sentry from "@sentry/browser"
 import { GetUserMediaError } from "../errors"
 import ErrorComponent from "./ErrorComponent"
+import UAParser from "ua-parser-js"
 
 function inIframe() {
   try {
@@ -11,13 +12,6 @@ function inIframe() {
   }
 }
 
-function isFacebook() {
-  return (
-    navigator.userAgent.match(/(iPod|iPhone|iPad)/) &&
-    navigator.userAgent.match(/FBAV/i)
-  )
-}
-
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -25,7 +19,10 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    if (inIframe() || isFacebook()) {
+    const parser = new UAParser()
+    const browser = parser.getBrowser()
+    const isFacebook = browser.name === "Facebook"
+    if (inIframe() || isFacebook) {
       this.setState({
         component: (
           <ErrorComponent text="Pour utiliser directpodcast.fr, il faut l'ouvrir dans sa propre page." />
@@ -67,6 +64,7 @@ class ErrorBoundary extends React.Component {
       scope.setExtra("error.message", error.message)
       scope.setExtra("error.name", error.name)
       scope.setExtra("errorInfo", errorInfo)
+      scope.setExtra("User Agent result", parser.getResult())
       const eventID = Sentry.captureException(error)
       this.setState({
         error: error,
