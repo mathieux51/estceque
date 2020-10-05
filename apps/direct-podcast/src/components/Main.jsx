@@ -105,9 +105,9 @@ const handleRecord = async ({
   recorder,
   setRecorder,
   a,
-  stream
+  isStreamActive
 }) => {
-  if (!isRecording && recorder && stream.active) {
+  if (!isRecording && recorder && isStreamActive) {
     setIsRecording(true);
     recorder.startRecording();
     return;
@@ -127,6 +127,7 @@ function Main() {
   const [error, setError] = React.useState(null);
   const recorderState = recorder && recorder.state;
   const prevRecorderState = usePrevious(recorderState);
+  const isStreamActive = Boolean(stream && stream.active)
 
   React.useEffect(() => {
     if (
@@ -147,10 +148,10 @@ function Main() {
         recorder,
         setRecorder,
         a: anchorRef.current,
-        stream
+        isStreamActive
       });
     }
-  }, [anchorRef, isRecording, prevRecorderState, recorder, recorderState]);
+  }, [anchorRef, isRecording, prevRecorderState, recorder, recorderState, isStreamActive]);
 
   const handleSubmit = (evt) => {
     evt.preventDefault();
@@ -171,7 +172,7 @@ function Main() {
       recorder,
       setRecorder,
       a: anchorRef.current,
-      stream
+      isStreamActive
     });
   };
 
