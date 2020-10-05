@@ -10,7 +10,7 @@ const useClickOutide = (ref, callback) => {
         callbackRef.current(evt)
       }
     },
-    [ref],
+    [ref]
   )
   React.useEffect(() => {
     document.addEventListener('click', handleClick, true)
