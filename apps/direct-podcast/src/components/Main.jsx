@@ -1,12 +1,12 @@
-import React from "react"
-import styled from "styled-components"
-import RecordRTC from "recordrtc"
-import { saveAs } from "file-saver"
-import Mic from "./Mic"
-import MicOff from "./MicOff"
-import Timer from "./Timer"
-import Footer from "./Footer"
-import usePrevious from "../hooks/usePrevious"
+import React from 'react'
+import styled from 'styled-components'
+import RecordRTC from 'recordrtc'
+import { saveAs } from 'file-saver'
+import Mic from './Mic'
+import MicOff from './MicOff'
+import Timer from './Timer'
+import Footer from './Footer'
+import usePrevious from '../hooks/usePrevious'
 // import elementInvisible from "../style/elementInvisible"
 
 const addZero = (str) => (str.length === 1 ? `0${str}` : str)
@@ -59,8 +59,8 @@ const StyledMicOff = styled(MicOff)`
   }
 `
 
-const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
-  const blob = recorder.getBlob()
+const handleStopRecording = ({ recorder, setRecorder, a }) => async () => {
+  const blob = await recorder.getBlob()
   saveAs(blob, getFilename())
   recorder.destroy()
   setRecorder(null)
@@ -68,11 +68,11 @@ const handleStopRecording = ({ recorder, setRecorder, a }) => () => {
 
 const handleSetStream = async ({ stream, setError, setStream }) => {
   try {
-    const _stream = await navigator.mediaDevices.getUserMedia({
+    const userMediaStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
       video: false,
     })
-    setStream(_stream)
+    setStream(userMediaStream)
   } catch (error) {
     setError(error)
   }
@@ -86,13 +86,13 @@ const handleSetRecorder = async ({
 }) => {
   try {
     if (stream && !recorder) {
-      const recorder = RecordRTC(stream.clone(), {
+      const nextRecorder = RecordRTC(stream.clone(), {
         recorderType: RecordRTC.StereoAudioRecorder,
-        mimeType: "audio/wav",
+        mimeType: 'audio/wav',
         disableLogs: true,
       })
 
-      setRecorder(recorder)
+      setRecorder(nextRecorder)
     }
   } catch (error) {
     setError(error)
@@ -105,8 +105,9 @@ const handleRecord = async ({
   recorder,
   setRecorder,
   a,
+  isStreamActive,
 }) => {
-  if (!isRecording && recorder) {
+  if (!isRecording && recorder && isStreamActive) {
     setIsRecording(true)
     recorder.startRecording()
     return
@@ -126,27 +127,41 @@ function Main() {
   const [error, setError] = React.useState(null)
   const recorderState = recorder && recorder.state
   const prevRecorderState = usePrevious(recorderState)
+  const isStreamActive = Boolean(stream && stream.active)
 
   React.useEffect(() => {
     if (
-      recorderState !== "stopped" &&
-      !(recorderState === null && prevRecorderState === "stopped")
+      recorderState !== 'stopped' &&
+      !(recorderState === null && prevRecorderState === 'stopped')
     ) {
-      handleSetRecorder({ recorder, setRecorder, setError, stream })
+      handleSetRecorder({
+        recorder,
+        setRecorder,
+        setError,
+        stream,
+      })
     }
   }, [recorder, isRecording, stream, recorderState, prevRecorderState])
 
   React.useEffect(() => {
-    if (recorderState === "inactive" && prevRecorderState === null) {
+    if (recorderState === 'inactive' && prevRecorderState === null) {
       handleRecord({
         isRecording,
         setIsRecording,
         recorder,
         setRecorder,
         a: anchorRef.current,
+        isStreamActive,
       })
     }
-  }, [anchorRef, isRecording, prevRecorderState, recorder, recorderState])
+  }, [
+    anchorRef,
+    isRecording,
+    prevRecorderState,
+    recorder,
+    recorderState,
+    isStreamActive,
+  ])
 
   const handleSubmit = (evt) => {
     evt.preventDefault()
@@ -158,13 +173,19 @@ function Main() {
       return
     }
 
-    handleSetRecorder({ recorder, setRecorder, setError, stream })
+    handleSetRecorder({
+      recorder,
+      setRecorder,
+      setError,
+      stream,
+    })
     handleRecord({
       isRecording,
       setIsRecording,
       recorder,
       setRecorder,
       a: anchorRef.current,
+      isStreamActive,
     })
   }
 
@@ -175,7 +196,7 @@ function Main() {
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
-        <Button type="submit" aria-label="enregistrer">
+        <Button type='submit' aria-label='enregistrer'>
           {isRecording ? <StyledMic /> : <StyledMicOff />}
         </Button>
         <Timer isRecording={isRecording} />

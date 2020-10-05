@@ -1,6 +1,6 @@
-import React from "react"
-import styled from "styled-components"
-import CreativeCommonIcon from "./CreativeCommonIcon"
+import React from 'react'
+import styled from 'styled-components'
+import CreativeCommonIcon from './CreativeCommonIcon'
 
 const Container = styled.div`
   color: ${(props) => props.theme.white};
@@ -21,9 +21,9 @@ const StyledCreativeCommonIcon = styled(CreativeCommonIcon)`
 const CommonCreative = ({ className }) => (
   <Container className={className}>
     <A
-      rel="license"
-      href="http://creativecommons.org/licenses/by-nc-nd/4.0/"
-      target="_blank"
+      rel='license'
+      href='http://creativecommons.org/licenses/by-nc-nd/4.0/'
+      target='_blank'
     >
       <StyledCreativeCommonIcon />
     </A>

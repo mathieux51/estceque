@@ -1,11 +1,11 @@
-import React from "react"
-import styled from "styled-components"
-import { GoogleReCaptcha } from "react-google-recaptcha-v3"
-import CommonCreative from "./CommonCreative"
-import Help from "./Help"
-import Mail from "./Mail"
-import Tooltip from "./Tooltip"
-import useClickOutside from "../hooks/useClickOutside"
+import React from 'react'
+import styled from 'styled-components'
+import { GoogleReCaptcha } from 'react-google-recaptcha-v3'
+import CommonCreative from './CommonCreative'
+import Help from './Help'
+import Mail from './Mail'
+import Tooltip from './Tooltip'
+import useClickOutside from '../hooks/useClickOutside'
 
 const Container = styled.div`
   display: flex;
@@ -66,15 +66,15 @@ const Footer = ({ className }) => {
   }
 
   useClickOutside(buttonRef, () => setIsVisible(false))
-  const [token, setToken] = React.useState("")
+  const [token, setToken] = React.useState('')
   const handleOnVerify = (t) => setToken(t)
-  const email = token ? "contact@directpodcast.fr" : ""
+  const email = token ? 'contact@directpodcast.fr' : ''
 
   return (
     <Container className={className}>
       <SubContainer>
         <Tooltip isVisible={isVisible}>
-          <Button onClick={handleClick} ref={buttonRef} aria-label="Aide">
+          <Button onClick={handleClick} ref={buttonRef} aria-label='Aide'>
             <StyledHelp />
           </Button>
         </Tooltip>

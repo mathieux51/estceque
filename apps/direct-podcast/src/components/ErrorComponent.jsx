@@ -1,7 +1,7 @@
-import React from "react"
-import styled from "styled-components"
-import Footer from "./Footer"
-import media from "../media"
+import React from 'react'
+import styled from 'styled-components'
+import Footer from './Footer'
+import media from '../media'
 
 const Container = styled.div`
   display: flex;
@@ -21,7 +21,7 @@ const SubContainer = styled.div`
 
 const TextContainer = styled.div`
   width: 60vw;
-  ${media.down("md")} {
+  ${media.down('md')} {
     width: 90vw;
   }
   max-width: 960px;
@@ -30,7 +30,7 @@ const TextContainer = styled.div`
 
 const Text = styled.span`
   color: ${(props) => props.theme.white};
-  ${media.down("md")} {
+  ${media.down('md')} {
     font-size: 20px;
   }
 `
@@ -76,7 +76,7 @@ const Bubble = styled(Text)`
   position: relative;
 
   &::before {
-    content: "";
+    content: '';
     position: absolute;
     width: 0;
     height: 0;
@@ -96,14 +96,14 @@ const Title = styled.h2`
 `
 
 const ErrorComponent = ({ className, text, eventID, error, onClick }) => {
-  const emojiStyle = { fontSize: 80, paddingLeft: "3rem" }
+  const emojiStyle = { fontSize: 80, paddingLeft: '3rem' }
   return (
     <Container className={className}>
       <SubContainer>
         <TextContainer>
           <Title>
             <Bubble>{text}</Bubble>
-            <span role="img" aria-label="error" style={emojiStyle}>
+            <span role='img' aria-label='error' style={emojiStyle}>
               🤖
             </span>
           </Title>
@@ -118,7 +118,8 @@ const ErrorComponent = ({ className, text, eventID, error, onClick }) => {
         </TextContainer>
         {error && (
           <Details>
-            <Pre>{error.toString()}</Pre>{" "}
+            <Pre>{error.toString()}</Pre>
+            {' '}
           </Details>
         )}
       </SubContainer>

@@ -1,6 +1,6 @@
-import React from "react"
-import styled from "styled-components"
-import elementInvisible from "../style/elementInvisible"
+import React from 'react'
+import styled from 'styled-components'
+import elementInvisible from '../style/elementInvisible'
 
 const Right = styled.span`
   width: 70vw;
@@ -25,7 +25,7 @@ const Container = styled.div`
   position: relative;
   text-align: left;
   & ${Right} {
-    ${(props) => (props.isVisible ? "" : elementInvisible)};
+    ${(props) => (props.isVisible ? '' : elementInvisible)};
   }
 `
 
@@ -59,7 +59,7 @@ const Tooltip = ({ className, children, isVisible }) => (
         j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement
         --> Le fichier sonore se télécharge automatiquement sur mon appareil.
       </p>
-      <I></I>
+      <I />
     </Right>
   </Container>
 )

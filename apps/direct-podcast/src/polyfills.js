@@ -1,5 +1,5 @@
-import "react-app-polyfill/ie11"
-import { GetUserMediaError } from "./errors"
+import 'react-app-polyfill/ie11'
+import { GetUserMediaError } from './errors'
 
 // source: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // Older browsers might not implement mediaDevices at all, so we set an empty object first
@@ -13,18 +13,19 @@ if (navigator.mediaDevices === undefined) {
 if (navigator.mediaDevices.getUserMedia === undefined) {
   navigator.mediaDevices.getUserMedia = function (constraints) {
     // First get ahold of the legacy getUserMedia, if present
-    var getUserMedia = navigator.webkitGetUserMedia || navigator.mozGetUserMedia
+    const getUserMedia =
+      navigator.webkitGetUserMedia || navigator.mozGetUserMedia
 
     // Some browsers just don't implement it - return a rejected promise with an error
     // to keep a consistent interface
     if (!getUserMedia) {
       return Promise.reject(
-        new GetUserMediaError("getUserMedia is not implemented in this browser")
+        new GetUserMediaError('getUserMedia is not implemented in this browser')
       )
     }
 
     // Otherwise, wrap the call to the old navigator.getUserMedia with a Promise
-    return new Promise(function (resolve, reject) {
+    return new Promise((resolve, reject) => {
       getUserMedia.call(navigator, constraints, resolve, reject)
     })
   }

@@ -1,8 +1,8 @@
-import React from "react"
-import * as Sentry from "@sentry/browser"
-import { GetUserMediaError } from "../errors"
-import ErrorComponent from "./ErrorComponent"
-import UAParser from "ua-parser-js"
+import React from 'react'
+import * as Sentry from '@sentry/browser'
+import UAParser from 'ua-parser-js'
+import { GetUserMediaError } from '../errors'
+import ErrorComponent from './ErrorComponent'
 
 function inIframe() {
   try {
@@ -15,14 +15,11 @@ function inIframe() {
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
-    this.state = { error: null, errorInfo: null, eventID: "", component: null }
+    this.state = { error: null, errorInfo: null, eventID: '', component: null }
   }
 
   componentDidCatch(error, errorInfo) {
-    const parser = new UAParser()
-    const browser = parser.getBrowser()
-    const isFacebook = browser.name === "Facebook"
-    if (inIframe() || isFacebook) {
+    if (inIframe()) {
       this.setState({
         component: (
           <ErrorComponent text="Pour utiliser directpodcast.fr, il faut l'ouvrir dans sa propre page." />
@@ -32,15 +29,19 @@ class ErrorBoundary extends React.Component {
     }
 
     if (error instanceof GetUserMediaError) {
+      const parser = new UAParser()
+      const { name, version } = parser.getBrowser()
+      const text = name
+        ? `Désolé ! Le navigateur ${name} (v${version}) n'est pas supporté par directpodcast.fr.`
+        : "Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr."
+
       this.setState({
-        component: (
-          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr." />
-        ),
+        component: <ErrorComponent text={text} />,
       })
       return
     }
 
-    if (error.name && error.name.match("NotFoundError")) {
+    if (error.name && error.name.match('NotFoundError')) {
       this.setState({
         component: (
           <ErrorComponent text="directpodcast.fr n'a pas trouvé de microphone." />
@@ -50,8 +51,8 @@ class ErrorBoundary extends React.Component {
     }
 
     if (
-      (error.message && error.message.match("NotAllowedError")) ||
-      (error.name && error.name.match("NotAllowedError"))
+      (error.message && error.message.match('NotAllowedError')) ||
+      (error.name && error.name.match('NotAllowedError'))
     ) {
       this.setState({
         component: (
@@ -61,14 +62,13 @@ class ErrorBoundary extends React.Component {
       return
     }
     Sentry.withScope((scope) => {
-      scope.setExtra("error.message", error.message)
-      scope.setExtra("error.name", error.name)
-      scope.setExtra("errorInfo", errorInfo)
-      scope.setExtra("User Agent result", parser.getResult())
+      scope.setExtra('error.message', error.message)
+      scope.setExtra('error.name', error.name)
+      scope.setExtra('errorInfo', errorInfo)
       const eventID = Sentry.captureException(error)
       this.setState({
-        error: error,
-        errorInfo: errorInfo,
+        error,
+        errorInfo,
         eventID,
       })
     })
@@ -84,7 +84,7 @@ class ErrorBoundary extends React.Component {
     if (this.state.errorInfo) {
       return (
         <ErrorComponent
-          text="Quelque chose a mal tourné..."
+          text='Quelque chose a mal tourné...'
           eventID={this.state.eventID}
           onClick={this.handleClick}
           error={this.state.error}

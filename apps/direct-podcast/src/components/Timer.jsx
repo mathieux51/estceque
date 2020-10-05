@@ -1,10 +1,10 @@
-import React from "react"
-import styled from "styled-components"
+import React from 'react'
+import styled from 'styled-components'
 
 const CounterText = styled.span`
   color: ${(props) => props.theme.white};
   font-size: 24px;
-  font-family: "Antipasto", sans-serif;
+  font-family: 'Antipasto', sans-serif;
 `
 
 function toHHMMSS(seconds) {
@@ -12,7 +12,7 @@ function toHHMMSS(seconds) {
   const hours = seconds / 3600
   const minutes = (seconds % 3600) / 60
 
-  return [hours, minutes, seconds % 60].map(format).join(":")
+  return [hours, minutes, seconds % 60].map(format).join(':')
 }
 
 const Counter = () => {

@@ -1,4 +1,4 @@
-import React from "react"
+import React from 'react'
 
 const useClickOutide = (ref, callback) => {
   const callbackRef = React.useRef()
@@ -13,8 +13,8 @@ const useClickOutide = (ref, callback) => {
     [ref]
   )
   React.useEffect(() => {
-    document.addEventListener("click", handleClick, true)
-    return () => document.removeEventListener("click", handleClick, true)
+    document.addEventListener('click', handleClick, true)
+    return () => document.removeEventListener('click', handleClick, true)
   }, [handleClick])
 }
 
