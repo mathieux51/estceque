@@ -1,4 +1,4 @@
-const mediaHelper = require('styled-media-helper')
+import mediaHelper from 'styled-media-helper'
 
 const media = mediaHelper({
   sm: 320,
