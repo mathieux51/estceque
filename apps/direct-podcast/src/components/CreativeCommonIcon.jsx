@@ -1,6 +1,6 @@
-import React from "react"
+import React from 'react';
 
-const CreativeCommonIcon = ({ className, viewBox = "0 0 80 15" }) => (
+const CreativeCommonIcon = ({ className, viewBox = '0 0 80 15' }) => (
   <svg width="100%" viewBox={viewBox} className={className}>
     <defs>
       <clipPath clipPathUnits="userSpaceOnUse" id="a">
@@ -37,6 +37,6 @@ const CreativeCommonIcon = ({ className, viewBox = "0 0 80 15" }) => (
       fontFamily="Bitstream Vera Sans"
     />
   </svg>
-)
+);
 
-export default CreativeCommonIcon
+export default CreativeCommonIcon;

@@ -1,22 +1,22 @@
-import React from "react"
-import styled from "styled-components"
-import CreativeCommonIcon from "./CreativeCommonIcon"
+import React from 'react';
+import styled from 'styled-components';
+import CreativeCommonIcon from './CreativeCommonIcon';
 
 const Container = styled.div`
   color: ${(props) => props.theme.white};
   display: flex;
   justify-content: center;
   align-items: center;
-`
+`;
 
 const A = styled.a`
   color: ${(props) => props.theme.white};
-`
+`;
 
 const StyledCreativeCommonIcon = styled(CreativeCommonIcon)`
   width: 80px;
   height: 15px;
-`
+`;
 
 const CommonCreative = ({ className }) => (
   <Container className={className}>
@@ -28,7 +28,7 @@ const CommonCreative = ({ className }) => (
       <StyledCreativeCommonIcon />
     </A>
   </Container>
-)
+);
 
 //   <br />
 //          Ce(tte) ≈ìuvre est mise √† disposition selon les termes de la{" "}
@@ -37,4 +37,4 @@ const CommonCreative = ({ className }) => (
 //         Pas de Modification 4.0 International
 //     </A>
 
-export default CommonCreative
+export default CommonCreative;

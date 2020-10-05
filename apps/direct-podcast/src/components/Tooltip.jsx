@@ -59,7 +59,7 @@ const Tooltip = ({ className, children, isVisible }) => (
         j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement
         --> Le fichier sonore se télécharge automatiquement sur mon appareil.
       </p>
-      <I></I>
+      <I />
     </Right>
   </Container>
 )

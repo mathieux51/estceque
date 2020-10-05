@@ -1,16 +1,16 @@
-import React from "react"
-import styled from "styled-components"
-import { GoogleReCaptcha } from "react-google-recaptcha-v3"
-import CommonCreative from "./CommonCreative"
-import Help from "./Help"
-import Mail from "./Mail"
-import Tooltip from "./Tooltip"
-import useClickOutside from "../hooks/useClickOutside"
+import React from 'react';
+import styled from 'styled-components';
+import { GoogleReCaptcha } from 'react-google-recaptcha-v3';
+import CommonCreative from './CommonCreative';
+import Help from './Help';
+import Mail from './Mail';
+import Tooltip from './Tooltip';
+import useClickOutside from '../hooks/useClickOutside';
 
 const Container = styled.div`
   display: flex;
   flex-direction: column;
-`
+`;
 
 const SubContainer = styled.div`
   width: 100%;
@@ -19,18 +19,18 @@ const SubContainer = styled.div`
   max-width: 960px;
   align-items: center;
   margin: 0 auto;
-`
+`;
 
 const Button = styled.button`
   margin-left: 1rem;
-`
+`;
 
 const StyledHelp = styled(Help)`
   width: 70px;
   & path {
     fill: ${(props) => props.theme.grey};
   }
-`
+`;
 
 const StyledMail = styled(Mail)`
   margin-right: 1rem;
@@ -38,7 +38,7 @@ const StyledMail = styled(Mail)`
   & path {
     fill: ${(props) => props.theme.grey};
   }
-`
+`;
 
 const BottomNote = styled.h1`
   width: 100%;
@@ -49,26 +49,26 @@ const BottomNote = styled.h1`
   font-size: 15px;
   font-weight: normal;
   margin: 0;
-`
+`;
 
 const Footer = ({ className }) => {
-  const buttonRef = React.createRef()
-  const [isVisible, setIsVisible] = React.useState(false)
+  const buttonRef = React.createRef();
+  const [isVisible, setIsVisible] = React.useState(false);
   const handleClick = (evt) => {
-    evt.preventDefault()
-    evt.stopPropagation()
+    evt.preventDefault();
+    evt.stopPropagation();
     if (!isVisible) {
-      buttonRef.current.focus()
-      setIsVisible(true)
-      return
+      buttonRef.current.focus();
+      setIsVisible(true);
+      return;
     }
-    setIsVisible(false)
-  }
+    setIsVisible(false);
+  };
 
-  useClickOutside(buttonRef, () => setIsVisible(false))
-  const [token, setToken] = React.useState("")
-  const handleOnVerify = (t) => setToken(t)
-  const email = token ? "contact@directpodcast.fr" : ""
+  useClickOutside(buttonRef, () => setIsVisible(false));
+  const [token, setToken] = React.useState('');
+  const handleOnVerify = (t) => setToken(t);
+  const email = token ? 'contact@directpodcast.fr' : '';
 
   return (
     <Container className={className}>
@@ -89,7 +89,7 @@ const Footer = ({ className }) => {
       </SubContainer>
       <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
-  )
-}
+  );
+};
 
-export default Footer
+export default Footer;

@@ -19,10 +19,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    const parser = new UAParser()
-    const browser = parser.getBrowser()
-    const isFacebook = browser.name === "Facebook"
-    if (inIframe() || isFacebook) {
+    if (inIframe()) {
       this.setState({
         component: (
           <ErrorComponent text="Pour utiliser directpodcast.fr, il faut l'ouvrir dans sa propre page." />
@@ -32,10 +29,14 @@ class ErrorBoundary extends React.Component {
     }
 
     if (error instanceof GetUserMediaError) {
+      const parser = new UAParser()
+      const { name, version } = parser.getBrowser()
+      const text = name
+        ? `Désolé ! Le navigateur ${name} (v${version}) n'est pas supporté par directpodcast.fr.`
+        : "Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr."
+
       this.setState({
-        component: (
-          <ErrorComponent text="Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr." />
-        ),
+        component: <ErrorComponent text={text} />,
       })
       return
     }
@@ -64,7 +65,6 @@ class ErrorBoundary extends React.Component {
       scope.setExtra("error.message", error.message)
       scope.setExtra("error.name", error.name)
       scope.setExtra("errorInfo", errorInfo)
-      scope.setExtra("User Agent result", parser.getResult())
       const eventID = Sentry.captureException(error)
       this.setState({
         error: error,
