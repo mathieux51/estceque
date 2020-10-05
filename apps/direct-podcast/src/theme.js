@@ -3,6 +3,6 @@ const theme = {
   red: '#cd1719',
   white: '#ffffff',
   grey: '#9d9d9c',
-};
+}
 
-export default theme;
+export default theme

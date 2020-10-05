@@ -1,4 +1,4 @@
-import { css } from 'styled-components';
+import { css } from 'styled-components'
 
 const elementInvisible = css`
   position: absolute !important;
@@ -7,6 +7,6 @@ const elementInvisible = css`
   overflow: hidden;
   clip: rect(1px 1px 1px 1px); /* IE6, IE7 */
   clip: rect(1px, 1px, 1px, 1px);
-`;
+`
 
-export default elementInvisible;
+export default elementInvisible
