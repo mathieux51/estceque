@@ -67,8 +67,11 @@ const Footer = ({ className }) => {
 
   useClickOutside(buttonRef, () => setIsVisible(false))
   const [token, setToken] = React.useState('')
-  const handleOnVerify = (t) => setToken(t)
-  const email = token ? 'contact@directpodcast.fr' : ''
+  const [email, setEmail] = React.useState('')
+  const handleOnVerify = (t) => {
+    setToken(t)
+    setEmail('contact@directpodcast.fr')
+  }
 
   return (
     <Container className={className}>
