@@ -65,13 +65,13 @@ const Footer = ({ className }) => {
     setIsVisible(false)
   }
 
-  // useClickOutside(buttonRef, () => setIsVisible(false))
+  useClickOutside(buttonRef, () => setIsVisible(false))
   const [email, setEmail] = React.useState('')
-  const handleOnVerify = (token) => {
+  const handleOnVerify = React.useCallback((token) => {
     if (token) {
       setEmail('contact@directpodcast.fr')
     }
-  }
+  }, [])
 
   return (
     <Container className={className}>
