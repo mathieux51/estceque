@@ -12,6 +12,16 @@ function inIframe() {
   }
 }
 
+function getUserMediaErrorText({ name, version, os }) {
+  if (os === 'iOS' && name !== 'Mobile Safari') {
+    return `Désolé ! Le navigateur ${name} (v${version}) n'est pas supporté par directpodcast.fr. Sur iOS il est recommandé d'utiliser "Mobile Safari"`
+  }
+  if (name) {
+    return `Désolé ! Le navigateur ${name} (v${version}) n'est pas supporté par directpodcast.fr.`
+  }
+  return "Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr."
+}
+
 class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
@@ -31,9 +41,8 @@ class ErrorBoundary extends React.Component {
     if (error instanceof GetUserMediaError) {
       const parser = new UAParser()
       const { name, version } = parser.getBrowser()
-      const text = name
-        ? `Désolé ! Le navigateur ${name} (v${version}) n'est pas supporté par directpodcast.fr.`
-        : "Désolé ! Ce navigateur n'est pas supporté par directpodcast.fr."
+      const os = parser.getOS()
+      const text = getUserMediaErrorText({ name, version, os: os.name })
 
       this.setState({
         component: <ErrorComponent text={text} />,
