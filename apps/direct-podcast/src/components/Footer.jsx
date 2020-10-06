@@ -69,7 +69,7 @@ const Footer = ({ className }) => {
   const [email, setEmail] = React.useState('')
   const handleOnVerify = (token) => {
     if (token) {
-    setEmail('contact@directpodcast.fr')
+      setEmail('contact@directpodcast.fr')
     }
   }
 
