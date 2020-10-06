@@ -118,8 +118,7 @@ const ErrorComponent = ({ className, text, eventID, error, onClick }) => {
         </TextContainer>
         {error && (
           <Details>
-            <Pre>{error.toString()}</Pre>
-            {' '}
+            <Pre>{error.toString()}</Pre>{' '}
           </Details>
         )}
       </SubContainer>
