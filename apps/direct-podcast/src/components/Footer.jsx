@@ -85,7 +85,7 @@ const Footer = ({ className }) => {
         <GoogleReCaptcha onVerify={handleOnVerify} />
         <a
           href={`mailto:${email}?Subject=directpodcast.fr`}
-          aria-label={`courriel ${token}`}
+          aria-label='courriel'
         >
           <StyledMail />
         </a>

@@ -193,8 +193,6 @@ function Main() {
     throw error
   }
 
-  console.log("Main")
-
   return (
     <Container>
       <Form onSubmit={handleSubmit}>
