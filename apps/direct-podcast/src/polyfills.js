@@ -1,5 +1,5 @@
 import 'react-app-polyfill/ie11'
-import { GetUserMediaError } from './errors'
+import GetUserMediaError from './errors'
 
 // source: https://developer.mozilla.org/en-US/docs/Web/API/MediaDevices/getUserMedia
 // Older browsers might not implement mediaDevices at all, so we set an empty object first

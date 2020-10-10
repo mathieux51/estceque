@@ -1,7 +1,7 @@
 import React from 'react'
 import * as Sentry from '@sentry/browser'
 import UAParser from 'ua-parser-js'
-import { GetUserMediaError } from '../errors'
+import GetUserMediaError from '../errors'
 import ErrorComponent from './ErrorComponent'
 
 function inIframe() {
