@@ -86,24 +86,27 @@ class ErrorBoundary extends React.Component {
   handleClick = async (evt) => {
     evt.preventDefault()
     evt.stopPropagation()
-    await navigator.clipboard.writeText(this.state.eventID)
+    const {eventID} = this.state
+    await navigator.clipboard.writeText(eventID)
   }
 
   render() {
-    if (this.state.errorInfo) {
+    const { errorInfo, eventID, error, component } = this.state
+    const { children } = this.props
+    if (errorInfo) {
       return (
         <ErrorComponent
           text='Quelque chose a mal tourné...'
-          eventID={this.state.eventID}
+          eventID={eventID}
           onClick={this.handleClick}
-          error={this.state.error}
+          error={error}
         />
       )
     }
-    if (this.state.component) {
-      return this.state.component
+    if (component) {
+      return component
     }
-    return this.props.children
+    return children
   }
 }
 
