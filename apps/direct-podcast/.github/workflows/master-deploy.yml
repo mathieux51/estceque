@@ -17,4 +17,5 @@ jobs:
           REACT_APP_RECAPTCHA_SERVER_SIDE: ${{ secrets.REACT_APP_RECAPTCHA_SERVER_SIDE }}
           NOW_ORG_ID: ${{ secrets.NOW_ORG_ID }}
           NOW_PROJECT_ID: ${{ secrets.NOW_PROJECT_ID }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
         run: npm run deploy
