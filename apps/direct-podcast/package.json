@@ -23,7 +23,7 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "react-scripts build && node scripts/sentry.js",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "deploy": "sh scripts/deploy.sh",
@@ -42,6 +42,7 @@
     ]
   },
   "devDependencies": {
+    "@sentry/cli": "^1.58.0",
     "@typescript-eslint/eslint-plugin": "^4.3.0",
     "@typescript-eslint/parser": "^4.3.0",
     "acorn": "^8.0.3",
