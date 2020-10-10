@@ -6,6 +6,7 @@ import Help from './Help'
 import Mail from './Mail'
 import Tooltip from './Tooltip'
 import useClickOutside from '../hooks/useClickOutside'
+import packageJSON from '../../package.json'
 
 const Container = styled.div`
   display: flex;
@@ -84,7 +85,7 @@ const Footer = ({ className }) => {
         <CommonCreative />
         <GoogleReCaptcha onVerify={handleOnVerify} />
         <a
-          href={`mailto:${email}?Subject=directpodcast.fr`}
+          href={`mailto:${email}?Subject=directpodcast.fr v${packageJSON.version}`}
           aria-label='courriel'
         >
           <StyledMail />

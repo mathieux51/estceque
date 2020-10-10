@@ -5,10 +5,11 @@ import * as Sentry from '@sentry/browser'
 import adapter from 'webrtc-adapter'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
+import packageJSON from '../package.json'
 
 if (process.env.NODE_ENV !== 'development') {
   Sentry.init({
-    release: 'v1.0.20',
+    release: packageJSON.version,
     dsn:
       'https://d1fd979948f14a358a8b2695c5df3abe@o381364.ingest.sentry.io/5208585',
   })

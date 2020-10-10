@@ -1,1 +1,1 @@
-export class GetUserMediaError extends Error {}
+export default class GetUserMediaError extends Error {}
