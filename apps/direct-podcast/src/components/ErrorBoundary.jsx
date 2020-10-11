@@ -86,7 +86,7 @@ class ErrorBoundary extends React.Component {
   handleClick = async (evt) => {
     evt.preventDefault()
     evt.stopPropagation()
-    const {eventID} = this.state
+    const { eventID } = this.state
     await navigator.clipboard.writeText(eventID)
   }
 
