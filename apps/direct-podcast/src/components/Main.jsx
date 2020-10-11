@@ -59,14 +59,18 @@ const StyledMicOff = styled(MicOff)`
   }
 `
 
-const handleStopRecording = ({ recorder, setRecorder, a }) => async () => {
-  const blob = await recorder.getBlob()
-  saveAs(blob, getFilename())
-  recorder.destroy()
-  setRecorder(null)
+const handleStopRecording = async ({ recorder, setRecorder, setError }) => {
+  try {
+    const blob = await recorder.getBlob()
+    saveAs(blob, getFilename())
+    recorder.destroy()
+    setRecorder(null)
+  } catch (error) {
+    setError(error)
+  }
 }
 
-const handleSetStream = async ({ stream, setError, setStream }) => {
+const handleSetStream = async ({ setError, setStream }) => {
   try {
     const userMediaStream = await navigator.mediaDevices.getUserMedia({
       audio: true,
@@ -104,23 +108,28 @@ const handleRecord = async ({
   setIsRecording,
   recorder,
   setRecorder,
-  a,
   isStreamActive,
+  setError,
 }) => {
-  if (!isRecording && recorder && isStreamActive) {
-    setIsRecording(true)
-    recorder.startRecording()
-    return
-  }
+  try {
+    if (!isRecording && recorder && isStreamActive) {
+      setIsRecording(true)
+      recorder.startRecording()
+      return
+    }
 
-  setIsRecording(false)
-  if (recorder) {
-    recorder.stopRecording(handleStopRecording({ recorder, setRecorder, a }))
+    setIsRecording(false)
+    if (recorder) {
+      recorder.stopRecording(() => {
+        handleStopRecording({ recorder, setRecorder, setError })
+      })
+    }
+  } catch (error) {
+    setError(error)
   }
 }
 
 function Main() {
-  const anchorRef = React.createRef()
   const [isRecording, setIsRecording] = React.useState(false)
   const [recorder, setRecorder] = React.useState(null)
   const [stream, setStream] = React.useState(null)
@@ -150,12 +159,11 @@ function Main() {
         setIsRecording,
         recorder,
         setRecorder,
-        a: anchorRef.current,
         isStreamActive,
+        setError,
       })
     }
   }, [
-    anchorRef,
     isRecording,
     prevRecorderState,
     recorder,
@@ -169,7 +177,7 @@ function Main() {
 
     // This is broken
     if (!stream) {
-      handleSetStream({ stream, setStream, setError })
+      handleSetStream({ setStream, setError })
       return
     }
 
@@ -184,8 +192,8 @@ function Main() {
       setIsRecording,
       recorder,
       setRecorder,
-      a: anchorRef.current,
       isStreamActive,
+      setError,
     })
   }
 
