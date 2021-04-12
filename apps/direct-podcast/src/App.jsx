@@ -33,17 +33,17 @@ const GlobalStyle = createGlobalStyle`
 
 function App() {
   return (
-    <ThemeProvider theme={theme}>
-      <GlobalStyle />
-      <ErrorBoundary>
-        <GoogleReCaptchaProvider
-          reCaptchaKey={process.env.REACT_APP_RECAPTCHA_CLIENT_SIDE}
-          language='fr'
-        >
+    <GoogleReCaptchaProvider
+      reCaptchaKey={process.env.REACT_APP_RECAPTCHA_CLIENT_SIDE}
+      language='fr'
+    >
+      <ThemeProvider theme={theme}>
+        <GlobalStyle />
+        <ErrorBoundary>
           <Main />
-        </GoogleReCaptchaProvider>
-      </ErrorBoundary>
-    </ThemeProvider>
+        </ErrorBoundary>
+      </ThemeProvider>
+    </GoogleReCaptchaProvider>
   )
 }
 
