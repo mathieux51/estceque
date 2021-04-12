@@ -13,5 +13,5 @@ npx now \
 
 npx now \
   -t ${NOW_TOKEN} \
-  alias direct-podcast.now.sh directpodcast.fr
+  alias direct-podcast.vercel.app directpodcast.fr
 
