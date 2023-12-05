@@ -70,7 +70,7 @@ const Footer = ({ className }) => {
   const [email, setEmail] = React.useState('')
   const handleOnVerify = React.useCallback((token) => {
     if (token) {
-      setEmail('contact@directpodcast.fr')
+      setEmail('estceque.asso@gmail.com')
     }
   }, [])
 
