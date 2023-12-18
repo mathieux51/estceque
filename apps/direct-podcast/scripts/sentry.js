@@ -1,5 +1,5 @@
-const SentryCli = require('@sentry/cli')
-const packageJSON = require('../package.json')
+const SentryCli = require('@sentry/cli') // eslint-disable-line
+const packageJSON = require('../package.json') // eslint-disable-line
 
 const cli = new SentryCli()
 async function main() {

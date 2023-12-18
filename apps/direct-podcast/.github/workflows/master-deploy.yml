@@ -12,10 +12,10 @@ jobs:
         run: npm ci
       - name: build and deploy to directpodcast.fr
         env:
-          NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
-          REACT_APP_RECAPTCHA_CLIENT_SIDE: ${{ secrets.REACT_APP_RECAPTCHA_CLIENT_SIDE }}
-          REACT_APP_RECAPTCHA_SERVER_SIDE: ${{ secrets.REACT_APP_RECAPTCHA_SERVER_SIDE }}
           NOW_ORG_ID: ${{ secrets.NOW_ORG_ID }}
           NOW_PROJECT_ID: ${{ secrets.NOW_PROJECT_ID }}
+          NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          ALIAS: "directpodcast.fr"
+          PROJECT_NAME: "directpodcast"
         run: npm run deploy

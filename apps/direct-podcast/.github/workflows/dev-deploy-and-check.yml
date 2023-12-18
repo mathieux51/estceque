@@ -1,0 +1,35 @@
+name: deploy and check Lighthouse
+on:
+  push:
+    branches:
+      - dev
+jobs:
+  deploy-and-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: install node_modules
+        run: npm ci
+      - name: build and deploy to directpodcast.fr
+        env:
+          NOW_ORG_ID: ${{ secrets.NOW_ORG_ID }}
+          NOW_PROJECT_ID: ${{ secrets.NOW_PROJECT_ID }}
+          NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          ALIAS: "dev.directpodcast.fr"
+          PROJECT_NAME: "directpodcast"
+        run: npm run deploy
+      - name: Run Lighthouse
+        uses: foo-software/lighthouse-check-action@master
+        id: lighthouseCheck
+        with:
+          urls: 'https://dev.directpodcast.fr'
+      - name: Handle Lighthouse Check results
+        uses: foo-software/lighthouse-check-status-action@master
+        with:
+          lighthouseCheckResults: ${{ steps.lighthouseCheck.outputs.lighthouseCheckResults }}
+          minAccessibilityScore: "100"
+          minBestPracticesScore: "100"
+          minPerformanceScore: "100"
+          minProgressiveWebAppScore: "100"
+          minSeoScore: "100"

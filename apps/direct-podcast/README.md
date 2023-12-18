@@ -7,14 +7,14 @@ npm i
 npm start
 ```
 
-# To do
+## To do
 
-- [ ] Use [DiskStorage](https://recordrtc.org/global.html#DiskStorage) or block recording after 45mins
+- [ ] Use [DiskStorage](https://recordrtc.org/global.html#DiskStorage)
 - [ ] Vu meter
 
 ## Workflow
 
-```
+```sh
 git checkout -b dev
 git push -u origin dev
 
@@ -30,5 +30,5 @@ gh pr merge
 
 - [Guide to Safari webrtc](https://webrtchacks.com/guide-to-safari-webrtc/)
 - [webrtc samples](https://webrtc.github.io/samples/)
-- (getusermedia](https://github.com/webrtc/samples/blob/gh-pages/src/content/getusermedia/audio/js/main.js)
+- [getusermedia](https://github.com/webrtc/samples/blob/gh-pages/src/content/getusermedia/audio/js/main.js)
 - [webrtc tutorial](https://codelabs.developers.google.com/codelabs/webrtc-web/#2)
