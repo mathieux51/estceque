@@ -2,7 +2,7 @@
 
 ## Getting started
 
-```sh
+```bash
 npm i
 npm start
 ```
@@ -14,7 +14,7 @@ npm start
 
 ## Workflow
 
-```sh
+```bash
 git checkout -b dev
 git push -u origin dev
 
