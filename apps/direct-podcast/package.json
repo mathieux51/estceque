@@ -3,7 +3,7 @@
     "node": "18.x"
   },
   "name": "direct-podcast",
-  "version": "1.0.26",
+  "version": "1.0.27",
   "private": true,
   "scripts": {
     "dev": "next dev",
