@@ -10,9 +10,10 @@ npm start
 ## dev sub domain
 
 ```sh
-# cloudflared tunnel create directpodcast
-# cloudflared tunnel route dns directpodcast dev
-cloudflared tunnel run directpodcast
+cloudflared login
+cloudflared tunnel create directpodcast
+cloudflared tunnel route dns directpodcast dev
+cloudflared tunnel --config=.cloudflared/config.yml run directpodcast
 ```
 
 
