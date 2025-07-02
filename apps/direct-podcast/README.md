@@ -7,24 +7,14 @@ npm i
 npm start
 ```
 
-## To do
+## dev sub domain
 
-- [ ] Use [DiskStorage](https://recordrtc.org/global.html#DiskStorage)
-- [ ] Vu meter
-
-## Workflow
-
-```bash
-git checkout -b dev
-git push -u origin dev
-
-# ...
-
-gh pr create
-npx release-it
-gh pr merge
-
+```sh
+# cloudflared tunnel create directpodcast
+# cloudflared tunnel route dns directpodcast dev
+cloudflared tunnel run directpodcast
 ```
+
 
 ## Related
 
