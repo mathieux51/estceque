@@ -17,7 +17,7 @@ jobs:
           NOW_TOKEN: ${{ secrets.NOW_TOKEN }}
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
           ALIAS: "directpodcast.fr"
-          PROJECT_NAME: "directpodcast"
+          PROJECT_NAME: "direct-podcast"
           REACT_APP_RECAPTCHA_SERVER_SIDE: ${{ secrets.REACT_APP_RECAPTCHA_SERVER_SIDE }}
           REACT_APP_RECAPTCHA_CLIENT_SIDE: ${{ secrets.REACT_APP_RECAPTCHA_CLIENT_SIDE }}
         run: npm run deploy
