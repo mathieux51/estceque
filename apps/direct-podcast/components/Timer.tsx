@@ -2,7 +2,7 @@ import React from 'react'
 import styled from 'styled-components'
 
 const CounterText = styled.span`
-  color: ${(props) => props.theme.white};
+  color: ${(props) => props.theme.grey};
   font-size: 24px;
   font-family: 'Antipasto', sans-serif;
 `

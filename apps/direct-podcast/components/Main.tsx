@@ -44,15 +44,11 @@ const StyledFooter = styled(Footer)`
   padding-bottom: 1rem;
 `
 
-const StyledMic = styled(Mic)`
-  & path {
-    fill: ${(props) => props.theme.red};
-  }
-`
+const StyledMic = styled(Mic)``
 
 const StyledMicOff = styled(MicOff)`
   & path {
-    fill: ${(props) => props.theme.white};
+    fill: ${(props) => props.theme.grey};
   }
 `
 const handleStream = async ({
@@ -194,6 +190,94 @@ function Main() {
   const [stream, setStream] = React.useState<MediaStream>()
   const [error, setError] = React.useState<Error>()
   const [useMp3, setUseMp3] = React.useState<boolean>(false) // either 'audio/wav' or 'audio/mpeg' (MP3)
+  const [volumeLevel, setVolumeLevel] = React.useState<number>(0)
+  const animationFrameRef = React.useRef<number>()
+  const audioContextRef = React.useRef<AudioContext>()
+  const analyserRef = React.useRef<AnalyserNode>()
+  const dataArrayRef = React.useRef<Uint8Array>()
+
+  // Setup audio level monitoring
+  React.useEffect(() => {
+    let cleanup = false
+
+    if (stream && isRecording) {
+      try {
+        // Close existing audio context if any
+        if (
+          audioContextRef.current &&
+          audioContextRef.current.state !== 'closed'
+        ) {
+          audioContextRef.current.close()
+          audioContextRef.current = undefined
+        }
+
+        // Create audio context and analyser
+        const audioContext = new (window.AudioContext ||
+          (window as unknown as { webkitAudioContext: typeof AudioContext })
+            .webkitAudioContext)()
+        audioContextRef.current = audioContext
+
+        const analyser = audioContext.createAnalyser()
+        analyser.fftSize = 2048
+        analyser.smoothingTimeConstant = 0.3
+        analyserRef.current = analyser
+
+        const source = audioContext.createMediaStreamSource(stream)
+        source.connect(analyser)
+
+        const bufferLength = analyser.fftSize
+        const dataArray = new Uint8Array(bufferLength)
+        dataArrayRef.current = dataArray
+
+        // Animation loop to update volume level
+        const updateVolume = () => {
+          if (cleanup || !analyserRef.current || !dataArrayRef.current) return
+
+          analyserRef.current.getByteTimeDomainData(dataArrayRef.current)
+
+          // Calculate RMS (Root Mean Square) for better volume representation
+          let sum = 0
+          for (let i = 0; i < bufferLength; i++) {
+            const amplitude = (dataArrayRef.current[i] - 128) / 128
+            sum += amplitude * amplitude
+          }
+          const rms = Math.sqrt(sum / bufferLength)
+          // Scale and clamp the volume (RMS is typically quite low, so we multiply)
+          const scaledVolume = Math.min(1, rms * 8)
+
+          setVolumeLevel(scaledVolume)
+
+          if (isRecording && !cleanup) {
+            animationFrameRef.current = requestAnimationFrame(updateVolume)
+          }
+        }
+
+        updateVolume()
+      } catch (err) {
+        console.error('Error setting up audio analysis:', err)
+      }
+    } else {
+      // Cleanup when not recording
+      setVolumeLevel(0)
+    }
+
+    return () => {
+      cleanup = true
+      if (animationFrameRef.current) {
+        cancelAnimationFrame(animationFrameRef.current)
+        animationFrameRef.current = undefined
+      }
+      if (
+        audioContextRef.current &&
+        audioContextRef.current.state !== 'closed'
+      ) {
+        audioContextRef.current.close().catch(() => {
+          // Ignore errors when closing
+        })
+        audioContextRef.current = undefined
+      }
+    }
+  }, [stream, isRecording])
 
   const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault()
@@ -259,7 +343,11 @@ function Main() {
       <StyledHeader onChange={handleChange} />
       <Form onSubmit={handleSubmit}>
         <Button type='submit' aria-label='enregistrer'>
-          {isRecording ? <StyledMic /> : <StyledMicOff />}
+          {isRecording ? (
+            <StyledMic volumeLevel={volumeLevel} />
+          ) : (
+            <StyledMicOff />
+          )}
         </Button>
         <Timer isRecording={isRecording} />
       </Form>

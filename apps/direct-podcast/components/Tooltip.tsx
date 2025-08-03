@@ -66,9 +66,9 @@ const Tooltip: React.FC<Props> = ({ className, children, isVisible }) => (
   <Container isVisible={isVisible} className={className}>
     {children}
     <Right>
-      <p>{`Je clique --> J'autorise l'accès à mon micro --> Je parle --> Lorsque
-        j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement
-        --> Le fichier sonore se télécharge automatiquement sur mon appareil.
+      <p>{`Je clique → J'autorise l'accès à mon micro → Je parle → Lorsque
+        j'ai terminé, je clique une seconde fois pour arrêter mon enregistrement
+        → Le fichier sonore se télécharge automatiquement sur mon appareil.
       `}</p>
       <I />
     </Right>

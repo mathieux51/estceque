@@ -1,6 +1,6 @@
 import React from 'react'
 import styled from 'styled-components'
-import Toggle from 'react-toggle'
+import Mp3Toggle from './Mp3Toggle'
 
 const Container = styled.div`
   max-width: 960px;
@@ -8,18 +8,6 @@ const Container = styled.div`
   justify-content: end;
   width: 100%;
   margin: 0 auto;
-`
-
-const SubContainer = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-right: 1rem;
-`
-
-const StyledText = styled.span`
-  color: ${(props) => props.theme.grey};
-  margin-bottom: 0.5rem;
 `
 
 type Props = {
@@ -30,10 +18,7 @@ type Props = {
 const Header: React.FC<Props> = ({ className, onChange }) => {
   return (
     <Container className={className}>
-      <SubContainer>
-        <StyledText>mp3</StyledText>
-        <Toggle defaultChecked={false} icons={false} onChange={onChange} />
-      </SubContainer>
+      <Mp3Toggle defaultChecked={false} onChange={onChange} />
     </Container>
   )
 }
