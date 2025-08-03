@@ -51,6 +51,13 @@ const StyledMicOff = styled(MicOff)`
     fill: ${(props) => props.theme.grey};
   }
 `
+
+const ConversionIndicator = styled.div`
+  color: ${(props) => props.theme.grey};
+  font-size: 16px;
+  margin-top: 0.5rem;
+  text-align: center;
+`
 const handleStream = async ({
   setError,
   setStream,
@@ -75,50 +82,97 @@ const handleStopRecording = async ({
   recorder,
   setRecorder,
   setError,
+  setIsConverting,
 }: {
   useMp3: boolean
   recorder: RecordRTC
   setError: React.Dispatch<React.SetStateAction<Error | undefined>>
   setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
+  setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   try {
     const blob = recorder.getBlob()
     if (useMp3) {
-      const { FFmpeg } = await import('@ffmpeg/ffmpeg')
-      const { toBlobURL } = await import('@ffmpeg/util')
-      const ffmpeg = new FFmpeg()
-      const version = packageJSON.devDependencies['@ffmpeg/core'].replace(
-        '^',
-        '',
-      )
-      const baseURL = `https://unpkg.com/@ffmpeg/core@${version}/dist/umd`
-      await ffmpeg.load({
-        coreURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.js`,
-          'text/javascript',
-        ),
-        wasmURL: await toBlobURL(
-          `${baseURL}/ffmpeg-core.wasm`,
-          'application/wasm',
-        ),
-      })
+      setIsConverting(true)
 
-      const fName = filename()
-      const wav = `${fName}.wav`
-      const mp3 = `${fName}.mp3`
-      const arrayBuffer = await blob.arrayBuffer()
-      const uint8Array = new Uint8Array(arrayBuffer)
-      await ffmpeg.writeFile(wav, uint8Array)
-      await ffmpeg.exec(['-i', wav, mp3])
-      const file = await ffmpeg.readFile(mp3)
-      saveAs(new Blob([file]), mp3)
+      let ffmpeg: import('@ffmpeg/ffmpeg').FFmpeg | null = null
+      try {
+        const { FFmpeg } = await import('@ffmpeg/ffmpeg')
+        const { toBlobURL } = await import('@ffmpeg/util')
+        ffmpeg = new FFmpeg()
+        const version = packageJSON.devDependencies['@ffmpeg/core'].replace(
+          '^',
+          '',
+        )
+        const baseURL = `https://unpkg.com/@ffmpeg/core@${version}/dist/umd`
+
+        await ffmpeg.load({
+          coreURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.js`,
+            'text/javascript',
+          ),
+          wasmURL: await toBlobURL(
+            `${baseURL}/ffmpeg-core.wasm`,
+            'application/wasm',
+          ),
+        })
+
+        const fName = filename()
+        const wav = `${fName}.wav`
+        const mp3 = `${fName}.mp3`
+        const arrayBuffer = await blob.arrayBuffer()
+        const uint8Array = new Uint8Array(arrayBuffer)
+
+        await ffmpeg.writeFile(wav, uint8Array)
+        await ffmpeg.exec(['-i', wav, mp3])
+        const file = await ffmpeg.readFile(mp3)
+        saveAs(new Blob([file]), mp3)
+
+        // Cleanup temporary files
+        try {
+          await ffmpeg.deleteFile(wav)
+          await ffmpeg.deleteFile(mp3)
+        } catch (cleanupError) {
+          // Ignore cleanup errors, they're not critical
+          console.warn('Failed to cleanup temporary files:', cleanupError)
+        }
+      } catch (conversionError) {
+        const error = toError(conversionError)
+        if (
+          error.message?.includes('network') ||
+          error.message?.includes('fetch')
+        ) {
+          setError(
+            new Error(
+              'Network error: Unable to load MP3 converter. Please check your internet connection.',
+            ),
+          )
+        } else if (
+          error.message?.includes('WASM') ||
+          error.message?.includes('WebAssembly')
+        ) {
+          setError(
+            new Error(
+              'Browser compatibility error: Your browser may not support MP3 conversion.',
+            ),
+          )
+        } else {
+          setError(new Error(`MP3 conversion failed: ${error.message}`))
+        }
+        throw error
+      } finally {
+        setIsConverting(false)
+      }
     } else {
       saveAs(blob, `${filename()}.wav`)
     }
     recorder.destroy()
     setRecorder(undefined)
   } catch (error) {
-    setError(toError(error))
+    if (!useMp3) {
+      setError(toError(error))
+    }
+    // MP3 errors are already handled above
   }
 }
 
@@ -157,6 +211,7 @@ const handleRecord = ({
   setRecorder,
   stream,
   useMp3,
+  setIsConverting,
 }: {
   stream: MediaStream | undefined
   isRecording: boolean
@@ -165,6 +220,7 @@ const handleRecord = ({
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>
   setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
   useMp3: boolean
+  setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
 }) => {
   try {
     if (!isRecording && typeof recorder !== 'undefined' && stream?.active) {
@@ -176,7 +232,13 @@ const handleRecord = ({
     setIsRecording(false)
     if (typeof recorder !== 'undefined') {
       recorder.stopRecording(() => {
-        handleStopRecording({ recorder, setRecorder, setError, useMp3 })
+        handleStopRecording({
+          recorder,
+          setRecorder,
+          setError,
+          useMp3,
+          setIsConverting,
+        })
       })
     }
   } catch (error) {
@@ -191,6 +253,7 @@ function Main() {
   const [error, setError] = React.useState<Error>()
   const [useMp3, setUseMp3] = React.useState<boolean>(false) // either 'audio/wav' or 'audio/mpeg' (MP3)
   const [volumeLevel, setVolumeLevel] = React.useState<number>(0)
+  const [isConverting, setIsConverting] = React.useState<boolean>(false)
   const animationFrameRef = React.useRef<number>()
   const audioContextRef = React.useRef<AudioContext>()
   const analyserRef = React.useRef<AnalyserNode>()
@@ -300,6 +363,7 @@ function Main() {
         setRecorder,
         stream: nextStream,
         useMp3,
+        setIsConverting,
       })
       return
     }
@@ -318,6 +382,7 @@ function Main() {
         setRecorder,
         stream,
         useMp3,
+        setIsConverting,
       })
       return
     }
@@ -330,6 +395,7 @@ function Main() {
       setRecorder,
       stream,
       useMp3,
+      setIsConverting,
     })
   }
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
@@ -350,6 +416,9 @@ function Main() {
           )}
         </Button>
         <Timer isRecording={isRecording} />
+        {isConverting && (
+          <ConversionIndicator>Converting to MP3...</ConversionIndicator>
+        )}
       </Form>
       <StyledFooter />
     </Container>
