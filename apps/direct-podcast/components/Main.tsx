@@ -10,6 +10,7 @@ import filename from '../helpers/filename'
 import type RecordRTC from 'recordrtc'
 import { toError } from '../helpers/errors'
 import packageJSON from '../package.json'
+import { saveSharedAudioFile } from '../lib/sharedDB'
 
 const Container = styled.div`
   height: 100vh;
@@ -166,7 +167,6 @@ const handleStopRecording = async ({
           await ffmpeg.deleteFile(mp3)
         } catch (cleanupError) {
           // Ignore cleanup errors, they're not critical
-          console.warn('Failed to cleanup temporary files:', cleanupError)
         }
       } catch (conversionError) {
         const error = toError(conversionError)
@@ -360,7 +360,7 @@ function Main() {
 
         updateVolume()
       } catch (err) {
-        console.error('Error setting up audio analysis:', err)
+        // Ignore audio setup errors, not critical for recording
       }
     } else {
       // Cleanup when not recording
@@ -446,169 +446,40 @@ function Main() {
   }
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
 
-  const [pendingShare, setPendingShare] = React.useState<{
-    arrayBuffer: ArrayBuffer
-    filename: string
-    fileType: string
-  } | null>(null)
+  const [isPreparingShare, setIsPreparingShare] = React.useState(false)
 
-  // Function to send large files in chunks
-  const sendFileInChunks = React.useCallback(
-    (
-      targetWindow: Window,
-      buffer: ArrayBuffer,
-      fileData: { filename: string; fileType: string },
-    ) => {
-      const chunkSize = 2 * 1024 * 1024 // 2MB chunks (larger for better speed)
-      const totalChunks = Math.ceil(buffer.byteLength / chunkSize)
-      let chunkIndex = 0
-
-      const sendNextChunk = () => {
-        if (chunkIndex >= totalChunks) {
-          return
-        }
-
-        if (targetWindow.closed) {
-          return
-        }
-
-        const start = chunkIndex * chunkSize
-        const end = Math.min(start + chunkSize, buffer.byteLength)
-        const chunk = buffer.slice(start, end)
-
-        try {
-          targetWindow.postMessage(
-            {
-              type: 'SHARED_AUDIO_CHUNK',
-              chunkIndex,
-              totalChunks,
-              chunk,
-              filename: fileData.filename,
-              fileType: fileData.fileType,
-            },
-            'https://montage.directpodcast.fr',
-          )
-
-          chunkIndex++
-          // Use requestAnimationFrame for faster, smoother transfer
-          requestAnimationFrame(sendNextChunk)
-        } catch {
-          alert("Erreur lors de l'envoi du fichier. Veuillez réessayer.")
-        }
-      }
-
-      sendNextChunk()
-    },
-    [],
-  )
-
-  // Function to send data to a target window
-  const waitAndSend = React.useCallback(
-    (
-      targetWindow: Window,
-      buffer: ArrayBuffer,
-      fileData: { filename: string; fileType: string },
-    ) => {
-      if (targetWindow.closed) {
-        return
-      }
-
-      // Use single transfer for smaller files (< 10MB), chunked for larger files
-      const maxSingleTransferSize = 10 * 1024 * 1024 // 10MB
-
-      if (buffer.byteLength <= maxSingleTransferSize) {
-        // Send as single file for faster transfer
-        try {
-          targetWindow.postMessage(
-            {
-              type: 'SHARED_AUDIO_FILE',
-              filename: fileData.filename,
-              fileType: fileData.fileType,
-              arrayBuffer: buffer,
-            },
-            'https://montage.directpodcast.fr',
-          )
-        } catch {
-          // Fallback to chunked transfer if single transfer fails
-          sendFileInChunks(targetWindow, buffer, fileData)
-        }
-      } else {
-        // Use chunked transfer for large files
-        sendFileInChunks(targetWindow, buffer, fileData)
-      }
-    },
-    [sendFileInChunks],
-  )
-
-  // Set up message listener once when component mounts
-  React.useEffect(() => {
-    const handleHandshake = (event: MessageEvent) => {
-      if (event.origin !== 'https://montage.directpodcast.fr' || !pendingShare)
-        return
-
-      if (event.data === 'MONTAGE_READY') {
-        try {
-          ;(event.source as Window)?.postMessage(
-            'READY_ACKNOWLEDGED',
-            'https://montage.directpodcast.fr',
-          )
-
-          // Send the file data
-          waitAndSend(
-            event.source as Window,
-            pendingShare.arrayBuffer,
-            pendingShare,
-          )
-
-          // Clear pending share
-          setPendingShare(null)
-        } catch (error) {
-          alert("Erreur lors de l'envoi du fichier. Veuillez réessayer.")
-        }
-      }
-    }
-
-    window.addEventListener('message', handleHandshake)
-
-    return () => {
-      window.removeEventListener('message', handleHandshake)
-    }
-  }, [pendingShare, waitAndSend, sendFileInChunks])
-
-  // Pre-prepare data when recording stops to avoid async delays during click
-  React.useEffect(() => {
-    if (lastRecording && !pendingShare) {
-      // Prepare data immediately when recording is available
-      lastRecording.blob
-        .arrayBuffer()
-        .then((arrayBuffer) => {
-          setPendingShare({
-            arrayBuffer,
-            filename: lastRecording.filename,
-            fileType: lastRecording.blob.type,
-          })
-        })
-        .catch(() => {
-          // Ignore errors, user will get feedback when they click
-        })
-    }
-  }, [lastRecording, pendingShare])
-
-  const handleShareToMontage = (e: React.MouseEvent<HTMLAnchorElement>) => {
+  const handleShareToMontage = async (
+    e: React.MouseEvent<HTMLAnchorElement>,
+  ) => {
     if (!lastRecording) {
       e.preventDefault()
       return
     }
 
-    if (!pendingShare) {
+    if (isPreparingShare) {
       e.preventDefault()
-      alert(
-        'Préparation du fichier en cours, veuillez réessayer dans un instant.',
-      )
+      alert('Préparation du partage en cours, veuillez patienter...')
       return
     }
 
-    // If we reach here, data is ready and anchor will navigate naturally
+    e.preventDefault()
+    setIsPreparingShare(true)
+
+    try {
+      // Save to shared IndexedDB
+      const arrayBuffer = await lastRecording.blob.arrayBuffer()
+      await saveSharedAudioFile(
+        lastRecording.filename,
+        lastRecording.blob.type,
+        arrayBuffer,
+      )
+
+      // Navigate using anchor href after data is saved
+      window.location.href = 'https://montage.directpodcast.fr?sharing=true'
+    } catch (error) {
+      alert('Erreur lors de la préparation du partage. Veuillez réessayer.')
+      setIsPreparingShare(false)
+    }
   }
 
   if (error) {
@@ -632,13 +503,13 @@ function Main() {
         )}
         {lastRecording && !isRecording && !isConverting && (
           <ShareButton
-            href='https://montage.directpodcast.fr?sharing=true'
-            target='_blank'
-            rel='noopener noreferrer'
+            href='#'
             onClick={handleShareToMontage}
-            className={!pendingShare ? 'disabled' : ''}
+            className={isPreparingShare ? 'disabled' : ''}
           >
-            Partager vers Direct Montage
+            {isPreparingShare
+              ? 'Préparation...'
+              : 'Partager vers Direct Montage'}
           </ShareButton>
         )}
       </Form>

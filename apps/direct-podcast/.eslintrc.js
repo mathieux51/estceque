@@ -35,6 +35,7 @@ module.exports = {
     'require-jsdoc': 0,
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
+    'no-console': 'error',
   },
   settings: {
     react: {
