@@ -61,8 +61,8 @@ const ConversionIndicator = styled.div`
 
 const ShareButton = styled.button`
   background-color: ${(props) => props.theme.black};
-  color: ${(props) => props.theme.white};
-  border: 2px solid ${(props) => props.theme.white};
+  color: ${(props) => props.theme.grey};
+  border: 2px solid ${(props) => props.theme.grey};
   padding: 0.75rem 1.5rem;
   font-size: 16px;
   cursor: pointer;
@@ -72,7 +72,7 @@ const ShareButton = styled.button`
 
   &:hover {
     background-color: ${(props) => props.theme.white};
-    color: ${(props) => props.theme.black};
+    color: ${(props) => props.theme.blue};
   }
 
   &:disabled {
