@@ -11,6 +11,7 @@ import type RecordRTC from 'recordrtc'
 import { toError } from '../helpers/errors'
 import packageJSON from '../package.json'
 import { saveSharedAudioFile } from '../lib/sharedDB'
+import IframeBridge, { IframeBridge as IframeBridgeType } from './IframeBridge'
 
 const Container = styled.div`
   height: 100vh;
@@ -447,11 +448,12 @@ function Main() {
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
 
   const [isPreparingShare, setIsPreparingShare] = React.useState(false)
+  const [iframeBridge, setIframeBridge] = React.useState<IframeBridgeType | null>(null)
 
   const handleShareToMontage = async (
     e: React.MouseEvent<HTMLAnchorElement>
   ) => {
-    if (!lastRecording) {
+    if (!lastRecording || !iframeBridge) {
       e.preventDefault()
       return
     }
@@ -466,18 +468,19 @@ function Main() {
     setIsPreparingShare(true)
 
     try {
-      // Save to shared IndexedDB
+      // Send audio data through iframe bridge
       const arrayBuffer = await lastRecording.blob.arrayBuffer()
-      await saveSharedAudioFile(
+      await iframeBridge.sendAudioData(
         lastRecording.filename,
         lastRecording.blob.type,
         arrayBuffer
       )
 
-      // Navigate using anchor href after data is saved
-      window.location.href = '/montage?sharing=true'
+      // Navigate to montage app
+      iframeBridge.navigateToMontage()
     } catch (error) {
       alert('Erreur lors de la préparation du partage. Veuillez réessayer.')
+    } finally {
       setIsPreparingShare(false)
     }
   }
@@ -505,15 +508,18 @@ function Main() {
           <ShareButton
             href='#'
             onClick={handleShareToMontage}
-            className={isPreparingShare ? 'disabled' : ''}
+            className={isPreparingShare || !iframeBridge ? 'disabled' : ''}
           >
             {isPreparingShare
               ? 'Préparation...'
+              : !iframeBridge
+              ? 'Initialisation...'
               : 'Partager vers Direct Montage'}
           </ShareButton>
         )}
       </Form>
       <StyledFooter />
+      <IframeBridge onBridgeReady={setIframeBridge} />
     </Container>
   )
 }
