@@ -446,37 +446,76 @@ function Main() {
     if (!lastRecording) return
 
     try {
-      // Use a simple file sharing approach via browser's download/upload mechanism
-      // Create a temporary download link
-      const url = URL.createObjectURL(lastRecording.blob)
-      const a = document.createElement('a')
-      a.href = url
-      a.download = lastRecording.filename
-      a.style.display = 'none'
-      document.body.appendChild(a)
-
-      // Show instructions to user
-      const shouldProceed = confirm(
-        `Pour partager ce fichier vers Direct Montage:\n\n` +
-          `1. Le fichier "${lastRecording.filename}" va être téléchargé\n` +
-          `2. Direct Montage va s'ouvrir dans un nouvel onglet\n` +
-          `3. Glissez-déposez le fichier téléchargé dans Direct Montage\n\n` +
-          `Continuer ?`,
+      // Open Direct Montage in a new window
+      const montageWindow = window.open(
+        'https://montage.directpodcast.fr?sharing=true',
+        '_blank',
       )
 
-      if (shouldProceed) {
-        // Trigger download
-        a.click()
-
-        // Open Direct Montage
-        setTimeout(() => {
-          window.open('https://montage.directpodcast.fr', '_blank')
-        }, 500) // Small delay to ensure download starts
+      if (!montageWindow) {
+        setError(
+          new Error(
+            "Impossible d'ouvrir Direct Montage. Veuillez autoriser les popups.",
+          ),
+        )
+        return
       }
 
-      // Cleanup
-      document.body.removeChild(a)
-      URL.revokeObjectURL(url)
+      // Convert blob to ArrayBuffer for transfer
+      const arrayBuffer = await lastRecording.blob.arrayBuffer()
+
+      // Wait for the window to load and then send the file data
+      const sendFileData = () => {
+        try {
+          montageWindow.postMessage(
+            {
+              type: 'SHARED_AUDIO_FILE',
+              filename: lastRecording.filename,
+              fileType: lastRecording.blob.type,
+              arrayBuffer: arrayBuffer,
+            },
+            'https://montage.directpodcast.fr',
+          )
+        } catch (error) {
+          // If postMessage fails due to size, try chunked transfer
+          sendFileInChunks(montageWindow, arrayBuffer)
+        }
+      }
+
+      // Function to send large files in chunks
+      const sendFileInChunks = (targetWindow: Window, buffer: ArrayBuffer) => {
+        const chunkSize = 1024 * 1024 // 1MB chunks
+        const totalChunks = Math.ceil(buffer.byteLength / chunkSize)
+        let chunkIndex = 0
+
+        const sendNextChunk = () => {
+          if (chunkIndex >= totalChunks) return
+
+          const start = chunkIndex * chunkSize
+          const end = Math.min(start + chunkSize, buffer.byteLength)
+          const chunk = buffer.slice(start, end)
+
+          targetWindow.postMessage(
+            {
+              type: 'SHARED_AUDIO_CHUNK',
+              chunkIndex,
+              totalChunks,
+              chunk,
+              filename: lastRecording.filename,
+              fileType: lastRecording.blob.type,
+            },
+            'https://montage.directpodcast.fr',
+          )
+
+          chunkIndex++
+          setTimeout(sendNextChunk, 50) // Small delay between chunks
+        }
+
+        sendNextChunk()
+      }
+
+      // Wait for Direct Montage to be ready
+      setTimeout(sendFileData, 2000) // Give the page time to load
     } catch (err) {
       setError(new Error("Échec du partage de l'enregistrement"))
     }
