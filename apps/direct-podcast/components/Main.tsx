@@ -446,39 +446,35 @@ function Main() {
     if (!lastRecording) return
 
     try {
-      // Store the recording in IndexedDB for cross-domain sharing
-      const request = indexedDB.open('DirectPodcastShared', 1)
+      // Convert blob to base64 for URL transfer
+      const reader = new FileReader()
+      reader.onload = () => {
+        const base64Data = (reader.result as string).split(',')[1]
+        const filename = encodeURIComponent(lastRecording.filename)
 
-      request.onupgradeneeded = (event) => {
-        const db = (event.target as IDBOpenDBRequest).result
-        if (!db.objectStoreNames.contains('recordings')) {
-          db.createObjectStore('recordings')
+        // Check if data is too large for URL (most browsers have ~2MB URL limit)
+        if (base64Data.length > 1000000) {
+          // ~1MB limit to be safe
+          // For large files, store in sessionStorage and use a simpler approach
+          sessionStorage.setItem('sharedAudioData', base64Data)
+          sessionStorage.setItem('sharedAudioFilename', lastRecording.filename)
+          sessionStorage.setItem('sharedAudioType', lastRecording.blob.type)
+
+          window.open(
+            `https://montage.directpodcast.fr?shared=session&filename=${filename}`,
+            '_blank',
+          )
+        } else {
+          // For smaller files, pass data directly in URL
+          window.open(
+            `https://montage.directpodcast.fr?shared=data&filename=${filename}&data=${encodeURIComponent(
+              base64Data,
+            )}&type=${encodeURIComponent(lastRecording.blob.type)}`,
+            '_blank',
+          )
         }
       }
-
-      request.onsuccess = async () => {
-        const db = request.result
-        const transaction = db.transaction(['recordings'], 'readwrite')
-        const store = transaction.objectStore('recordings')
-
-        // Store in IndexedDB directly
-        await store.put(
-          {
-            data: lastRecording.blob,
-            filename: lastRecording.filename,
-            timestamp: Date.now(),
-          },
-          'latest',
-        )
-
-        // Open Direct Montage with shared parameter
-        window.open(
-          `https://montage.directpodcast.fr?shared=true&filename=${encodeURIComponent(
-            lastRecording.filename,
-          )}`,
-          '_blank',
-        )
-      }
+      reader.readAsDataURL(lastRecording.blob)
     } catch (err) {
       setError(new Error('Failed to share recording'))
     }
