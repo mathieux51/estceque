@@ -453,86 +453,92 @@ function Main() {
   } | null>(null)
 
   // Function to send large files in chunks
-  const sendFileInChunks = (
-    targetWindow: Window,
-    buffer: ArrayBuffer,
-    fileData: { filename: string; fileType: string },
-  ) => {
-    const chunkSize = 2 * 1024 * 1024 // 2MB chunks (larger for better speed)
-    const totalChunks = Math.ceil(buffer.byteLength / chunkSize)
-    let chunkIndex = 0
+  const sendFileInChunks = React.useCallback(
+    (
+      targetWindow: Window,
+      buffer: ArrayBuffer,
+      fileData: { filename: string; fileType: string },
+    ) => {
+      const chunkSize = 2 * 1024 * 1024 // 2MB chunks (larger for better speed)
+      const totalChunks = Math.ceil(buffer.byteLength / chunkSize)
+      let chunkIndex = 0
 
-    const sendNextChunk = () => {
-      if (chunkIndex >= totalChunks) {
-        return
+      const sendNextChunk = () => {
+        if (chunkIndex >= totalChunks) {
+          return
+        }
+
+        if (targetWindow.closed) {
+          return
+        }
+
+        const start = chunkIndex * chunkSize
+        const end = Math.min(start + chunkSize, buffer.byteLength)
+        const chunk = buffer.slice(start, end)
+
+        try {
+          targetWindow.postMessage(
+            {
+              type: 'SHARED_AUDIO_CHUNK',
+              chunkIndex,
+              totalChunks,
+              chunk,
+              filename: fileData.filename,
+              fileType: fileData.fileType,
+            },
+            'https://montage.directpodcast.fr',
+          )
+
+          chunkIndex++
+          // Use requestAnimationFrame for faster, smoother transfer
+          requestAnimationFrame(sendNextChunk)
+        } catch {
+          alert("Erreur lors de l'envoi du fichier. Veuillez réessayer.")
+        }
       }
 
+      sendNextChunk()
+    },
+    [],
+  )
+
+  // Function to send data to a target window
+  const waitAndSend = React.useCallback(
+    (
+      targetWindow: Window,
+      buffer: ArrayBuffer,
+      fileData: { filename: string; fileType: string },
+    ) => {
       if (targetWindow.closed) {
         return
       }
 
-      const start = chunkIndex * chunkSize
-      const end = Math.min(start + chunkSize, buffer.byteLength)
-      const chunk = buffer.slice(start, end)
+      // Use single transfer for smaller files (< 10MB), chunked for larger files
+      const maxSingleTransferSize = 10 * 1024 * 1024 // 10MB
 
-      try {
-        targetWindow.postMessage(
-          {
-            type: 'SHARED_AUDIO_CHUNK',
-            chunkIndex,
-            totalChunks,
-            chunk,
-            filename: fileData.filename,
-            fileType: fileData.fileType,
-          },
-          'https://montage.directpodcast.fr',
-        )
-
-        chunkIndex++
-        // Use requestAnimationFrame for faster, smoother transfer
-        requestAnimationFrame(sendNextChunk)
-      } catch {
-        alert("Erreur lors de l'envoi du fichier. Veuillez réessayer.")
-      }
-    }
-
-    sendNextChunk()
-  }
-
-  // Function to send data to a target window
-  const waitAndSend = (
-    targetWindow: Window,
-    buffer: ArrayBuffer,
-    fileData: { filename: string; fileType: string },
-  ) => {
-    if (targetWindow.closed) {
-      return
-    }
-
-    // Use single transfer for smaller files (< 10MB), chunked for larger files
-    const maxSingleTransferSize = 10 * 1024 * 1024 // 10MB
-
-    if (buffer.byteLength <= maxSingleTransferSize) {
-      // Send as single file for faster transfer
-      try {
-        targetWindow.postMessage(
-          {
-            type: 'SHARED_AUDIO_FILE',
-            filename: fileData.filename,
-            fileType: fileData.fileType,
-            arrayBuffer: buffer,
-          },
-          'https://montage.directpodcast.fr',
-        )
-      } catch {
-        // Fallback to chunked transfer if single transfer fails
+      if (buffer.byteLength <= maxSingleTransferSize) {
+        // Send as single file for faster transfer
+        try {
+          targetWindow.postMessage(
+            {
+              type: 'SHARED_AUDIO_FILE',
+              filename: fileData.filename,
+              fileType: fileData.fileType,
+              arrayBuffer: buffer,
+            },
+            'https://montage.directpodcast.fr',
+          )
+        } catch {
+          // Fallback to chunked transfer if single transfer fails
+          sendFileInChunks(targetWindow, buffer, fileData)
+        }
+      } else {
+        // Use chunked transfer for large files
         sendFileInChunks(targetWindow, buffer, fileData)
       }
-    } else {
-      // Use chunked transfer for large files
-      sendFileInChunks(targetWindow, buffer, fileData)
-    }
-  }
+    },
+    [sendFileInChunks],
+  )
 
   // Set up message listener once when component mounts
   React.useEffect(() => {
@@ -573,15 +579,18 @@ function Main() {
   React.useEffect(() => {
     if (lastRecording && !pendingShare) {
       // Prepare data immediately when recording is available
-      lastRecording.blob.arrayBuffer().then(arrayBuffer => {
-        setPendingShare({
-          arrayBuffer,
-          filename: lastRecording.filename,
-          fileType: lastRecording.blob.type,
+      lastRecording.blob
+        .arrayBuffer()
+        .then((arrayBuffer) => {
+          setPendingShare({
+            arrayBuffer,
+            filename: lastRecording.filename,
+            fileType: lastRecording.blob.type,
+          })
         })
-      }).catch(() => {
-        // Ignore errors, user will get feedback when they click
-      })
+        .catch(() => {
+          // Ignore errors, user will get feedback when they click
+        })
     }
   }, [lastRecording, pendingShare])
 
@@ -593,7 +602,9 @@ function Main() {
 
     if (!pendingShare) {
       e.preventDefault()
-      alert("Préparation du fichier en cours, veuillez réessayer dans un instant.")
+      alert(
+        'Préparation du fichier en cours, veuillez réessayer dans un instant.',
+      )
       return
     }
 
