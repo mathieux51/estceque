@@ -446,78 +446,83 @@ function Main() {
     if (!lastRecording) return
 
     try {
-      // Open Direct Montage in a new window
+      // First, prepare the data
+      const arrayBuffer = await lastRecording.blob.arrayBuffer()
+
+      // Try to open Direct Montage in a new window
       const montageWindow = window.open(
         'https://montage.directpodcast.fr?sharing=true',
         '_blank',
+        'width=1200,height=800,scrollbars=yes,resizable=yes',
       )
 
-      if (!montageWindow) {
-        setError(
-          new Error(
-            "Impossible d'ouvrir Direct Montage. Veuillez autoriser les popups.",
-          ),
+      if (
+        !montageWindow ||
+        montageWindow.closed ||
+        typeof montageWindow.closed === 'undefined'
+      ) {
+        alert(
+          "Impossible d'ouvrir Direct Montage. Veuillez autoriser les popups dans votre navigateur et réessayer.",
         )
         return
       }
 
-      // Convert blob to ArrayBuffer for transfer
-      const arrayBuffer = await lastRecording.blob.arrayBuffer()
-
-      // Wait for the window to load and then send the file data
-      const sendFileData = () => {
-        try {
-          montageWindow.postMessage(
-            {
-              type: 'SHARED_AUDIO_FILE',
-              filename: lastRecording.filename,
-              fileType: lastRecording.blob.type,
-              arrayBuffer: arrayBuffer,
-            },
-            'https://montage.directpodcast.fr',
-          )
-        } catch (error) {
-          // If postMessage fails due to size, try chunked transfer
-          sendFileInChunks(montageWindow, arrayBuffer)
-        }
-      }
-
       // Function to send large files in chunks
       const sendFileInChunks = (targetWindow: Window, buffer: ArrayBuffer) => {
-        const chunkSize = 1024 * 1024 // 1MB chunks
+        const chunkSize = 512 * 1024 // 512KB chunks (smaller for better reliability)
         const totalChunks = Math.ceil(buffer.byteLength / chunkSize)
         let chunkIndex = 0
 
         const sendNextChunk = () => {
-          if (chunkIndex >= totalChunks) return
+          if (chunkIndex >= totalChunks) {
+            return
+          }
+
+          if (targetWindow.closed) {
+            return
+          }
 
           const start = chunkIndex * chunkSize
           const end = Math.min(start + chunkSize, buffer.byteLength)
           const chunk = buffer.slice(start, end)
 
-          targetWindow.postMessage(
-            {
-              type: 'SHARED_AUDIO_CHUNK',
-              chunkIndex,
-              totalChunks,
-              chunk,
-              filename: lastRecording.filename,
-              fileType: lastRecording.blob.type,
-            },
-            'https://montage.directpodcast.fr',
-          )
+          try {
+            targetWindow.postMessage(
+              {
+                type: 'SHARED_AUDIO_CHUNK',
+                chunkIndex,
+                totalChunks,
+                chunk,
+                filename: lastRecording.filename,
+                fileType: lastRecording.blob.type,
+              },
+              'https://montage.directpodcast.fr',
+            )
 
-          chunkIndex++
-          setTimeout(sendNextChunk, 50) // Small delay between chunks
+            chunkIndex++
+            setTimeout(sendNextChunk, 100) // Small delay between chunks
+          } catch {
+            alert("Erreur lors de l'envoi du fichier. Veuillez réessayer.")
+          }
         }
 
         sendNextChunk()
       }
 
-      // Wait for Direct Montage to be ready
-      setTimeout(sendFileData, 2000) // Give the page time to load
-    } catch (err) {
-      setError(new Error("Échec du partage de l'enregistrement"))
+      // Wait for Direct Montage to be ready, then send data
+      const waitAndSend = () => {
+        if (montageWindow.closed) {
+          return
+        }
+
+        // Always use chunked transfer for reliability
+        sendFileInChunks(montageWindow, arrayBuffer)
+      }
+
+      // Give the page time to load
+      setTimeout(waitAndSend, 3000)
+    } catch {
+      alert("Échec du partage de l'enregistrement. Veuillez réessayer.")
     }
   }
 
@@ -541,7 +546,14 @@ function Main() {
           <ConversionIndicator>Converting to MP3...</ConversionIndicator>
         )}
         {lastRecording && !isRecording && !isConverting && (
-          <ShareButton onClick={handleShareToMontage}>
+          <ShareButton
+            type='button'
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              handleShareToMontage()
+            }}
+          >
             Partager vers Direct Montage
           </ShareButton>
         )}
