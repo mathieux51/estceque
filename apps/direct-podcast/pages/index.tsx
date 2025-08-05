@@ -16,11 +16,11 @@ if (!isServer) {
   Sentry.configureScope((scope) => {
     scope.setExtra(
       'adapter.browserDetails.browser',
-      adapter.browserDetails.browser,
+      adapter.browserDetails.browser
     )
     scope.setExtra(
       'adapter.browserDetails.version',
-      adapter.browserDetails.version,
+      adapter.browserDetails.version
     )
   })
 }

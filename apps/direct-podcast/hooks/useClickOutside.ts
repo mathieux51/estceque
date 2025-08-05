@@ -2,7 +2,7 @@ import React from 'react'
 
 const useClickOutide = (
   ref: React.RefObject<HTMLButtonElement>,
-  callback: () => void,
+  callback: () => void
 ) => {
   const callbackRef = React.useRef<() => void>()
   callbackRef.current = callback
@@ -18,7 +18,7 @@ const useClickOutide = (
         callbackRef.current()
       }
     },
-    [ref],
+    [ref]
   )
   React.useEffect(() => {
     document.addEventListener('click', handleClick, true)

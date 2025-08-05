@@ -14,7 +14,7 @@ export const media = (Object.keys(sizes) as (keyof typeof sizes)[]).reduce(
   {} as Record<
     keyof typeof sizes | string,
     (l: TemplateStringsArray, ...p: any[]) => string // eslint-disable-line
-  >,
+  >
 )
 
 export default media

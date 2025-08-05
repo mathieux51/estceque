@@ -31,7 +31,7 @@ export const openSharedDB = (): Promise<IDBDatabase> => {
 export const saveSharedAudioFile = async (
   filename: string,
   fileType: string,
-  arrayBuffer: ArrayBuffer,
+  arrayBuffer: ArrayBuffer
 ): Promise<string> => {
   const db = await openSharedDB()
   const id = `shared_${Date.now()}_${Math.random().toString(36).substr(2, 9)}`
@@ -91,7 +91,7 @@ export const clearSharedAudioFiles = async (): Promise<void> => {
 }
 
 export const cleanupOldSharedFiles = async (
-  maxAgeMs: number = 24 * 60 * 60 * 1000,
+  maxAgeMs: number = 24 * 60 * 60 * 1000
 ): Promise<void> => {
   const db = await openSharedDB()
   const cutoffTime = Date.now() - maxAgeMs

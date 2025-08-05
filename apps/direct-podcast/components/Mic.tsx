@@ -13,7 +13,7 @@ const Mic: React.FC<Props> = ({
 }) => {
   // Generate a unique ID for this instance
   const [gradientId] = React.useState(
-    () => `mic-gradient-${Math.random().toString(36).substring(2, 11)}`,
+    () => `mic-gradient-${Math.random().toString(36).substring(2, 11)}`
   )
 
   // Clamp volume level between 0 and 1

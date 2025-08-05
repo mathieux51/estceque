@@ -133,18 +133,18 @@ const handleStopRecording = async ({
         ffmpeg = new FFmpeg()
         const version = packageJSON.devDependencies['@ffmpeg/core'].replace(
           '^',
-          '',
+          ''
         )
         const baseURL = `https://unpkg.com/@ffmpeg/core@${version}/dist/umd`
 
         await ffmpeg.load({
           coreURL: await toBlobURL(
             `${baseURL}/ffmpeg-core.js`,
-            'text/javascript',
+            'text/javascript'
           ),
           wasmURL: await toBlobURL(
             `${baseURL}/ffmpeg-core.wasm`,
-            'application/wasm',
+            'application/wasm'
           ),
         })
 
@@ -176,8 +176,8 @@ const handleStopRecording = async ({
         ) {
           setError(
             new Error(
-              'Network error: Unable to load MP3 converter. Please check your internet connection.',
-            ),
+              'Network error: Unable to load MP3 converter. Please check your internet connection.'
+            )
           )
         } else if (
           error.message?.includes('WASM') ||
@@ -185,8 +185,8 @@ const handleStopRecording = async ({
         ) {
           setError(
             new Error(
-              'Browser compatibility error: Your browser may not support MP3 conversion.',
-            ),
+              'Browser compatibility error: Your browser may not support MP3 conversion.'
+            )
           )
         } else {
           setError(new Error(`MP3 conversion failed: ${error.message}`))
@@ -449,7 +449,7 @@ function Main() {
   const [isPreparingShare, setIsPreparingShare] = React.useState(false)
 
   const handleShareToMontage = async (
-    e: React.MouseEvent<HTMLAnchorElement>,
+    e: React.MouseEvent<HTMLAnchorElement>
   ) => {
     if (!lastRecording) {
       e.preventDefault()
@@ -471,7 +471,7 @@ function Main() {
       await saveSharedAudioFile(
         lastRecording.filename,
         lastRecording.blob.type,
-        arrayBuffer,
+        arrayBuffer
       )
 
       // Navigate using anchor href after data is saved
