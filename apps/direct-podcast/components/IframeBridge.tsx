@@ -15,7 +15,11 @@ interface IframeBridgeProps {
 }
 
 export interface IframeBridge {
-  sendAudioData: (filename: string, fileType: string, arrayBuffer: ArrayBuffer) => Promise<void>
+  sendAudioData: (
+    filename: string,
+    fileType: string,
+    arrayBuffer: ArrayBuffer
+  ) => Promise<void>
   navigateToMontage: () => void
 }
 
@@ -23,41 +27,59 @@ const IframeBridge: React.FC<IframeBridgeProps> = ({ onBridgeReady }) => {
   const iframeRef = useRef<HTMLIFrameElement>(null)
   const bridgeReadyRef = useRef(false)
 
-  const sendAudioData = useCallback(async (filename: string, fileType: string, arrayBuffer: ArrayBuffer): Promise<void> => {
-    return new Promise((resolve, reject) => {
-      const iframe = iframeRef.current
-      if (!iframe || !iframe.contentWindow) {
-        reject(new Error('Bridge iframe not ready'))
-        return
-      }
-
-      const messageId = `audio-data-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`
-      
-      const handleResponse = (event: MessageEvent) => {
-        if (event.origin !== 'https://montage.directpodcast.fr') return
-        if (event.data.type === 'AUDIO_DATA_SAVED' && event.data.messageId === messageId) {
-          window.removeEventListener('message', handleResponse)
-          resolve()
-        } else if (event.data.type === 'AUDIO_DATA_ERROR' && event.data.messageId === messageId) {
-          window.removeEventListener('message', handleResponse)
-          reject(new Error(event.data.error))
+  const sendAudioData = useCallback(
+    async (
+      filename: string,
+      fileType: string,
+      arrayBuffer: ArrayBuffer
+    ): Promise<void> => {
+      return new Promise((resolve, reject) => {
+        const iframe = iframeRef.current
+        if (!iframe || !iframe.contentWindow) {
+          reject(new Error('Bridge iframe not ready'))
+          return
         }
-      }
 
-      window.addEventListener('message', handleResponse)
+        const messageId = `audio-data-${Date.now()}-${Math.random()
+          .toString(36)
+          .substr(2, 9)}`
 
-      // Send audio data
-      iframe.contentWindow.postMessage({
-        type: 'SAVE_AUDIO_DATA',
-        messageId,
-        data: {
-          filename,
-          fileType,
-          arrayBuffer
+        const handleResponse = (event: MessageEvent) => {
+          if (event.origin !== 'https://montage.directpodcast.fr') return
+          if (
+            event.data.type === 'AUDIO_DATA_SAVED' &&
+            event.data.messageId === messageId
+          ) {
+            window.removeEventListener('message', handleResponse)
+            resolve()
+          } else if (
+            event.data.type === 'AUDIO_DATA_ERROR' &&
+            event.data.messageId === messageId
+          ) {
+            window.removeEventListener('message', handleResponse)
+            reject(new Error(event.data.error))
+          }
         }
-      }, 'https://montage.directpodcast.fr')
-    })
-  }, [])
+
+        window.addEventListener('message', handleResponse)
+
+        // Send audio data
+        iframe.contentWindow.postMessage(
+          {
+            type: 'SAVE_AUDIO_DATA',
+            messageId,
+            data: {
+              filename,
+              fileType,
+              arrayBuffer,
+            },
+          },
+          'https://montage.directpodcast.fr'
+        )
+      })
+    },
+    []
+  )
 
   const navigateToMontage = useCallback(() => {
     window.open('https://montage.directpodcast.fr?sharing=true', '_blank')
@@ -65,11 +87,11 @@ const IframeBridge: React.FC<IframeBridgeProps> = ({ onBridgeReady }) => {
 
   const handleIframeLoad = useCallback(() => {
     if (bridgeReadyRef.current) return
-    
+
     bridgeReadyRef.current = true
     const bridge: IframeBridge = {
       sendAudioData,
-      navigateToMontage
+      navigateToMontage,
     }
     onBridgeReady(bridge)
   }, [onBridgeReady, sendAudioData, navigateToMontage])
@@ -89,9 +111,9 @@ const IframeBridge: React.FC<IframeBridgeProps> = ({ onBridgeReady }) => {
   return (
     <HiddenIframe
       ref={iframeRef}
-      src="https://montage.directpodcast.fr/bridge"
+      src='https://montage.directpodcast.fr/bridge'
       onLoad={handleIframeLoad}
-      title="IndexedDB Bridge"
+      title='IndexedDB Bridge'
     />
   )
 }

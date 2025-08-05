@@ -10,7 +10,6 @@ import filename from '../helpers/filename'
 import type RecordRTC from 'recordrtc'
 import { toError } from '../helpers/errors'
 import packageJSON from '../package.json'
-import { saveSharedAudioFile } from '../lib/sharedDB'
 import IframeBridge, { IframeBridge as IframeBridgeType } from './IframeBridge'
 
 const Container = styled.div`
@@ -448,7 +447,8 @@ function Main() {
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
 
   const [isPreparingShare, setIsPreparingShare] = React.useState(false)
-  const [iframeBridge, setIframeBridge] = React.useState<IframeBridgeType | null>(null)
+  const [iframeBridge, setIframeBridge] =
+    React.useState<IframeBridgeType | null>(null)
 
   const handleShareToMontage = async (
     e: React.MouseEvent<HTMLAnchorElement>
@@ -513,8 +513,8 @@ function Main() {
             {isPreparingShare
               ? 'Préparation...'
               : !iframeBridge
-              ? 'Initialisation...'
-              : 'Partager vers Direct Montage'}
+                ? 'Initialisation...'
+                : 'Partager vers Direct Montage'}
           </ShareButton>
         )}
       </Form>
