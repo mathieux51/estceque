@@ -33,19 +33,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'require-jsdoc': 0,
-    '@typescript-eslint/member-delimiter-style': [
-      'error',
-      {
-        multiline: {
-          delimiter: 'none',
-          requireLast: false,
-        },
-        singleline: {
-          delimiter: 'comma',
-          requireLast: false,
-        },
-      },
-    ],
+    '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
   },
   settings: {

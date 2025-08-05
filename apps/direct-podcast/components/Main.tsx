@@ -58,6 +58,28 @@ const ConversionIndicator = styled.div`
   margin-top: 0.5rem;
   text-align: center;
 `
+
+const ShareButton = styled.button`
+  background-color: ${(props) => props.theme.black};
+  color: ${(props) => props.theme.white};
+  border: 2px solid ${(props) => props.theme.white};
+  padding: 0.75rem 1.5rem;
+  font-size: 16px;
+  cursor: pointer;
+  border-radius: 4px;
+  margin-top: 1rem;
+  transition: all 0.2s ease;
+
+  &:hover {
+    background-color: ${(props) => props.theme.white};
+    color: ${(props) => props.theme.black};
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+`
 const handleStream = async ({
   setError,
   setStream,
@@ -83,12 +105,16 @@ const handleStopRecording = async ({
   setRecorder,
   setError,
   setIsConverting,
+  setLastRecording,
 }: {
   useMp3: boolean
   recorder: RecordRTC
   setError: React.Dispatch<React.SetStateAction<Error | undefined>>
   setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
   setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
+  setLastRecording: React.Dispatch<
+    React.SetStateAction<{ blob: Blob; filename: string } | null>
+  >
 }) => {
   try {
     const blob = recorder.getBlob()
@@ -126,7 +152,9 @@ const handleStopRecording = async ({
         await ffmpeg.writeFile(wav, uint8Array)
         await ffmpeg.exec(['-i', wav, mp3])
         const file = await ffmpeg.readFile(mp3)
-        saveAs(new Blob([file]), mp3)
+        const mp3Blob = new Blob([file])
+        saveAs(mp3Blob, mp3)
+        setLastRecording({ blob: mp3Blob, filename: mp3 })
 
         // Cleanup temporary files
         try {
@@ -164,7 +192,9 @@ const handleStopRecording = async ({
         setIsConverting(false)
       }
     } else {
-      saveAs(blob, `${filename()}.wav`)
+      const wavFilename = `${filename()}.wav`
+      saveAs(blob, wavFilename)
+      setLastRecording({ blob, filename: wavFilename })
     }
     recorder.destroy()
     setRecorder(undefined)
@@ -212,6 +242,7 @@ const handleRecord = ({
   stream,
   useMp3,
   setIsConverting,
+  setLastRecording,
 }: {
   stream: MediaStream | undefined
   isRecording: boolean
@@ -221,6 +252,9 @@ const handleRecord = ({
   setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
   useMp3: boolean
   setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
+  setLastRecording: React.Dispatch<
+    React.SetStateAction<{ blob: Blob; filename: string } | null>
+  >
 }) => {
   try {
     if (!isRecording && typeof recorder !== 'undefined' && stream?.active) {
@@ -238,6 +272,7 @@ const handleRecord = ({
           setError,
           useMp3,
           setIsConverting,
+          setLastRecording,
         })
       })
     }
@@ -254,6 +289,10 @@ function Main() {
   const [useMp3, setUseMp3] = React.useState<boolean>(false) // either 'audio/wav' or 'audio/mpeg' (MP3)
   const [volumeLevel, setVolumeLevel] = React.useState<number>(0)
   const [isConverting, setIsConverting] = React.useState<boolean>(false)
+  const [lastRecording, setLastRecording] = React.useState<{
+    blob: Blob
+    filename: string
+  } | null>(null)
   const animationFrameRef = React.useRef<number>()
   const audioContextRef = React.useRef<AudioContext>()
   const analyserRef = React.useRef<AnalyserNode>()
@@ -364,6 +403,7 @@ function Main() {
         stream: nextStream,
         useMp3,
         setIsConverting,
+        setLastRecording,
       })
       return
     }
@@ -383,6 +423,7 @@ function Main() {
         stream,
         useMp3,
         setIsConverting,
+        setLastRecording,
       })
       return
     }
@@ -396,9 +437,52 @@ function Main() {
       stream,
       useMp3,
       setIsConverting,
+      setLastRecording,
     })
   }
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
+
+  const handleShareToMontage = async () => {
+    if (!lastRecording) return
+
+    try {
+      // Store the recording in IndexedDB for cross-domain sharing
+      const request = indexedDB.open('DirectPodcastShared', 1)
+
+      request.onupgradeneeded = (event) => {
+        const db = (event.target as IDBOpenDBRequest).result
+        if (!db.objectStoreNames.contains('recordings')) {
+          db.createObjectStore('recordings')
+        }
+      }
+
+      request.onsuccess = async () => {
+        const db = request.result
+        const transaction = db.transaction(['recordings'], 'readwrite')
+        const store = transaction.objectStore('recordings')
+
+        // Store in IndexedDB directly
+        await store.put(
+          {
+            data: lastRecording.blob,
+            filename: lastRecording.filename,
+            timestamp: Date.now(),
+          },
+          'latest',
+        )
+
+        // Open Direct Montage with shared parameter
+        window.open(
+          `https://montage.directpodcast.fr?shared=true&filename=${encodeURIComponent(
+            lastRecording.filename,
+          )}`,
+          '_blank',
+        )
+      }
+    } catch (err) {
+      setError(new Error('Failed to share recording'))
+    }
+  }
 
   if (error) {
     throw error
@@ -418,6 +502,11 @@ function Main() {
         <Timer isRecording={isRecording} />
         {isConverting && (
           <ConversionIndicator>Converting to MP3...</ConversionIndicator>
+        )}
+        {lastRecording && !isRecording && !isConverting && (
+          <ShareButton onClick={handleShareToMontage}>
+            Partager vers Direct Montage
+          </ShareButton>
         )}
       </Form>
       <StyledFooter />
