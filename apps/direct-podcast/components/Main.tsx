@@ -475,7 +475,7 @@ function Main() {
       )
 
       // Navigate using anchor href after data is saved
-      window.location.href = 'https://montage.directpodcast.fr?sharing=true'
+      window.location.href = '/montage?sharing=true'
     } catch (error) {
       alert('Erreur lors de la préparation du partage. Veuillez réessayer.')
       setIsPreparingShare(false)
