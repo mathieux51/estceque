@@ -450,21 +450,70 @@ function Main() {
       const arrayBuffer = await lastRecording.blob.arrayBuffer()
 
       // Try to open Direct Montage in a new window
-      const montageWindow = window.open(
+      let montageWindow = window.open(
         'https://montage.directpodcast.fr?sharing=true',
         '_blank',
         'width=1200,height=800,scrollbars=yes,resizable=yes',
       )
 
+      // Check if popup was blocked
       if (
         !montageWindow ||
         montageWindow.closed ||
         typeof montageWindow.closed === 'undefined'
       ) {
-        alert(
-          "Impossible d'ouvrir Direct Montage. Veuillez autoriser les popups dans votre navigateur et réessayer.",
+        // Popup blocked - try fallback methods
+        const userChoice = confirm(
+          'Votre navigateur bloque les popups. Voulez-vous :\n\n' +
+            'OK = Ouvrir Direct Montage dans un nouvel onglet\n' +
+            "Annuler = Copier le lien et l'ouvrir manuellement",
         )
-        return
+
+        if (userChoice) {
+          // Try opening in a new tab (more likely to work)
+          montageWindow = window.open(
+            'https://montage.directpodcast.fr?sharing=true',
+            '_blank',
+          )
+
+          if (!montageWindow) {
+            // Still blocked - provide manual fallback
+            const link = 'https://montage.directpodcast.fr?sharing=true'
+            navigator.clipboard
+              ?.writeText(link)
+              .then(() => {
+                alert(
+                  `Le lien a été copié dans votre presse-papiers :\n${link}\n\n` +
+                    'Collez-le dans un nouvel onglet pour recevoir votre fichier.',
+                )
+              })
+              .catch(() => {
+                alert(
+                  `Veuillez ouvrir ce lien manuellement :\n${link}\n\n` +
+                    'Copiez-le et collez-le dans un nouvel onglet pour recevoir votre fichier.',
+                )
+              })
+            return
+          }
+        } else {
+          // User chose to copy link manually
+          const link = 'https://montage.directpodcast.fr?sharing=true'
+          navigator.clipboard
+            ?.writeText(link)
+            .then(() => {
+              alert(
+                `Le lien a été copié dans votre presse-papiers :\n${link}\n\n` +
+                  'Collez-le dans un nouvel onglet pour recevoir votre fichier.',
+              )
+            })
+            .catch(() => {
+              alert(
+                `Veuillez ouvrir ce lien manuellement :\n${link}\n\n` +
+                  'Copiez-le et collez-le dans un nouvel onglet pour recevoir votre fichier.',
+              )
+            })
+          return
+        }
       }
 
       // Function to send large files in chunks
@@ -512,7 +561,7 @@ function Main() {
 
       // Wait for Direct Montage to be ready, then send data
       const waitAndSend = () => {
-        if (montageWindow.closed) {
+        if (montageWindow && montageWindow.closed) {
           return
         }
 
@@ -522,7 +571,7 @@ function Main() {
         if (arrayBuffer.byteLength <= maxSingleTransferSize) {
           // Send as single file for faster transfer
           try {
-            montageWindow.postMessage(
+            montageWindow!.postMessage(
               {
                 type: 'SHARED_AUDIO_FILE',
                 filename: lastRecording.filename,
@@ -533,16 +582,78 @@ function Main() {
             )
           } catch {
             // Fallback to chunked transfer if single transfer fails
-            sendFileInChunks(montageWindow, arrayBuffer)
+            sendFileInChunks(montageWindow!, arrayBuffer)
           }
         } else {
           // Use chunked transfer for large files
-          sendFileInChunks(montageWindow, arrayBuffer)
+          sendFileInChunks(montageWindow!, arrayBuffer)
         }
       }
 
-      // Give the page time to load
-      setTimeout(waitAndSend, 3000)
+      // Set up message listener for handshake
+      let dataSent = false
+      const handleHandshake = (event: MessageEvent) => {
+        if (event.origin !== 'https://montage.directpodcast.fr') return
+
+        if (event.data === 'MONTAGE_READY' && !dataSent) {
+          // Direct Montage is ready to receive files
+          dataSent = true
+          window.removeEventListener('message', handleHandshake)
+          clearTimeout(fallbackTimeout)
+
+          // Acknowledge receipt to stop retries
+          try {
+            montageWindow!.postMessage(
+              'READY_ACKNOWLEDGED',
+              'https://montage.directpodcast.fr',
+            )
+          } catch {
+            // Ignore if window is closed
+          }
+
+          waitAndSend()
+        }
+      }
+
+      window.addEventListener('message', handleHandshake)
+
+      // Also send data after a fallback delay in case handshake fails
+      // This ensures compatibility but should rarely be needed
+      const fallbackTimeout = setTimeout(() => {
+        if (!dataSent) {
+          dataSent = true
+          window.removeEventListener('message', handleHandshake)
+          waitAndSend()
+        }
+      }, 5000) // Generous fallback
+
+      // Monitor window status using requestAnimationFrame
+      let monitoring = true
+      const checkWindowClosed = () => {
+        if (!monitoring) return
+
+        if (montageWindow && montageWindow.closed) {
+          monitoring = false
+          window.removeEventListener('message', handleHandshake)
+          clearTimeout(fallbackTimeout)
+          if (!dataSent) {
+            alert(
+              'La fenêtre Direct Montage a été fermée.\n\n' +
+                "Si vous ne l'avez pas fermée volontairement, votre navigateur a peut-être bloqué la popup.\n" +
+                "Essayez de cliquer à nouveau sur 'Partager vers Direct Montage'.",
+            )
+          }
+        } else if (dataSent) {
+          // Stop monitoring once data is sent
+          monitoring = false
+        } else {
+          // Keep checking
+          requestAnimationFrame(checkWindowClosed)
+        }
+      }
+
+      // Start monitoring window status
+      requestAnimationFrame(checkWindowClosed)
     } catch {
       alert("Échec du partage de l'enregistrement. Veuillez réessayer.")
     }
