@@ -7,6 +7,10 @@
     {
       "source": "/montage/:path*",
       "destination": "https://montage.directpodcast.fr/:path*"
+    },
+    {
+      "source": "/montage",
+      "destination": "https://montage.directpodcast.fr/"
     }
   ]
 }
