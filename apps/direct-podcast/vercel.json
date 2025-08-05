@@ -2,5 +2,11 @@
   "github": {
     "enabled": false
   },
-  "builds": [{ "src": "next.config.js", "use": "@vercel/next" }]
+  "builds": [{ "src": "next.config.js", "use": "@vercel/next" }],
+  "rewrites": [
+    {
+      "source": "/montage/:path*",
+      "destination": "https://montage.directpodcast.fr/:path*"
+    }
+  ]
 }
