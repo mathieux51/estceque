@@ -26,16 +26,29 @@ module.exports = {
   },
   plugins: ['react', '@typescript-eslint', 'prettier'],
   rules: {
+    // Prettier
     'prettier/prettier': 'error',
-    semi: 0,
-    'react/prop-types': 0,
-    'react/display-name': 0,
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'warn',
-    'require-jsdoc': 0,
+    
+    // Console and debugging
+    'no-console': 'error',
+    
+    // TypeScript specific
     '@typescript-eslint/member-delimiter-style': 'off',
     '@typescript-eslint/ban-ts-comment': 'warn',
-    'no-console': 'error',
+    '@typescript-eslint/no-unused-vars': 'warn',
+    
+    // React specific
+    'react/prop-types': 'off',
+    'react/display-name': 'off',
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'warn',
+    
+    // General code quality
+    'semi': 'off',
+    'require-jsdoc': 'off',
+    'prefer-const': 'error',
+    'no-var': 'error',
+    'no-unused-vars': 'off', // Use TypeScript version instead
   },
   settings: {
     react: {
