@@ -569,20 +569,35 @@ function Main() {
     }
   }, [pendingShare, waitAndSend, sendFileInChunks])
 
-  const handleShareToMontage = async () => {
-    if (!lastRecording) return
-
-    try {
-      // Prepare the data and store it for when Direct Montage is ready
-      const arrayBuffer = await lastRecording.blob.arrayBuffer()
-      setPendingShare({
-        arrayBuffer,
-        filename: lastRecording.filename,
-        fileType: lastRecording.blob.type,
+  // Pre-prepare data when recording stops to avoid async delays during click
+  React.useEffect(() => {
+    if (lastRecording && !pendingShare) {
+      // Prepare data immediately when recording is available
+      lastRecording.blob.arrayBuffer().then(arrayBuffer => {
+        setPendingShare({
+          arrayBuffer,
+          filename: lastRecording.filename,
+          fileType: lastRecording.blob.type,
+        })
+      }).catch(() => {
+        // Ignore errors, user will get feedback when they click
       })
-    } catch {
-      alert("Échec du partage de l'enregistrement. Veuillez réessayer.")
     }
+  }, [lastRecording, pendingShare])
+
+  const handleShareToMontage = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    if (!lastRecording) {
+      e.preventDefault()
+      return
+    }
+
+    if (!pendingShare) {
+      e.preventDefault()
+      alert("Préparation du fichier en cours, veuillez réessayer dans un instant.")
+      return
+    }
+
+    // If we reach here, data is ready and anchor will navigate naturally
   }
 
   if (error) {
@@ -610,6 +625,7 @@ function Main() {
             target='_blank'
             rel='noopener noreferrer'
             onClick={handleShareToMontage}
+            className={!pendingShare ? 'disabled' : ''}
           >
             Partager vers Direct Montage
           </ShareButton>
