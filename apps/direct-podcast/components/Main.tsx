@@ -446,37 +446,39 @@ function Main() {
     if (!lastRecording) return
 
     try {
-      // Convert blob to base64 for URL transfer
-      const reader = new FileReader()
-      reader.onload = () => {
-        const base64Data = (reader.result as string).split(',')[1]
-        const filename = encodeURIComponent(lastRecording.filename)
+      // Use a simple file sharing approach via browser's download/upload mechanism
+      // Create a temporary download link
+      const url = URL.createObjectURL(lastRecording.blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = lastRecording.filename
+      a.style.display = 'none'
+      document.body.appendChild(a)
 
-        // Check if data is too large for URL (most browsers have ~2MB URL limit)
-        if (base64Data.length > 1000000) {
-          // ~1MB limit to be safe
-          // For large files, store in sessionStorage and use a simpler approach
-          sessionStorage.setItem('sharedAudioData', base64Data)
-          sessionStorage.setItem('sharedAudioFilename', lastRecording.filename)
-          sessionStorage.setItem('sharedAudioType', lastRecording.blob.type)
+      // Show instructions to user
+      const shouldProceed = confirm(
+        `Pour partager ce fichier vers Direct Montage:\n\n` +
+          `1. Le fichier "${lastRecording.filename}" va être téléchargé\n` +
+          `2. Direct Montage va s'ouvrir dans un nouvel onglet\n` +
+          `3. Glissez-déposez le fichier téléchargé dans Direct Montage\n\n` +
+          `Continuer ?`,
+      )
 
-          window.open(
-            `https://montage.directpodcast.fr?shared=session&filename=${filename}`,
-            '_blank',
-          )
-        } else {
-          // For smaller files, pass data directly in URL
-          window.open(
-            `https://montage.directpodcast.fr?shared=data&filename=${filename}&data=${encodeURIComponent(
-              base64Data,
-            )}&type=${encodeURIComponent(lastRecording.blob.type)}`,
-            '_blank',
-          )
-        }
+      if (shouldProceed) {
+        // Trigger download
+        a.click()
+
+        // Open Direct Montage
+        setTimeout(() => {
+          window.open('https://montage.directpodcast.fr', '_blank')
+        }, 500) // Small delay to ensure download starts
       }
-      reader.readAsDataURL(lastRecording.blob)
+
+      // Cleanup
+      document.body.removeChild(a)
+      URL.revokeObjectURL(url)
     } catch (err) {
-      setError(new Error('Failed to share recording'))
+      setError(new Error("Échec du partage de l'enregistrement"))
     }
   }
 
