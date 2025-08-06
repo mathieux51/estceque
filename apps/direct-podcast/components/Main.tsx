@@ -475,7 +475,7 @@ function Main() {
       )
 
       // Navigate to montage app
-      window.location.href = '/montage?shared=true'
+      window.location.href = '/montage?sharing=true'
     } catch (error) {
       alert('Erreur lors de la préparation du partage. Veuillez réessayer.')
     } finally {
