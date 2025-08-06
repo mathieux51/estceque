@@ -11,4 +11,13 @@
 //   },
 // })
 // )
-module.exports = {}
+module.exports = {
+  async rewrites() {
+    return [
+      {
+        source: '/recuperation',
+        destination: '/recovery',
+      },
+    ]
+  },
+}

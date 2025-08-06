@@ -10,13 +10,13 @@ const Right = styled.span`
   margin-left: 3px;
   transform: translate(0, -100%);
   padding: 10px 20px;
-  color: ${(props) => props.theme.white};
+  color: ${(props) => props.theme.grey};
   background: ${(props) => props.theme.blue};
   border-radius: 4px;
   position: absolute;
   z-index: 1;
   box-sizing: border-box;
-  border: 1px solid ${(props) => props.theme.white};
+  border: 1px solid ${(props) => props.theme.grey};
   transition: opacity 0.8s;
 `
 
@@ -52,7 +52,7 @@ const I = styled.i`
     left: 0;
     top: 50%;
     transform: translate(50%,-50%) rotate(-45deg);
-    background: ${(props) => props.theme.white};
+    background: ${(props) => props.theme.grey};
     box-shadow: 0 1px 8px rgba(0,0,0,0.5);
   `
 
@@ -62,6 +62,15 @@ type Props = {
   children: JSX.Element
 }
 
+const Link = styled.a`
+  color: ${(props) => props.theme.grey};
+  text-decoration: underline;
+  
+  &:hover {
+    opacity: 0.8;
+  }
+`
+
 const Tooltip: React.FC<Props> = ({ className, children, isVisible }) => (
   <Container isVisible={isVisible} className={className}>
     {children}
@@ -70,6 +79,9 @@ const Tooltip: React.FC<Props> = ({ className, children, isVisible }) => (
         j'ai terminé, je clique une seconde fois pour arrêter mon enregistrement
         → Le fichier sonore se télécharge automatiquement sur mon appareil.
       `}</p>
+      <p>
+        <Link href="/recuperation">Récupérer mes enregistrements</Link>
+      </p>
       <I />
     </Right>
   </Container>

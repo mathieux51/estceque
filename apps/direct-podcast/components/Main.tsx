@@ -7,10 +7,23 @@ import Timer from './Timer'
 import Footer from './Footer'
 import Header from './Header'
 import filename from '../helpers/filename'
-import type RecordRTC from 'recordrtc'
 import { toError } from '../helpers/errors'
 import packageJSON from '../package.json'
 import { saveSharedAudioFile } from '../lib/sharedDB'
+import {
+  saveLocalRecording,
+  getLatestLocalRecording,
+  cleanupOldLocalRecordings,
+} from '../lib/recordingDB'
+import {
+  createRecordingSession,
+  saveRecordingChunk,
+  markSessionComplete,
+  getIncompleteSessions,
+  reassembleRecording,
+  cleanupOldSessions,
+  deleteSession,
+} from '../lib/chunkedRecordingDB'
 
 const Container = styled.div`
   height: 100vh;
@@ -111,103 +124,153 @@ const handleStopRecording = async ({
   setError,
   setIsConverting,
   setLastRecording,
+  currentSessionIdRef,
+  recordedChunksRef,
 }: {
   useMp3: boolean
-  recorder: RecordRTC
+  recorder: MediaRecorder
   setError: React.Dispatch<React.SetStateAction<Error | undefined>>
-  setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
+  setRecorder: React.Dispatch<React.SetStateAction<MediaRecorder | undefined>>
   setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
   setLastRecording: React.Dispatch<
     React.SetStateAction<{ blob: Blob; filename: string } | null>
   >
+  currentSessionIdRef: React.MutableRefObject<string | null>
+  recordedChunksRef: React.MutableRefObject<Blob[]>
 }) => {
-  try {
-    const blob = recorder.getBlob()
-    if (useMp3) {
-      setIsConverting(true)
-
-      let ffmpeg: import('@ffmpeg/ffmpeg').FFmpeg | null = null
+  return new Promise<void>((resolve) => {
+    recorder.onstop = async () => {
       try {
-        const { FFmpeg } = await import('@ffmpeg/ffmpeg')
-        const { toBlobURL } = await import('@ffmpeg/util')
-        ffmpeg = new FFmpeg()
-        const version = packageJSON.devDependencies['@ffmpeg/core'].replace(
-          '^',
-          ''
-        )
-        const baseURL = `https://unpkg.com/@ffmpeg/core@${version}/dist/umd`
-
-        await ffmpeg.load({
-          coreURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.js`,
-            'text/javascript'
-          ),
-          wasmURL: await toBlobURL(
-            `${baseURL}/ffmpeg-core.wasm`,
-            'application/wasm'
-          ),
+        // Combine all recorded chunks
+        const blob = new Blob(recordedChunksRef.current, {
+          type: recordedChunksRef.current[0]?.type || 'audio/webm',
         })
 
-        const fName = filename()
-        const wav = `${fName}.wav`
-        const mp3 = `${fName}.mp3`
-        const arrayBuffer = await blob.arrayBuffer()
-        const uint8Array = new Uint8Array(arrayBuffer)
+        // Always convert to WAV first (or MP3 if requested)
+        setIsConverting(true)
 
-        await ffmpeg.writeFile(wav, uint8Array)
-        await ffmpeg.exec(['-i', wav, mp3])
-        const file = await ffmpeg.readFile(mp3)
-        const mp3Blob = new Blob([file])
-        saveAs(mp3Blob, mp3)
-        setLastRecording({ blob: mp3Blob, filename: mp3 })
-
-        // Cleanup temporary files
+        let ffmpeg: import('@ffmpeg/ffmpeg').FFmpeg | null = null
         try {
-          await ffmpeg.deleteFile(wav)
-          await ffmpeg.deleteFile(mp3)
-        } catch (cleanupError) {
-          // Ignore cleanup errors, they're not critical
-        }
-      } catch (conversionError) {
-        const error = toError(conversionError)
-        if (
-          error.message?.includes('network') ||
-          error.message?.includes('fetch')
-        ) {
-          setError(
-            new Error(
-              'Network error: Unable to load MP3 converter. Please check your internet connection.'
-            )
+          const { FFmpeg } = await import('@ffmpeg/ffmpeg')
+          const { toBlobURL } = await import('@ffmpeg/util')
+          ffmpeg = new FFmpeg()
+          const version = packageJSON.devDependencies['@ffmpeg/core'].replace(
+            '^',
+            ''
           )
-        } else if (
-          error.message?.includes('WASM') ||
-          error.message?.includes('WebAssembly')
-        ) {
-          setError(
-            new Error(
-              'Browser compatibility error: Your browser may not support MP3 conversion.'
+          const baseURL = `https://unpkg.com/@ffmpeg/core@${version}/dist/umd`
+
+          await ffmpeg.load({
+            coreURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.js`,
+              'text/javascript'
+            ),
+            wasmURL: await toBlobURL(
+              `${baseURL}/ffmpeg-core.wasm`,
+              'application/wasm'
+            ),
+          })
+
+          const fName = filename()
+          const inputExt = blob.type.includes('wav') ? 'wav' : blob.type.includes('webm') ? 'webm' : 'mp4'
+          const input = `${fName}.${inputExt}`
+          const arrayBuffer = await blob.arrayBuffer()
+          const uint8Array = new Uint8Array(arrayBuffer)
+
+          await ffmpeg.writeFile(input, uint8Array)
+
+          if (useMp3) {
+            // Convert to MP3
+            const mp3 = `${fName}.mp3`
+            await ffmpeg.exec(['-i', input, mp3])
+            const file = await ffmpeg.readFile(mp3)
+            const mp3Blob = new Blob([file])
+            saveAs(mp3Blob, mp3)
+            setLastRecording({ blob: mp3Blob, filename: mp3 })
+
+            // Save to IndexedDB for data persistence
+            const mp3ArrayBuffer = await mp3Blob.arrayBuffer()
+            await saveLocalRecording(mp3, 'audio/mpeg', mp3ArrayBuffer, true)
+
+            // Mark session as complete
+            if (currentSessionIdRef.current) {
+              await markSessionComplete(currentSessionIdRef.current, mp3)
+              currentSessionIdRef.current = null
+            }
+
+            // Cleanup temporary files
+            try {
+              await ffmpeg.deleteFile(input)
+              await ffmpeg.deleteFile(mp3)
+            } catch (cleanupError) {
+              // Ignore cleanup errors, they're not critical
+            }
+          } else {
+            // Convert to WAV
+            const wav = `${fName}.wav`
+            await ffmpeg.exec(['-i', input, wav])
+            const file = await ffmpeg.readFile(wav)
+            const wavBlob = new Blob([file])
+            saveAs(wavBlob, wav)
+            setLastRecording({ blob: wavBlob, filename: wav })
+
+            // Save to IndexedDB for data persistence
+            const wavArrayBuffer = await wavBlob.arrayBuffer()
+            await saveLocalRecording(wav, 'audio/wav', wavArrayBuffer, false)
+
+            // Mark session as complete
+            if (currentSessionIdRef.current) {
+              await markSessionComplete(currentSessionIdRef.current, wav)
+              currentSessionIdRef.current = null
+            }
+
+            // Cleanup temporary files
+            try {
+              await ffmpeg.deleteFile(input)
+              await ffmpeg.deleteFile(wav)
+            } catch (cleanupError) {
+              // Ignore cleanup errors, they're not critical
+            }
+          }
+        } catch (conversionError) {
+          const error = toError(conversionError)
+          if (
+            error.message?.includes('network') ||
+            error.message?.includes('fetch')
+          ) {
+            setError(
+              new Error(
+                'Network error: Unable to load converter. Please check your internet connection.'
+              )
             )
-          )
-        } else {
-          setError(new Error(`MP3 conversion failed: ${error.message}`))
+          } else if (
+            error.message?.includes('WASM') ||
+            error.message?.includes('WebAssembly')
+          ) {
+            setError(
+              new Error(
+                'Browser compatibility error: Your browser may not support audio conversion.'
+              )
+            )
+          } else {
+            setError(new Error(`Audio conversion failed: ${error.message}`))
+          }
+        } finally {
+          setIsConverting(false)
         }
-        throw error
-      } finally {
-        setIsConverting(false)
+
+        setRecorder(undefined)
+        resolve()
+      } catch (error) {
+        if (!useMp3) {
+          setError(toError(error))
+        }
+        resolve()
       }
-    } else {
-      const wavFilename = `${filename()}.wav`
-      saveAs(blob, wavFilename)
-      setLastRecording({ blob, filename: wavFilename })
     }
-    recorder.destroy()
-    setRecorder(undefined)
-  } catch (error) {
-    if (!useMp3) {
-      setError(toError(error))
-    }
-    // MP3 errors are already handled above
-  }
+
+    recorder.stop()
+  })
 }
 
 const handleRecorder = async ({
@@ -215,20 +278,17 @@ const handleRecorder = async ({
   setRecorder,
   setError,
   stream,
+  createMediaRecorder,
 }: {
-  recorder: RecordRTC | undefined
-  setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
+  recorder: MediaRecorder | undefined
+  setRecorder: React.Dispatch<React.SetStateAction<MediaRecorder | undefined>>
   setError: React.Dispatch<React.SetStateAction<Error | undefined>>
   stream: MediaStream | undefined
-}): Promise<RecordRTC | undefined> => {
+  createMediaRecorder: (stream: MediaStream) => MediaRecorder
+}): Promise<MediaRecorder | undefined> => {
   try {
     if (typeof stream !== 'undefined' && typeof recorder === 'undefined') {
-      const RecordRTC = (await import('recordrtc')).default
-      const nextRecorder = new RecordRTC(stream.clone(), {
-        recorderType: RecordRTC.StereoAudioRecorder,
-        mimeType: 'audio/wav',
-        disableLogs: true,
-      })
+      const nextRecorder = createMediaRecorder(stream)
       setRecorder(nextRecorder)
       return nextRecorder
     }
@@ -237,7 +297,7 @@ const handleRecorder = async ({
   }
 }
 
-const handleRecord = ({
+const handleRecord = async ({
   isRecording,
   recorder,
   setError,
@@ -247,37 +307,50 @@ const handleRecord = ({
   useMp3,
   setIsConverting,
   setLastRecording,
+  currentSessionIdRef,
+  chunkIndexRef,
+  recordedChunksRef,
 }: {
   stream: MediaStream | undefined
   isRecording: boolean
-  recorder: RecordRTC | undefined
+  recorder: MediaRecorder | undefined
   setError: React.Dispatch<React.SetStateAction<Error | undefined>>
   setIsRecording: React.Dispatch<React.SetStateAction<boolean>>
-  setRecorder: React.Dispatch<React.SetStateAction<RecordRTC | undefined>>
+  setRecorder: React.Dispatch<React.SetStateAction<MediaRecorder | undefined>>
   useMp3: boolean
   setIsConverting: React.Dispatch<React.SetStateAction<boolean>>
   setLastRecording: React.Dispatch<
     React.SetStateAction<{ blob: Blob; filename: string } | null>
   >
+  currentSessionIdRef: React.MutableRefObject<string | null>
+  chunkIndexRef: React.MutableRefObject<number>
+  recordedChunksRef: React.MutableRefObject<Blob[]>
 }) => {
   try {
     if (!isRecording && typeof recorder !== 'undefined' && stream?.active) {
       setIsRecording(true)
-      recorder.startRecording()
+      // Create a new recording session
+      const sessionId = await createRecordingSession('audio/webm')
+      currentSessionIdRef.current = sessionId
+      chunkIndexRef.current = 0
+      
+      // Start recording with 5-second intervals for chunks
+      recorder.start(5000)
       return
     }
 
     setIsRecording(false)
+    
     if (typeof recorder !== 'undefined') {
-      recorder.stopRecording(() => {
-        handleStopRecording({
-          recorder,
-          setRecorder,
-          setError,
-          useMp3,
-          setIsConverting,
-          setLastRecording,
-        })
+      await handleStopRecording({
+        recorder,
+        setRecorder,
+        setError,
+        useMp3,
+        setIsConverting,
+        setLastRecording,
+        currentSessionIdRef,
+        recordedChunksRef,
       })
     }
   } catch (error) {
@@ -287,7 +360,7 @@ const handleRecord = ({
 
 function Main() {
   const [isRecording, setIsRecording] = React.useState(false)
-  const [recorder, setRecorder] = React.useState<RecordRTC>()
+  const [recorder, setRecorder] = React.useState<MediaRecorder>()
   const [stream, setStream] = React.useState<MediaStream>()
   const [error, setError] = React.useState<Error>()
   const [useMp3, setUseMp3] = React.useState<boolean>(false) // either 'audio/wav' or 'audio/mpeg' (MP3)
@@ -297,10 +370,91 @@ function Main() {
     blob: Blob
     filename: string
   } | null>(null)
+  const currentSessionIdRef = React.useRef<string | null>(null)
+  const chunkIndexRef = React.useRef(0)
   const animationFrameRef = React.useRef<number>()
   const audioContextRef = React.useRef<AudioContext>()
   const analyserRef = React.useRef<AnalyserNode>()
   const dataArrayRef = React.useRef<Uint8Array>()
+  const recordedChunksRef = React.useRef<Blob[]>([])
+
+  const createMediaRecorder = (stream: MediaStream): MediaRecorder => {
+    // MediaRecorder doesn't support audio/wav in most browsers
+    // Use webm/opus which has excellent support and quality
+    let mimeType = 'audio/webm;codecs=opus'
+    if (!MediaRecorder.isTypeSupported(mimeType)) {
+      mimeType = 'audio/webm'
+      if (!MediaRecorder.isTypeSupported(mimeType)) {
+        mimeType = 'audio/mp4'
+        if (!MediaRecorder.isTypeSupported(mimeType)) {
+          mimeType = ''
+        }
+      }
+    }
+
+    const mediaRecorder = new MediaRecorder(stream, {
+      mimeType,
+    })
+
+    recordedChunksRef.current = []
+
+    mediaRecorder.ondataavailable = async (event) => {
+      if (event.data.size > 0) {
+        // Store chunk for final recording
+        recordedChunksRef.current.push(event.data)
+        
+        // Also save to IndexedDB for crash recovery
+        if (currentSessionIdRef.current) {
+          try {
+            const arrayBuffer = await event.data.arrayBuffer()
+            await saveRecordingChunk(
+              currentSessionIdRef.current,
+              chunkIndexRef.current,
+              arrayBuffer
+            )
+            chunkIndexRef.current += 1
+          } catch (error) {
+            // Error saving chunk - continue silently
+          }
+        }
+      }
+    }
+
+    return mediaRecorder
+  }
+
+  // Recover last recording from IndexedDB on page load
+  React.useEffect(() => {
+    const loadLastRecording = async () => {
+      try {
+        // Clean up old sessions and recordings
+        await cleanupOldLocalRecordings()
+        await cleanupOldSessions()
+
+        // Note: Incomplete sessions are left as-is for manual recovery via recovery page
+
+        // If no incomplete sessions, load the latest complete recording
+        const lastSavedRecording = await getLatestLocalRecording()
+        if (lastSavedRecording) {
+          const blob = new Blob([lastSavedRecording.arrayBuffer], {
+            type: lastSavedRecording.fileType,
+          })
+          setLastRecording({
+            blob,
+            filename: lastSavedRecording.filename,
+          })
+          // Set MP3 mode if the recovered recording was converted
+          if (lastSavedRecording.isConverted) {
+            setUseMp3(true)
+          }
+        }
+      } catch (error) {
+        // Error loading last recording - silently continue
+      }
+    }
+
+    loadLastRecording()
+  }, [])
 
   // Setup audio level monitoring
   React.useEffect(() => {
@@ -397,6 +551,7 @@ function Main() {
         setError,
         setRecorder,
         stream: nextStream,
+        createMediaRecorder,
       })
       handleRecord({
         isRecording,
@@ -408,6 +563,9 @@ function Main() {
         useMp3,
         setIsConverting,
         setLastRecording,
+        currentSessionIdRef,
+        chunkIndexRef,
+        recordedChunksRef,
       })
       return
     }
@@ -417,6 +575,7 @@ function Main() {
         setError,
         setRecorder,
         stream,
+        createMediaRecorder,
       })
       handleRecord({
         isRecording,
@@ -428,6 +587,9 @@ function Main() {
         useMp3,
         setIsConverting,
         setLastRecording,
+        currentSessionIdRef,
+        chunkIndexRef,
+        recordedChunksRef,
       })
       return
     }
@@ -442,6 +604,9 @@ function Main() {
       useMp3,
       setIsConverting,
       setLastRecording,
+      currentSessionIdRef,
+      chunkIndexRef,
+      recordedChunksRef,
     })
   }
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
@@ -500,7 +665,9 @@ function Main() {
         </Button>
         <Timer isRecording={isRecording} />
         {isConverting && (
-          <ConversionIndicator>Converting to MP3...</ConversionIndicator>
+          <ConversionIndicator>
+            {useMp3 ? 'Conversion en MP3...' : 'Conversion en WAV...'}
+          </ConversionIndicator>
         )}
         {lastRecording && !isRecording && !isConverting && (
           <ShareButton

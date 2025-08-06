@@ -12,13 +12,16 @@ const Container = styled.div`
 
 type Props = {
   className?: string
-  onChange: React.ChangeEventHandler<HTMLInputElement>
+  onChange?: React.ChangeEventHandler<HTMLInputElement>
+  showMp3Toggle?: boolean
 }
 
-const Header: React.FC<Props> = ({ className, onChange }) => {
+const Header: React.FC<Props> = ({ className, onChange, showMp3Toggle = true }) => {
   return (
     <Container className={className}>
-      <Mp3Toggle defaultChecked={false} onChange={onChange} />
+      {showMp3Toggle && onChange && (
+        <Mp3Toggle defaultChecked={false} onChange={onChange} />
+      )}
     </Container>
   )
 }
