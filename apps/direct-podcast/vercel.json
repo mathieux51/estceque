@@ -6,7 +6,7 @@
   "rewrites": [
     {
       "source": "/montage/:match*",
-      "destination": "https://direct-montage-mathieux51-mathieus-projects-19f8bd9f.vercel.app/montage/:match*"
+      "destination": "https://direct-montage-mathieux51-mathieus-projects-19f8bd9f.vercel.app/:match*"
     }
   ]
 }
