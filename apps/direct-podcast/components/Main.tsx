@@ -29,16 +29,46 @@ const Container = styled.div`
   flex-direction: column;
   display: flex;
 `
-const Button = styled.button`
+const Button = styled.button<{ $isRecording?: boolean }>`
   width: 12rem;
   height: 12rem;
   cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.2s ease, box-shadow 0.3s ease;
+  
+  @media (max-width: 768px) {
+    width: 14rem;
+    height: 14rem;
+  }
+  
+  &:hover {
+    transform: scale(1.05);
+  }
+  
+  &:active {
+    transform: scale(0.98);
+  }
+  
+  ${(props) => props.$isRecording && `
+    animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  `}
+  
+  @keyframes pulse {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.05);
+    }
+  }
 `
 
 const StyledHeader = styled(Header)`
-  height: 70px;
-  padding-top: 1rem;
-  padding-right: 1rem;
+  height: 72px;
+  padding-top: 16px;
+  padding-right: 16px;
 `
 
 const Form = styled.form`
@@ -48,11 +78,12 @@ const Form = styled.form`
   justify-content: center;
   align-items: center;
   flex-direction: column;
+  gap: 16px;
 `
 
 const StyledFooter = styled(Footer)`
-  height: 92px;
-  padding-bottom: 1rem;
+  min-height: 96px;
+  padding-bottom: 24px;
 `
 
 const StyledMic = styled(Mic)``
@@ -66,27 +97,54 @@ const StyledMicOff = styled(MicOff)`
 const ConversionIndicator = styled.div`
   color: ${(props) => props.theme.grey};
   font-size: 16px;
-  margin-top: 0.5rem;
   text-align: center;
+  padding: 8px 16px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  border-radius: 8px;
+  animation: fadeIn 0.3s ease;
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(-10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
 `
 
 const ShareButton = styled.a`
-  background-color: ${(props) => props.theme.black};
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
   color: ${(props) => props.theme.grey};
   border: 2px solid ${(props) => props.theme.grey};
-  padding: 0.75rem 1.5rem;
+  padding: 12px 24px;
   font-size: 16px;
   cursor: pointer;
-  border-radius: 4px;
-  margin-top: 1rem;
+  border-radius: 8px;
   transition: all 0.2s ease;
   text-decoration: none;
   display: inline-block;
   text-align: center;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  
+  @media (max-width: 768px) {
+    padding: 16px 32px;
+    font-size: 18px;
+  }
 
   &:hover {
-    background-color: ${(props) => props.theme.white};
-    color: ${(props) => props.theme.blue};
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    color: ${(props) => props.theme.white};
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
 
   &.disabled {
@@ -378,6 +436,7 @@ function Main() {
   const analyserRef = React.useRef<AnalyserNode>()
   const dataArrayRef = React.useRef<Uint8Array>()
   const recordedChunksRef = React.useRef<Blob[]>([])
+  const formRef = React.useRef<HTMLFormElement>(null)
 
   const createMediaRecorder = (stream: MediaStream): MediaRecorder => {
     // MediaRecorder doesn't support audio/wav in most browsers
@@ -612,6 +671,26 @@ function Main() {
   }
   const handleChange = () => setUseMp3((prevUseMp3) => !prevUseMp3)
 
+  // Add keyboard shortcut for spacebar
+  React.useEffect(() => {
+    const handleKeyPress = (event: KeyboardEvent) => {
+      // Check if spacebar is pressed and no input field is focused
+      if (event.code === 'Space' && 
+          !['INPUT', 'TEXTAREA', 'SELECT'].includes(
+            (event.target as HTMLElement)?.tagName
+          )) {
+        event.preventDefault()
+        // Trigger form submit
+        if (formRef.current) {
+          formRef.current.requestSubmit()
+        }
+      }
+    }
+
+    window.addEventListener('keydown', handleKeyPress)
+    return () => window.removeEventListener('keydown', handleKeyPress)
+  }, [])
+
   const [isPreparingShare, setIsPreparingShare] = React.useState(false)
 
   const handleShareToMontage = async (
@@ -656,8 +735,8 @@ function Main() {
   return (
     <Container>
       <StyledHeader onChange={handleChange} />
-      <Form onSubmit={handleSubmit}>
-        <Button type='submit' aria-label='enregistrer'>
+      <Form onSubmit={handleSubmit} ref={formRef}>
+        <Button type='submit' aria-label='enregistrer' $isRecording={isRecording}>
           {isRecording ? (
             <StyledMic volumeLevel={volumeLevel} />
           ) : (

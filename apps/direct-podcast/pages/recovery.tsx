@@ -55,19 +55,26 @@ const Title = styled.h1`
 `
 
 const Section = styled.div`
-  background: ${(props) => props.theme.blue};
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(10px);
   border-radius: 8px;
-  padding: 0.75rem;
-  margin-bottom: 1rem;
+  padding: 16px;
+  margin-bottom: 16px;
   border: 1px solid ${(props) => props.theme.grey};
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   overflow-x: auto;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
 
   @media (min-width: 768px) {
-    padding: 1.5rem;
-    margin-bottom: 1.5rem;
+    padding: 24px;
+    margin-bottom: 24px;
+  }
+  
+  &:hover {
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
 `
 
@@ -87,25 +94,34 @@ const RecordingList = styled.ul`
 `
 
 const RecordingItem = styled.li`
-  padding: 0.5rem;
+  padding: 8px;
   border: 1px solid ${(props) => props.theme.grey};
-  border-radius: 4px;
-  margin-bottom: 0.5rem;
+  border-radius: 8px;
+  margin-bottom: 8px;
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
-  background: rgba(255, 255, 255, 0.05);
+  gap: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(5px);
   width: 100%;
   max-width: 100%;
   box-sizing: border-box;
   overflow-wrap: break-word;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   @media (min-width: 640px) {
     flex-direction: row;
     justify-content: space-between;
     align-items: center;
-    padding: 0.75rem;
-    gap: 0.75rem;
+    padding: 12px;
+    gap: 12px;
+  }
+  
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    background: rgba(255, 255, 255, 0.08);
   }
 
   strong {
@@ -139,39 +155,56 @@ const RecordingItem = styled.li`
 `
 
 const Button = styled.button`
-  background: ${(props) => props.theme.white};
-  color: ${(props) => props.theme.blue};
-  border: 1px solid ${(props) => props.theme.grey};
-  padding: 0.5rem 1rem;
-  border-radius: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+  color: ${(props) => props.theme.grey};
+  border: 2px solid ${(props) => props.theme.grey};
+  padding: 8px 16px;
+  border-radius: 8px;
   cursor: pointer;
   font-size: 0.875rem;
   white-space: nowrap;
   width: 100%;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 
   @media (min-width: 640px) {
     width: auto;
+    padding: 12px 24px;
+  }
+  
+  @media (max-width: 768px) {
+    padding: 12px 20px;
+    font-size: 1rem;
   }
 
   &:hover {
-    background: ${(props) => props.theme.grey};
+    transform: scale(1.05);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     color: ${(props) => props.theme.white};
+  }
+  
+  &:active {
+    transform: scale(0.98);
   }
 
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
+    transform: none;
   }
 `
 
 const DangerButton = styled(Button)`
-  background: #dc3545;
+  background: ${(props) => props.theme.red};
   color: ${(props) => props.theme.white};
-  border: 1px solid #dc3545;
+  border: 2px solid ${(props) => props.theme.red};
 
   &:hover {
-    background: #c82333;
-    border-color: #c82333;
+    background: #a54550;
+    border-color: #a54550;
+    color: ${(props) => props.theme.white};
   }
 `
 

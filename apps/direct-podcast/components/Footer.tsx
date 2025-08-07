@@ -22,21 +22,49 @@ const SubContainer = styled.div`
 `
 
 const Button = styled.button`
-  margin-left: 1rem;
+  margin-left: 16px;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
+  }
 `
 
 const StyledHelp = styled(Help)`
   width: 70px;
+  transition: opacity 0.2s ease;
+  & path {
+    fill: ${(props) => props.theme.grey};
+  }
+  
+  &:hover {
+    opacity: 0.8;
+  }
+`
+
+const StyledMail = styled(Mail)`
+  width: 70px;
+  transition: transform 0.2s ease, opacity 0.2s ease;
   & path {
     fill: ${(props) => props.theme.grey};
   }
 `
 
-const StyledMail = styled(Mail)`
-  margin-right: 1rem;
-  width: 70px;
-  & path {
-    fill: ${(props) => props.theme.grey};
+const MailLink = styled.a`
+  margin-right: 16px;
+  display: inline-block;
+  transition: transform 0.2s ease;
+  
+  &:hover {
+    transform: scale(1.1);
+  }
+  
+  &:active {
+    transform: scale(0.95);
   }
 `
 
@@ -79,12 +107,12 @@ const Footer: React.FC<Props> = ({ className }) => {
           </Button>
         </Tooltip>
         <CommonCreative />
-        <a
+        <MailLink
           href={`mailto:estceque.asso@gmail.com?Subject=directpodcast.fr v${packageJSON.version}`}
           aria-label='courriel'
         >
           <StyledMail />
-        </a>
+        </MailLink>
       </SubContainer>
       <BottomNote>D’après une idée originale de Blandine Schmidt</BottomNote>
     </Container>
