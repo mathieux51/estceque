@@ -43,7 +43,7 @@ const Section = styled.section`
   border: 1px solid ${(props) => props.theme.grey};
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   transition: all 0.3s ease;
-  
+
   &:hover {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
@@ -84,22 +84,22 @@ const ColorSwatch = styled.div<{ $bgColor: string; $isLight?: boolean }>`
   color: ${(props) => (props.$isLight ? '#005064' : '#ffffff')};
   border: 1px solid ${(props) => props.theme.grey};
   text-align: center;
-  
+
   strong {
     display: block;
     margin-bottom: 0.25rem;
   }
-  
+
   code {
     font-size: 0.875rem;
     font-family: monospace;
   }
 `
 
-const TypographyExample = styled.div<{ 
-  $fontSize?: string; 
-  $fontFamily?: string;
-  $fontWeight?: string;
+const TypographyExample = styled.div<{
+  $fontSize?: string
+  $fontFamily?: string
+  $fontWeight?: string
 }>`
   color: ${(props) => props.theme.grey};
   font-size: ${(props) => props.$fontSize || '1rem'};
@@ -109,7 +109,7 @@ const TypographyExample = styled.div<{
   padding: 0.5rem;
   border-left: 3px solid ${(props) => props.theme.grey};
   padding-left: 1rem;
-  
+
   span {
     display: block;
     font-size: 0.875rem;
@@ -131,7 +131,7 @@ const SpacingBox = styled.div<{ $size: string; $pixels: number }>`
   display: flex;
   flex-direction: column;
   align-items: center;
-  
+
   div {
     width: ${(props) => props.$size};
     height: ${(props) => props.$size};
@@ -140,7 +140,7 @@ const SpacingBox = styled.div<{ $size: string; $pixels: number }>`
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     border-radius: 4px;
   }
-  
+
   span {
     color: ${(props) => props.theme.grey};
     font-size: 0.875rem;
@@ -166,19 +166,19 @@ const StyledButton = styled.button`
   font-size: 16px;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+
   @media (max-width: 768px) {
     padding: 16px 32px;
     font-size: 18px;
   }
-  
+
   &:hover {
     transform: scale(1.05);
     background: rgba(255, 255, 255, 0.2);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     color: ${(props) => props.theme.white};
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -194,19 +194,19 @@ const SecondaryButton = styled.button`
   font-size: 16px;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+
   @media (max-width: 768px) {
     padding: 16px 32px;
     font-size: 18px;
   }
-  
+
   &:hover {
     transform: scale(1.05);
     background: ${(props) => props.theme.grey};
     color: ${(props) => props.theme.white};
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -222,19 +222,19 @@ const DangerButton = styled.button`
   font-size: 16px;
   transition: all 0.2s ease;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+
   @media (max-width: 768px) {
     padding: 16px 32px;
     font-size: 18px;
   }
-  
+
   &:hover {
     transform: scale(1.05);
     background: #a54550;
     border-color: #a54550;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -252,13 +252,19 @@ const IconWrapper = styled.div`
   flex-direction: column;
   align-items: center;
   gap: 0.5rem;
-  
+  width: 70px;
+
   span {
     color: ${(props) => props.theme.grey};
     font-size: 0.875rem;
     font-family: 'Antipasto', sans-serif;
   }
-  
+
+  svg {
+    width: 70px;
+    height: 70px;
+  }
+
   svg path {
     fill: ${(props) => props.theme.grey};
   }
@@ -283,16 +289,16 @@ const CodeBlock = styled.pre`
 
 const DesignSystemPage = () => {
   const [demoRecording, setDemoRecording] = React.useState(false)
-  
+
   return (
     <Container>
       <Header showMp3Toggle={false} />
       <Main>
         <Title>Design System</Title>
-        
+
         <Section>
           <SectionTitle>Colors</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Primary Colors</SubTitle>
             <ColorGrid>
@@ -306,7 +312,7 @@ const DesignSystemPage = () => {
               </ColorSwatch>
             </ColorGrid>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Neutral Colors</SubTitle>
             <ColorGrid>
@@ -318,13 +324,13 @@ const DesignSystemPage = () => {
                 <strong>Grey</strong>
                 <code>{theme.grey}</code>
               </ColorSwatch>
-              <ColorSwatch $bgColor="#000000">
+              <ColorSwatch $bgColor='#000000'>
                 <strong>Black</strong>
                 <code>#000000</code>
               </ColorSwatch>
             </ColorGrid>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Semantic Colors</SubTitle>
             <ColorGrid>
@@ -343,123 +349,149 @@ const DesignSystemPage = () => {
             </ColorGrid>
           </SubSection>
         </Section>
-        
+
         <Section>
           <SectionTitle>Typography</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Font Families</SubTitle>
             <TypographyExample $fontFamily="'Roboto', sans-serif">
               Roboto - Primary font for body text
-              <span>font-family: 'Roboto', sans-serif</span>
+              <span>font-family: &apos;Roboto&apos;, sans-serif</span>
             </TypographyExample>
             <TypographyExample $fontFamily="'Antipasto', sans-serif">
               Antipasto - Display font for headings and timer
-              <span>font-family: 'Antipasto', sans-serif</span>
+              <span>font-family: &apos;Antipasto&apos;, sans-serif</span>
             </TypographyExample>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Font Sizes</SubTitle>
-            <TypographyExample $fontSize="0.75rem">
+            <TypographyExample $fontSize='0.75rem'>
               Extra Small (0.75rem / 12px)
               <span>font-size: 0.75rem</span>
             </TypographyExample>
-            <TypographyExample $fontSize="0.875rem">
+            <TypographyExample $fontSize='0.875rem'>
               Small (0.875rem / 14px)
               <span>font-size: 0.875rem</span>
             </TypographyExample>
-            <TypographyExample $fontSize="1rem">
+            <TypographyExample $fontSize='1rem'>
               Base (1rem / 16px)
               <span>font-size: 1rem</span>
             </TypographyExample>
-            <TypographyExample $fontSize="1.5rem">
+            <TypographyExample $fontSize='1.5rem'>
               Large (1.5rem / 24px)
               <span>font-size: 1.5rem</span>
             </TypographyExample>
-            <TypographyExample $fontSize="2rem">
+            <TypographyExample $fontSize='2rem'>
               Extra Large (2rem / 32px)
               <span>font-size: 2rem</span>
             </TypographyExample>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Font Weights</SubTitle>
-            <TypographyExample $fontWeight="lighter">
+            <TypographyExample $fontWeight='lighter'>
               Lighter
               <span>font-weight: lighter</span>
             </TypographyExample>
-            <TypographyExample $fontWeight="normal">
+            <TypographyExample $fontWeight='normal'>
               Normal
               <span>font-weight: normal</span>
             </TypographyExample>
-            <TypographyExample $fontWeight="bold">
+            <TypographyExample $fontWeight='bold'>
               Bold
               <span>font-weight: bold</span>
             </TypographyExample>
           </SubSection>
         </Section>
-        
+
         <Section>
           <SectionTitle>Spacing (8px Grid System)</SectionTitle>
           <SpacingGrid>
-            <SpacingBox $size="8px" $pixels={8}>
+            <SpacingBox $size='8px' $pixels={8}>
               <div />
               <span>8px (base)</span>
             </SpacingBox>
-            <SpacingBox $size="16px" $pixels={16}>
+            <SpacingBox $size='16px' $pixels={16}>
               <div />
               <span>16px (2x)</span>
             </SpacingBox>
-            <SpacingBox $size="24px" $pixels={24}>
+            <SpacingBox $size='24px' $pixels={24}>
               <div />
               <span>24px (3x)</span>
             </SpacingBox>
-            <SpacingBox $size="32px" $pixels={32}>
+            <SpacingBox $size='32px' $pixels={32}>
               <div />
               <span>32px (4x)</span>
             </SpacingBox>
-            <SpacingBox $size="40px" $pixels={40}>
+            <SpacingBox $size='40px' $pixels={40}>
               <div />
               <span>40px (5x)</span>
             </SpacingBox>
-            <SpacingBox $size="48px" $pixels={48}>
+            <SpacingBox $size='48px' $pixels={48}>
               <div />
               <span>48px (6x)</span>
             </SpacingBox>
-            <SpacingBox $size="64px" $pixels={64}>
+            <SpacingBox $size='64px' $pixels={64}>
               <div />
               <span>64px (8x)</span>
             </SpacingBox>
           </SpacingGrid>
         </Section>
-        
+
         <Section>
           <SectionTitle>Buttons</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Button Variants</SubTitle>
             <ButtonGrid>
               <StyledButton>Primary Button</StyledButton>
               <SecondaryButton>Secondary Button</SecondaryButton>
               <DangerButton>Danger Button</DangerButton>
-              <StyledButton disabled style={{ opacity: 0.5, cursor: 'not-allowed' }}>
+              <StyledButton
+                disabled
+                style={{ opacity: 0.5, cursor: 'not-allowed' }}
+              >
                 Disabled Button
               </StyledButton>
             </ButtonGrid>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Toggle Components</SubTitle>
             <ComponentExample>
-              <div style={{ display: 'flex', gap: '32px', alignItems: 'center', justifyContent: 'center' }}>
+              <div
+                style={{
+                  display: 'flex',
+                  gap: '32px',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                }}
+              >
                 <div>
                   <Mp3Toggle defaultChecked={false} onChange={() => {}} />
-                  <p style={{ color: theme.grey, fontSize: '14px', marginTop: '8px' }}>Off State</p>
+                  <p
+                    style={{
+                      color: theme.grey,
+                      fontSize: '14px',
+                      marginTop: '8px',
+                    }}
+                  >
+                    Off State
+                  </p>
                 </div>
                 <div>
                   <Mp3Toggle defaultChecked={true} onChange={() => {}} />
-                  <p style={{ color: theme.grey, fontSize: '14px', marginTop: '8px' }}>On State</p>
+                  <p
+                    style={{
+                      color: theme.grey,
+                      fontSize: '14px',
+                      marginTop: '8px',
+                    }}
+                  >
+                    On State
+                  </p>
                 </div>
               </div>
             </ComponentExample>
@@ -472,24 +504,24 @@ const DesignSystemPage = () => {
 // Glass morphism effect with backdrop blur`}</CodeBlock>
           </SubSection>
         </Section>
-        
+
         <Section>
           <SectionTitle>Icons</SectionTitle>
           <IconGrid>
             <IconWrapper>
-              <Mic style={{ width: '70px' }} volumeLevel={0.5} />
+              <Mic volumeLevel={0.5} />
               <span>Mic (Recording)</span>
             </IconWrapper>
             <IconWrapper>
-              <MicOff style={{ width: '70px' }} />
+              <MicOff />
               <span>Mic Off</span>
             </IconWrapper>
             <IconWrapper>
-              <Help style={{ width: '70px' }} />
+              <Help />
               <span>Help</span>
             </IconWrapper>
             <IconWrapper>
-              <Mail style={{ width: '70px' }} />
+              <Mail />
               <span>Mail</span>
             </IconWrapper>
             <IconWrapper>
@@ -498,16 +530,18 @@ const DesignSystemPage = () => {
             </IconWrapper>
           </IconGrid>
         </Section>
-        
+
         <Section>
           <SectionTitle>Components</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Timer Component</SubTitle>
             <ComponentExample style={{ textAlign: 'center' }}>
               <Timer isRecording={demoRecording} />
               <div style={{ marginTop: '1rem' }}>
-                <SecondaryButton onClick={() => setDemoRecording(!demoRecording)}>
+                <SecondaryButton
+                  onClick={() => setDemoRecording(!demoRecording)}
+                >
                   {demoRecording ? 'Stop Timer' : 'Start Timer'}
                 </SecondaryButton>
               </div>
@@ -515,10 +549,10 @@ const DesignSystemPage = () => {
             <CodeBlock>{`<Timer isRecording={isRecording} />`}</CodeBlock>
           </SubSection>
         </Section>
-        
+
         <Section>
           <SectionTitle>Layout</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Container Widths</SubTitle>
             <TypographyExample>
@@ -534,7 +568,7 @@ const DesignSystemPage = () => {
               <span>Maximum width for tooltip content</span>
             </TypographyExample>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Heights</SubTitle>
             <TypographyExample>
@@ -551,7 +585,7 @@ const DesignSystemPage = () => {
             </TypographyExample>
           </SubSection>
         </Section>
-        
+
         <Section>
           <SectionTitle>Breakpoints</SectionTitle>
           <TypographyExample>
@@ -571,7 +605,7 @@ const DesignSystemPage = () => {
             <span>Large desktop screens</span>
           </TypographyExample>
         </Section>
-        
+
         <Section>
           <SectionTitle>Transitions & Animations</SectionTitle>
           <TypographyExample>
@@ -587,14 +621,15 @@ const DesignSystemPage = () => {
             <span>Slow fades and reveals</span>
           </TypographyExample>
           <TypographyExample>
-            <strong>Pulse Animation:</strong> 2s cubic-bezier(0.4, 0, 0.6, 1) infinite
+            <strong>Pulse Animation:</strong> 2s cubic-bezier(0.4, 0, 0.6, 1)
+            infinite
             <span>Used for recording button breathing effect</span>
           </TypographyExample>
         </Section>
-        
+
         <Section>
           <SectionTitle>New Design Features</SectionTitle>
-          
+
           <SubSection>
             <SubTitle>Visual Effects</SubTitle>
             <TypographyExample>
@@ -612,7 +647,7 @@ const DesignSystemPage = () => {
               <span>Provides tactile feedback for interactive elements</span>
             </TypographyExample>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Responsive Design</SubTitle>
             <TypographyExample>
@@ -626,7 +661,7 @@ const DesignSystemPage = () => {
               <span>Recording button: 14rem on mobile (vs 12rem desktop)</span>
             </TypographyExample>
           </SubSection>
-          
+
           <SubSection>
             <SubTitle>Keyboard Interaction</SubTitle>
             <TypographyExample>

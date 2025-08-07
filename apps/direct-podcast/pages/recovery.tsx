@@ -72,7 +72,7 @@ const Section = styled.div`
     padding: 24px;
     margin-bottom: 24px;
   }
-  
+
   &:hover {
     box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
   }
@@ -117,7 +117,7 @@ const RecordingItem = styled.li`
     padding: 12px;
     gap: 12px;
   }
-  
+
   &:hover {
     transform: translateY(-2px);
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
@@ -172,7 +172,7 @@ const Button = styled.button`
     width: auto;
     padding: 12px 24px;
   }
-  
+
   @media (max-width: 768px) {
     padding: 12px 20px;
     font-size: 1rem;
@@ -184,7 +184,7 @@ const Button = styled.button`
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     color: ${(props) => props.theme.white};
   }
-  
+
   &:active {
     transform: scale(0.98);
   }

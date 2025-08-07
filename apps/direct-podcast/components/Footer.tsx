@@ -24,11 +24,11 @@ const SubContainer = styled.div`
 const Button = styled.button`
   margin-left: 16px;
   transition: transform 0.2s ease;
-  
+
   &:hover {
     transform: scale(1.1);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }
@@ -40,7 +40,7 @@ const StyledHelp = styled(Help)`
   & path {
     fill: ${(props) => props.theme.grey};
   }
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -48,7 +48,9 @@ const StyledHelp = styled(Help)`
 
 const StyledMail = styled(Mail)`
   width: 70px;
-  transition: transform 0.2s ease, opacity 0.2s ease;
+  transition:
+    transform 0.2s ease,
+    opacity 0.2s ease;
   & path {
     fill: ${(props) => props.theme.grey};
   }
@@ -58,11 +60,11 @@ const MailLink = styled.a`
   margin-right: 16px;
   display: inline-block;
   transition: transform 0.2s ease;
-  
+
   &:hover {
     transform: scale(1.1);
   }
-  
+
   &:active {
     transform: scale(0.95);
   }

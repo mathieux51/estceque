@@ -27,7 +27,7 @@ const ToggleButton = styled.button<{ $isChecked: boolean }>`
   transition: all 0.3s ease;
   padding: 0;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  
+
   @media (max-width: 768px) {
     width: 72px;
     height: 40px;
@@ -40,7 +40,7 @@ const ToggleButton = styled.button<{ $isChecked: boolean }>`
     border-color: ${(props) =>
       props.$isChecked ? props.theme.green : props.theme.white};
   }
-  
+
   &:active {
     transform: scale(0.98);
   }
@@ -63,7 +63,7 @@ const ToggleCircle = styled.div<{ $isChecked: boolean }>`
   left: ${(props) => (props.$isChecked ? 'calc(100% - 26px)' : '-1px')};
   transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
-  
+
   @media (max-width: 768px) {
     width: 32px;
     height: 32px;
