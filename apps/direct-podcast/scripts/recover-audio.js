@@ -29,15 +29,15 @@ async function recoverAllAudio() {
     return new Promise((resolve) => {
       request.onsuccess = () => {
         const recordings = request.result
-        
+
         recordings.forEach((recording, index) => {
           const blob = new Blob([recording.arrayBuffer], {
-            type: recording.fileType || 'audio/wav'
+            type: recording.fileType || 'audio/wav',
           })
           const filename = recording.filename || `recovered_${index + 1}.wav`
           saveBlob(blob, filename)
         })
-        
+
         resolve(recordings.length)
       }
     })
@@ -52,14 +52,16 @@ async function recoverAllAudio() {
     })
 
     // Get all sessions
-    const sessionsTransaction = db.transaction(['recordingSessions'], 'readonly')
+    const sessionsTransaction = db.transaction(
+      ['recordingSessions'],
+      'readonly'
+    )
     const sessionsStore = sessionsTransaction.objectStore('recordingSessions')
     const sessionsRequest = sessionsStore.getAll()
 
     const sessions = await new Promise((resolve) => {
       sessionsRequest.onsuccess = () => resolve(sessionsRequest.result)
     })
-
 
     // For each session, get and combine chunks
     for (const session of sessions) {
@@ -79,16 +81,24 @@ async function recoverAllAudio() {
 
       if (chunks.length > 0) {
         // Combine chunks into single blob
-        const arrayBuffers = chunks.map(chunk => chunk.arrayBuffer)
-        const blob = new Blob(arrayBuffers, { type: session.mimeType || 'audio/webm' })
-        
+        const arrayBuffers = chunks.map((chunk) => chunk.arrayBuffer)
+        const blob = new Blob(arrayBuffers, {
+          type: session.mimeType || 'audio/webm',
+        })
+
         const date = new Date(session.startTime).toISOString().split('T')[0]
         const mimeType = session.mimeType || 'audio/webm'
-        
+
         // Always save as WebM for manual recovery (conversion would require FFmpeg in console)
-        const extension = mimeType.includes('wav') ? 'wav' : mimeType.includes('webm') ? 'webm' : 'mp4'
-        const filename = session.filename || `session_${date}_${session.id.substr(-6)}.${extension}`
-        
+        const extension = mimeType.includes('wav')
+          ? 'wav'
+          : mimeType.includes('webm')
+            ? 'webm'
+            : 'mp4'
+        const filename =
+          session.filename ||
+          `session_${date}_${session.id.substr(-6)}.${extension}`
+
         saveBlob(blob, filename)
       }
     }
@@ -111,15 +121,15 @@ async function recoverAllAudio() {
     return new Promise((resolve) => {
       request.onsuccess = () => {
         const files = request.result
-        
+
         files.forEach((file, index) => {
           const blob = new Blob([file.arrayBuffer], {
-            type: file.fileType || 'audio/wav'
+            type: file.fileType || 'audio/wav',
           })
           const filename = file.filename || `shared_${index + 1}.wav`
           saveBlob(blob, filename)
         })
-        
+
         resolve(files.length)
       }
     })
@@ -127,9 +137,9 @@ async function recoverAllAudio() {
 
   // Run all recovery methods
   try {
-    const localCount = await recoverLocalRecordings()
-    const chunkedCount = await recoverChunkedRecordings()
-    const sharedCount = await recoverSharedFiles()
+    await recoverLocalRecordings()
+    await recoverChunkedRecordings()
+    await recoverSharedFiles()
   } catch (error) {
     // Recovery error - continue silently
   }

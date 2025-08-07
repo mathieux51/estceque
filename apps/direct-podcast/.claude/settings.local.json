@@ -9,7 +9,8 @@
       "Bash(npx tsc:*)",
       "Bash(timeout 10s npm run dev)",
       "Bash(true)",
-      "Bash(gtimeout:*)"
+      "Bash(gtimeout:*)",
+      "Bash(npm run lint:*)"
     ],
     "deny": []
   }

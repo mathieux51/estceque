@@ -16,7 +16,11 @@ type Props = {
   showMp3Toggle?: boolean
 }
 
-const Header: React.FC<Props> = ({ className, onChange, showMp3Toggle = true }) => {
+const Header: React.FC<Props> = ({
+  className,
+  onChange,
+  showMp3Toggle = true,
+}) => {
   return (
     <Container className={className}>
       {showMp3Toggle && onChange && (

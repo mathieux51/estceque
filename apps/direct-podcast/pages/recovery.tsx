@@ -2,12 +2,19 @@ import React, { useState } from 'react'
 import styled from 'styled-components'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
-import { getAllLocalRecordings, clearAllDatabases } from '../lib/recordingDB'
+import {
+  getAllLocalRecordings,
+  clearAllDatabases,
+  LocalRecording,
+} from '../lib/recordingDB'
 import {
   getIncompleteSessions,
   reassembleRecording,
   getSessionChunks,
+  RecordingSession,
 } from '../lib/chunkedRecordingDB'
+
+type RecordingSessionWithChunks = RecordingSession & { chunkCount: number }
 
 const Container = styled.div`
   min-height: 100vh;
@@ -56,11 +63,11 @@ const RecordingItem = styled.li`
   justify-content: space-between;
   align-items: center;
   background: rgba(255, 255, 255, 0.05);
-  
+
   strong {
     color: ${(props) => props.theme.grey};
   }
-  
+
   small {
     color: ${(props) => props.theme.grey};
     opacity: 0.8;
@@ -74,12 +81,12 @@ const Button = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
-  
+
   &:hover {
     background: ${(props) => props.theme.grey};
     color: ${(props) => props.theme.white};
   }
-  
+
   &:disabled {
     opacity: 0.5;
     cursor: not-allowed;
@@ -90,7 +97,7 @@ const DangerButton = styled(Button)`
   background: #dc3545;
   color: ${(props) => props.theme.white};
   border: 1px solid #dc3545;
-  
+
   &:hover {
     background: #c82333;
     border-color: #c82333;
@@ -110,7 +117,7 @@ const HomeLink = styled.a`
   font-size: 16px;
   margin-bottom: 1rem;
   display: inline-block;
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -128,9 +135,11 @@ const ErrorMessage = styled.div`
 
 const RecoveryPage = () => {
   const [loading, setLoading] = useState(false)
-  const [recordings, setRecordings] = useState<any[]>([])
-  const [sessions, setSessions] = useState<any[]>([])
-  const [convertingSessionId, setConvertingSessionId] = useState<string | null>(null)
+  const [recordings, setRecordings] = useState<LocalRecording[]>([])
+  const [sessions, setSessions] = useState<RecordingSessionWithChunks[]>([])
+  const [convertingSessionId, setConvertingSessionId] = useState<string | null>(
+    null
+  )
   const [error, setError] = useState<string | null>(null)
 
   const loadRecordings = async () => {
@@ -169,7 +178,7 @@ const RecoveryPage = () => {
     }
   }
 
-  const downloadRecording = (recording: any) => {
+  const downloadRecording = (recording: LocalRecording) => {
     // Use the actual stored file type, not forced WAV
     const blob = new Blob([recording.arrayBuffer], {
       type: recording.fileType,
@@ -177,7 +186,7 @@ const RecoveryPage = () => {
     const url = URL.createObjectURL(blob)
     const a = document.createElement('a')
     a.href = url
-    
+
     // Determine correct extension from actual file type
     let extension = 'wav'
     if (recording.fileType?.includes('webm')) {
@@ -187,18 +196,18 @@ const RecoveryPage = () => {
     } else if (recording.fileType?.includes('mpeg')) {
       extension = 'mp3'
     }
-    
+
     // Replace extension in filename if needed
     const baseFilename = recording.filename.replace(/\.\w+$/, '')
     a.download = `${baseFilename}.${extension}`
-    
+
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
     URL.revokeObjectURL(url)
   }
 
-  const downloadSession = async (session: any) => {
+  const downloadSession = async (session: RecordingSessionWithChunks) => {
     try {
       setConvertingSessionId(session.id)
       setError(null)
@@ -210,13 +219,13 @@ const RecoveryPage = () => {
             // Import FFmpeg dynamically
             const { FFmpeg } = await import('@ffmpeg/ffmpeg')
             const { toBlobURL } = await import('@ffmpeg/util')
-            
+
             const ffmpeg = new FFmpeg()
-            
+
             // Load FFmpeg with the correct version
             // Note: Using a fixed version since we don't have access to packageJSON here
             const baseURL = 'https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd'
-            
+
             await ffmpeg.load({
               coreURL: await toBlobURL(
                 `${baseURL}/ffmpeg-core.js`,
@@ -227,32 +236,34 @@ const RecoveryPage = () => {
                 'application/wasm'
               ),
             })
-            
+
             const inputFile = 'recovered.webm'
             const outputFile = 'recovered.wav'
-            
+
             // Write WebM data to FFmpeg
             const arrayBuffer = await recovered.blob.arrayBuffer()
             const uint8Array = new Uint8Array(arrayBuffer)
             await ffmpeg.writeFile(inputFile, uint8Array)
-            
+
             // Convert to WAV
             await ffmpeg.exec(['-i', inputFile, outputFile])
-            
+
             // Read the converted WAV file
             const wavData = await ffmpeg.readFile(outputFile)
             const wavBlob = new Blob([wavData], { type: 'audio/wav' })
-            
+
             // Download the WAV file
             const url = URL.createObjectURL(wavBlob)
             const a = document.createElement('a')
             a.href = url
-            a.download = `recovered_${new Date(session.startTime).toISOString().split('T')[0]}.wav`
+            a.download = `recovered_${
+              new Date(session.startTime).toISOString().split('T')[0]
+            }.wav`
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
             URL.revokeObjectURL(url)
-            
+
             // Cleanup
             try {
               await ffmpeg.deleteFile(inputFile)
@@ -262,11 +273,15 @@ const RecoveryPage = () => {
             }
           } catch (conversionError) {
             // If FFmpeg conversion fails, fall back to downloading the original WebM
-            setError('Conversion en WAV échouée, téléchargement du fichier WebM original')
+            setError(
+              'Conversion en WAV échouée, téléchargement du fichier WebM original'
+            )
             const url = URL.createObjectURL(recovered.blob)
             const a = document.createElement('a')
             a.href = url
-            a.download = `recovered_${new Date(session.startTime).toISOString().split('T')[0]}.webm`
+            a.download = `recovered_${
+              new Date(session.startTime).toISOString().split('T')[0]
+            }.webm`
             document.body.appendChild(a)
             a.click()
             document.body.removeChild(a)
@@ -277,8 +292,14 @@ const RecoveryPage = () => {
           const url = URL.createObjectURL(recovered.blob)
           const a = document.createElement('a')
           a.href = url
-          const extension = recovered.mimeType.includes('wav') ? 'wav' : recovered.mimeType.includes('mp4') ? 'mp4' : 'webm'
-          a.download = `recovered_${new Date(session.startTime).toISOString().split('T')[0]}.${extension}`
+          const extension = recovered.mimeType.includes('wav')
+            ? 'wav'
+            : recovered.mimeType.includes('mp4')
+              ? 'mp4'
+              : 'webm'
+          a.download = `recovered_${
+            new Date(session.startTime).toISOString().split('T')[0]
+          }.${extension}`
           document.body.appendChild(a)
           a.click()
           document.body.removeChild(a)
@@ -302,7 +323,11 @@ const RecoveryPage = () => {
   }
 
   const handleClearAll = async () => {
-    if (confirm('Êtes-vous sûr de vouloir supprimer tous les enregistrements stockés localement ? Cette action est irréversible.')) {
+    if (
+      confirm(
+        'Êtes-vous sûr de vouloir supprimer tous les enregistrements stockés localement ? Cette action est irréversible.'
+      )
+    ) {
       setLoading(true)
       setError(null)
       try {
@@ -326,15 +351,15 @@ const RecoveryPage = () => {
     <Container>
       <Header showMp3Toggle={false} />
       <Main>
-        <HomeLink href="/">← Retour à l'enregistrement</HomeLink>
-        
+        <HomeLink href='/'>← Retour à l&apos;enregistrement</HomeLink>
+
         <Title>Récupération des Enregistrements</Title>
-        
+
         {error && (
           <ErrorMessage>
             {error}
-            <button 
-              onClick={() => setError(null)} 
+            <button
+              onClick={() => setError(null)}
               style={{
                 background: 'none',
                 border: 'none',
@@ -343,19 +368,20 @@ const RecoveryPage = () => {
                 float: 'right',
                 fontSize: '16px',
                 padding: '0',
-                marginLeft: '1rem'
+                marginLeft: '1rem',
               }}
             >
               ×
             </button>
           </ErrorMessage>
         )}
-        
+
         <InfoText>
-          Les enregistrements sont stockés localement dans votre navigateur en utilisant IndexedDB. 
-          Ils ne quittent jamais votre appareil sauf si vous les partagez explicitement.
-          Les enregistrements complétés sont automatiquement supprimés après 7 jours, 
-          et les sessions incomplètes après 24 heures.
+          Les enregistrements sont stockés localement dans votre navigateur en
+          utilisant IndexedDB. Ils ne quittent jamais votre appareil sauf si
+          vous les partagez explicitement. Les enregistrements complétés sont
+          automatiquement supprimés après 7 jours, et les sessions incomplètes
+          après 24 heures.
         </InfoText>
 
         <Section>
@@ -364,9 +390,10 @@ const RecoveryPage = () => {
           </SectionTitle>
           {recordings.length > 0 ? (
             <>
-              <InfoText style={{color: '#999', fontSize: '12px'}}>
-                Certains fichiers peuvent être des récupérations automatiques incorrectes. 
-                Utilisez le bouton "Supprimer tous les enregistrements" pour nettoyer et recommencer.
+              <InfoText style={{ color: '#999', fontSize: '12px' }}>
+                Certains fichiers peuvent être des récupérations automatiques
+                incorrectes. Utilisez le bouton &quot;Supprimer tous les
+                enregistrements&quot; pour nettoyer et recommencer.
               </InfoText>
               <RecordingList>
                 {recordings.map((recording) => (
@@ -388,39 +415,44 @@ const RecoveryPage = () => {
               </RecordingList>
             </>
           ) : (
-            <p style={{color: '#999'}}>Aucun enregistrement complété trouvé</p>
+            <p style={{ color: '#999' }}>
+              Aucun enregistrement complété trouvé
+            </p>
           )}
         </Section>
 
         <Section>
-          <SectionTitle>
-            Sessions Incomplètes ({sessions.length})
-          </SectionTitle>
+          <SectionTitle>Sessions Incomplètes ({sessions.length})</SectionTitle>
           {sessions.length > 0 ? (
             <>
               <p style={{ marginBottom: '1rem', color: '#999' }}>
-                Ces sessions peuvent être des enregistrements interrompus par un crash
+                Ces sessions peuvent être des enregistrements interrompus par un
+                crash
               </p>
               <RecordingList>
                 {sessions.map((session) => (
                   <RecordingItem key={session.id}>
                     <div>
-                      <strong>Session du {formatDate(session.startTime)}</strong>
+                      <strong>
+                        Session du {formatDate(session.startTime)}
+                      </strong>
                       <br />
                       <small>{session.chunkCount} segments sauvegardés</small>
                     </div>
-                    <Button 
+                    <Button
                       onClick={() => downloadSession(session)}
                       disabled={convertingSessionId === session.id}
                     >
-                      {convertingSessionId === session.id ? 'Conversion...' : 'Récupérer'}
+                      {convertingSessionId === session.id
+                        ? 'Conversion...'
+                        : 'Récupérer'}
                     </Button>
                   </RecordingItem>
                 ))}
               </RecordingList>
             </>
           ) : (
-            <p style={{color: '#999'}}>Aucune session incomplète trouvée</p>
+            <p style={{ color: '#999' }}>Aucune session incomplète trouvée</p>
           )}
         </Section>
 

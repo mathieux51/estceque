@@ -19,10 +19,7 @@ import {
   createRecordingSession,
   saveRecordingChunk,
   markSessionComplete,
-  getIncompleteSessions,
-  reassembleRecording,
   cleanupOldSessions,
-  deleteSession,
 } from '../lib/chunkedRecordingDB'
 
 const Container = styled.div`
@@ -172,7 +169,11 @@ const handleStopRecording = async ({
           })
 
           const fName = filename()
-          const inputExt = blob.type.includes('wav') ? 'wav' : blob.type.includes('webm') ? 'webm' : 'mp4'
+          const inputExt = blob.type.includes('wav')
+            ? 'wav'
+            : blob.type.includes('webm')
+              ? 'webm'
+              : 'mp4'
           const input = `${fName}.${inputExt}`
           const arrayBuffer = await blob.arrayBuffer()
           const uint8Array = new Uint8Array(arrayBuffer)
@@ -333,14 +334,14 @@ const handleRecord = async ({
       const sessionId = await createRecordingSession('audio/webm')
       currentSessionIdRef.current = sessionId
       chunkIndexRef.current = 0
-      
+
       // Start recording with 5-second intervals for chunks
       recorder.start(5000)
       return
     }
 
     setIsRecording(false)
-    
+
     if (typeof recorder !== 'undefined') {
       await handleStopRecording({
         recorder,
@@ -402,7 +403,7 @@ function Main() {
       if (event.data.size > 0) {
         // Store chunk for final recording
         recordedChunksRef.current.push(event.data)
-        
+
         // Also save to IndexedDB for crash recovery
         if (currentSessionIdRef.current) {
           try {

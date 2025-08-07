@@ -177,14 +177,16 @@ export const getIncompleteSessions = async (): Promise<RecordingSession[]> => {
   return new Promise((resolve, reject) => {
     const transaction = db.transaction([SESSIONS_STORE_NAME], 'readonly')
     const store = transaction.objectStore(SESSIONS_STORE_NAME)
-    
+
     // Get all sessions and filter manually to avoid index issues
     const request = store.getAll()
 
     request.onsuccess = () => {
       const sessions = request.result as RecordingSession[]
       // Filter for incomplete sessions
-      const incompleteSessions = sessions.filter(session => !session.isComplete)
+      const incompleteSessions = sessions.filter(
+        (session) => !session.isComplete
+      )
       // Sort by start time, newest first
       incompleteSessions.sort((a, b) => b.startTime - a.startTime)
       resolve(incompleteSessions)
@@ -221,7 +223,9 @@ export const reassembleRecording = async (
   // Combine all chunks into a single blob
   const arrayBuffers = chunks.map((chunk) => chunk.arrayBuffer)
   // Use webm for chunks
-  const blob = new Blob(arrayBuffers, { type: session.mimeType || 'audio/webm' })
+  const blob = new Blob(arrayBuffers, {
+    type: session.mimeType || 'audio/webm',
+  })
 
   return { blob, mimeType: session.mimeType || 'audio/webm' }
 }

@@ -65,7 +65,7 @@ type Props = {
 const Link = styled.a`
   color: ${(props) => props.theme.grey};
   text-decoration: underline;
-  
+
   &:hover {
     opacity: 0.8;
   }
@@ -80,7 +80,7 @@ const Tooltip: React.FC<Props> = ({ className, children, isVisible }) => (
         → Le fichier sonore se télécharge automatiquement sur mon appareil.
       `}</p>
       <p>
-        <Link href="/recuperation">Récupérer mes enregistrements</Link>
+        <Link href='/recuperation'>Récupérer mes enregistrements</Link>
       </p>
       <I />
     </Right>
