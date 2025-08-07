@@ -21,32 +21,64 @@ const Container = styled.div`
   background: ${(props) => props.theme.blue};
   display: flex;
   flex-direction: column;
+  width: 100%;
+  max-width: 100vw;
+  overflow-x: hidden;
+  box-sizing: border-box;
 `
 
 const Main = styled.main`
   flex: 1;
-  padding: 2rem;
+  padding: 0.75rem;
   max-width: 800px;
   margin: 0 auto;
   width: 100%;
+  max-width: 100vw;
+  box-sizing: border-box;
+  overflow-x: hidden;
+
+  @media (min-width: 768px) {
+    padding: 2rem;
+    max-width: 800px;
+  }
 `
 
 const Title = styled.h1`
   color: ${(props) => props.theme.grey};
-  margin-bottom: 2rem;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+
+  @media (min-width: 768px) {
+    font-size: 2rem;
+    margin-bottom: 2rem;
+  }
 `
 
 const Section = styled.div`
   background: ${(props) => props.theme.blue};
   border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
+  padding: 0.75rem;
+  margin-bottom: 1rem;
   border: 1px solid ${(props) => props.theme.grey};
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: auto;
+
+  @media (min-width: 768px) {
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
+  }
 `
 
 const SectionTitle = styled.h2`
   margin-bottom: 1rem;
   color: ${(props) => props.theme.grey};
+  font-size: 1.1rem;
+
+  @media (min-width: 768px) {
+    font-size: 1.5rem;
+  }
 `
 
 const RecordingList = styled.ul`
@@ -55,22 +87,54 @@ const RecordingList = styled.ul`
 `
 
 const RecordingItem = styled.li`
-  padding: 0.75rem;
+  padding: 0.5rem;
   border: 1px solid ${(props) => props.theme.grey};
   border-radius: 4px;
   margin-bottom: 0.5rem;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
+  flex-direction: column;
+  gap: 0.5rem;
   background: rgba(255, 255, 255, 0.05);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-wrap: break-word;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    gap: 0.75rem;
+  }
 
   strong {
     color: ${(props) => props.theme.grey};
+    font-size: 0.9rem;
+    word-break: break-word;
+
+    @media (min-width: 768px) {
+      font-size: 1rem;
+    }
   }
 
   small {
     color: ${(props) => props.theme.grey};
     opacity: 0.8;
+    font-size: 0.75rem;
+
+    @media (min-width: 768px) {
+      font-size: 0.875rem;
+    }
+  }
+
+  > div {
+    flex: 1;
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: break-word;
+    word-wrap: break-word;
+    hyphens: auto;
   }
 `
 
@@ -81,6 +145,13 @@ const Button = styled.button`
   padding: 0.5rem 1rem;
   border-radius: 4px;
   cursor: pointer;
+  font-size: 0.875rem;
+  white-space: nowrap;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    width: auto;
+  }
 
   &:hover {
     background: ${(props) => props.theme.grey};
@@ -106,17 +177,25 @@ const DangerButton = styled(Button)`
 
 const InfoText = styled.p`
   color: ${(props) => props.theme.grey};
-  font-size: 14px;
+  font-size: 0.875rem;
   margin-bottom: 1rem;
-  line-height: 1.4;
+  line-height: 1.5;
+
+  @media (min-width: 768px) {
+    font-size: 14px;
+  }
 `
 
 const HomeLink = styled.a`
   color: ${(props) => props.theme.grey};
   text-decoration: underline;
-  font-size: 16px;
+  font-size: 0.875rem;
   margin-bottom: 1rem;
   display: inline-block;
+
+  @media (min-width: 768px) {
+    font-size: 16px;
+  }
 
   &:hover {
     opacity: 0.8;
@@ -126,11 +205,30 @@ const HomeLink = styled.a`
 const ErrorMessage = styled.div`
   background: rgba(220, 53, 69, 0.1);
   color: #dc3545;
-  padding: 1rem;
+  padding: 0.75rem;
   border-radius: 4px;
   border: 1px solid rgba(220, 53, 69, 0.3);
   margin-bottom: 1rem;
-  font-size: 14px;
+  font-size: 0.875rem;
+  word-wrap: break-word;
+
+  @media (min-width: 768px) {
+    padding: 1rem;
+    font-size: 14px;
+  }
+`
+
+const ButtonContainer = styled.div`
+  display: flex;
+  gap: 0.75rem;
+  flex-direction: column;
+  width: 100%;
+
+  @media (min-width: 640px) {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 1rem;
+  }
 `
 
 const RecoveryPage = () => {
@@ -457,14 +555,14 @@ const RecoveryPage = () => {
         </Section>
 
         <Section>
-          <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
+          <ButtonContainer>
             <Button onClick={loadRecordings} disabled={loading}>
               {loading ? 'Chargement...' : 'Actualiser'}
             </Button>
             <DangerButton onClick={handleClearAll} disabled={loading}>
               Supprimer tous les enregistrements
             </DangerButton>
-          </div>
+          </ButtonContainer>
         </Section>
       </Main>
       <Footer />
