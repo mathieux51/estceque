@@ -1,6 +1,6 @@
 {
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "name": "direct-podcast",
   "version": "1.0.27",
