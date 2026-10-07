@@ -72,7 +72,7 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
       records, and sharing a real recording between the two domains.
       `cutover` now defaults to `true`.
 - [x] Old repositories archived on GitHub (read-only, reversible)
-- [ ] Delete the Vercel projects `direct-podcast` and `direct-montage` once
-      nothing points to them (irreversible, so left for a manual decision)
+- [x] 2026-10-07: Vercel projects `direct-podcast`, `direct-montage` and
+      `directpodcast-redirection` deleted, `directpodcast.fr` removed from Vercel
 - [ ] Move the Terraform state to a remote backend
 - [ ] Upgrade Direct Podcast's dependencies (Next.js 14.0.3)
