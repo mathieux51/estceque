@@ -1,4 +1,6 @@
 import type { Metadata } from 'next'
+import { aushaImage } from '@/lib/images'
+import { pageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
 import EpisodeCard from '@/components/EpisodeCard'
@@ -17,15 +19,13 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const group = findProject((await params).slug)
   if (!group) return {}
-  const { project } = group
-  const url = `/projets/${project.slug}/`
-  const title = `${project.title} : podcast, ${project.partner}`
-  return {
-    title,
+  const { project, episodes } = group
+  return pageMetadata({
+    title: `${project.title} : podcast, ${project.partner}`,
     description: project.summary,
-    alternates: { canonical: url },
-    openGraph: { title, description: project.summary, url },
-  }
+    path: `/projets/${project.slug}/`,
+    image: aushaImage(episodes[0]?.image ?? null, 1400),
+  })
 }
 
 export default async function ProjectPage({ params }: Params) {

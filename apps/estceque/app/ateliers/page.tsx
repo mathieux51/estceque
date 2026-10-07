@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 import Link from 'next/link'
 import JsonLd from '@/components/JsonLd'
 import ProjectCard from '@/components/ProjectCard'
@@ -8,16 +8,11 @@ import { AUDIENCES, type Audience } from '@/lib/projects'
 const description =
   "Ateliers radio, webradio et podcast animés par Blandine Schmidt pour les écoles, collèges, lycées, universités et structures sociales du Sud-Ouest. Éducation aux médias et à l'information par le son, référencés Pass Culture (Adage)."
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: 'Ateliers radio et podcast avec Blandine Schmidt',
   description,
-  alternates: { canonical: '/ateliers/' },
-  openGraph: {
-    title: 'Ateliers radio et podcast avec Blandine Schmidt',
-    description,
-    url: '/ateliers/',
-  },
-}
+  path: '/ateliers/',
+})
 
 const steps = [
   [

@@ -41,6 +41,13 @@ const worker = {
     }
     const target = legacyRedirect(url)
     if (target) return Response.redirect(new URL(target, url).toString(), 301)
+    // Pages live at addresses ending with "/": redirect for good (the assets
+    // handler would answer with a temporary 307).
+    const last = url.pathname.split('/').pop() ?? ''
+    if (last && !last.includes('.')) {
+      url.pathname += '/'
+      return Response.redirect(url.toString(), 301)
+    }
     const response = await env.ASSETS.fetch(request)
     // next.* shows the same site as production: keep it out of search results.
     if (url.hostname.startsWith('next.')) {

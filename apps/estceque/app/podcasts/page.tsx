@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 import AushaPlayer from '@/components/AushaPlayer'
 import EpisodeSearch from '@/components/EpisodeSearch'
 import JsonLd from '@/components/JsonLd'
@@ -13,12 +13,11 @@ import { searchItems } from '@/lib/search'
 
 const description = `Les ${episodes.length} épisodes du podcast ${SITE_NAME} : webradios scolaires, fictions et docu-fictions, podcasts de savoir et paroles d'habitants. Recherchez par titre, établissement, ville, public ou année.`
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: 'Tous les podcasts',
   description,
-  alternates: { canonical: '/podcasts/' },
-  openGraph: { title: 'Tous les podcasts', description, url: '/podcasts/' },
-}
+  path: '/podcasts/',
+})
 
 export default function Podcasts() {
   const groups = projectsWithEpisodes()

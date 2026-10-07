@@ -16,6 +16,7 @@ import {
   summary,
 } from '@/lib/content'
 import { aushaImage } from '@/lib/images'
+import { pageMetadata } from '@/lib/seo'
 import { AUDIENCES } from '@/lib/projects'
 
 type Params = { params: Promise<{ slug: string }> }
@@ -29,22 +30,20 @@ export function generateStaticParams() {
 export async function generateMetadata({ params }: Params): Promise<Metadata> {
   const episode = findEpisode((await params).slug)
   if (!episode) return {}
-  const url = `/podcasts/${episode.slug}/`
-  const description = summary(episode.paragraphs)
-  const image = aushaImage(episode.image, 1400)
+  // Episodes of a series often start alike: lead with the episode's own title.
+  const description = summary([
+    `${shortTitle(episode)}.`,
+    ...episode.paragraphs,
+  ])
   return {
-    title: shortTitle(episode),
-    description,
-    alternates: { canonical: url },
-    openGraph: {
+    ...pageMetadata({
+      title: shortTitle(episode),
+      description,
+      path: `/podcasts/${episode.slug}/`,
+      image: aushaImage(episode.image, 1400),
       type: 'article',
       publishedTime: episode.publishedAt,
-      title: episode.title,
-      description,
-      url,
-      images: image ? [{ url: image, width: 1400, height: 1400 }] : undefined,
-      audio: [{ url: episode.audioUrl, type: 'audio/mpeg' }],
-    },
+    }),
   }
 }
 

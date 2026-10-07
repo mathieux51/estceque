@@ -53,6 +53,30 @@ association "Est-ce que t'entends ce que je vois ?":
 - [x] HTTP to HTTPS redirect in the Worker (the zone has "Always Use HTTPS" off)
 - [ ] After cutover: Search Console (new sitemap), Ausha website link
 
+## SEO and AI discoverability (2026-10-07)
+
+- [x] Audit of the 139 built pages: canonical, description, one h1, valid
+      JSON-LD, image alt text everywhere
+- [x] Every page has a share image (section pages lost it when they set their
+      own Open Graph data); project pages use their latest episode's cover
+- [x] No duplicate titles or descriptions: episode descriptions start with the
+      episode's own title; titles are never cut (the end often tells episodes
+      apart), the site name is added only when the title stays short
+- [x] Pages without the final "/" redirect with a permanent 301 (was a 307)
+- [x] `llms.txt` and `llms-full.txt` (https://llmstxt.org): plain summary of
+      the association, Blandine Schmidt, the workshops, projects and every
+      episode, for AI assistants
+- [x] IndexNow (Bing, which ChatGPT search and Copilot rely on, Yandex...):
+      key file in `public/`, `scripts/indexnow.mjs` run by CI after each deploy
+      (all pages on push, recent changes on the daily run)
+- [x] AI crawlers (GPTBot, ClaudeBot, PerplexityBot, OAI-SearchBot...) and
+      Googlebot get the pages; robots.txt allows everything
+- [ ] Check Cloudflare's AI bot blocking for the zone (dashboard: AI Crawl
+      Control / Bots); the API token cannot read it
+- [ ] Google Search Console and Bing Webmaster Tools: submit the sitemap
+- [ ] Links to Blandine Schmidt's public profiles (thesis, LinkedIn...) in her
+      structured data, if she wants them
+
 ## Decisions
 
 - Projects are defined in code (`lib/projects.ts`), matched on episode titles:

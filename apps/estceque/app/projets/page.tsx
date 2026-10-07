@@ -1,16 +1,15 @@
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 import ProjectCard from '@/components/ProjectCard'
 import { projectsWithEpisodes } from '@/lib/content'
 
 const description =
   "Les projets radio et podcast de l'association avec les écoles, collèges, lycées, universités et structures sociales du Sud-Ouest : webradios, docu-fictions, podcasts de savoir."
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: 'Les projets',
   description,
-  alternates: { canonical: '/projets/' },
-  openGraph: { title: 'Les projets', description, url: '/projets/' },
-}
+  path: '/projets/',
+})
 
 export default function Projects() {
   const groups = projectsWithEpisodes()

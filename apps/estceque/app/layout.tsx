@@ -43,7 +43,7 @@ export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
     default: `${SITE_NAME} | Ateliers radio et podcast, éducation aux médias`,
-    template: `%s | ${SITE_NAME}`,
+    template: "%s | Est-ce que t'entends",
   },
   description,
   applicationName: SITE_NAME,

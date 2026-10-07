@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import { pageMetadata } from '@/lib/seo'
 import ArteRadioPlayer from '@/components/ArteRadioPlayer'
 import JsonLd from '@/components/JsonLd'
 import MapEmbed from '@/components/MapEmbed'
@@ -7,16 +7,11 @@ import { SITE_URL, map } from '@/lib/content'
 const description =
   "L'oreille voyageuse : une carte sonore et plurilingue de contes en français langue-monde, créés en podcast au DEFLE de l'Université Bordeaux Montaigne. Cliquez sur une épingle pour écouter."
 
-export const metadata: Metadata = {
+export const metadata = pageMetadata({
   title: "L'oreille voyageuse, la carte sonore",
   description,
-  alternates: { canonical: '/oreille-voyageuse/' },
-  openGraph: {
-    title: "L'oreille voyageuse, la carte sonore",
-    description,
-    url: '/oreille-voyageuse/',
-  },
-}
+  path: '/oreille-voyageuse/',
+})
 
 export default function SoundMap() {
   const tales = map.places.filter((place) => place.player)

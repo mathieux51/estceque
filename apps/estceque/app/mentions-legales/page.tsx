@@ -3,6 +3,8 @@ import { CONTACT_EMAIL, SITE_NAME } from '@/lib/content'
 
 export const metadata: Metadata = {
   title: 'Mentions légales',
+  description:
+    "Mentions légales du site de l'association Est-ce que t'entends ce que je vois ? : éditeur, hébergement, données personnelles et droits.",
   alternates: { canonical: '/mentions-legales/' },
   robots: { index: false, follow: true },
 }
