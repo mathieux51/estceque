@@ -29,8 +29,14 @@ export function legacyRedirect(url: URL): string | null {
 const worker = {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url)
-    if (url.hostname === 'www.estceque.org') {
-      url.hostname = 'estceque.org'
+    // One redirect to https://estceque.org for both http and www.
+    const local = url.hostname === 'localhost' || url.hostname === '127.0.0.1'
+    if (
+      (url.protocol === 'http:' && !local) ||
+      url.hostname === 'www.estceque.org'
+    ) {
+      url.protocol = 'https:'
+      if (url.hostname === 'www.estceque.org') url.hostname = 'estceque.org'
       return Response.redirect(url.toString(), 301)
     }
     const target = legacyRedirect(url)
