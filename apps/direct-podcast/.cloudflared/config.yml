@@ -1,0 +1,6 @@
+tunnel: directpodcast
+
+ingress:
+  - hostname: dev.directpodcast.fr
+    service: http://localhost:3000
+  - service: http_status:404
