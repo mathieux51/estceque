@@ -1,0 +1,16 @@
+{
+  "$schema": "./node_modules/wrangler/config-schema.json",
+  "name": "estceque",
+  "main": "worker/index.ts",
+  "compatibility_date": "2026-10-01",
+  // Domains are attached with Terraform (infra/cloudflare/estceque.tf).
+  "workers_dev": false,
+  "assets": {
+    "directory": "./out",
+    "binding": "ASSETS",
+    // The worker sees every request so it can redirect www and the old blog.
+    "run_worker_first": true,
+    "html_handling": "auto-trailing-slash",
+    "not_found_handling": "404-page"
+  }
+}

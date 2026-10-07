@@ -6,6 +6,8 @@ Monorepo of the Est-ce que association's audio tools:
   browser, on [directpodcast.fr](https://directpodcast.fr)
 - [`apps/direct-montage`](apps/direct-montage): edit it (multitrack editor),
   on [directmontage.fr](https://directmontage.fr)
+- [`apps/estceque`](apps/estceque): the association's site, on
+  [estceque.org](https://estceque.org) (podcasts, ateliers, sound map)
 - [`apps/direct-social`](apps/direct-social) + [`services/social`](services/social):
   Direct Social, a podcast social network (local / Docker only for now)
 
@@ -86,6 +88,12 @@ The Terraform state is kept locally (gitignored) for now. Mail records
 (Cloudflare Email Routing for directpodcast.fr, Gandi for directmontage.fr)
 are not managed here.
 
+The same configuration holds the private R2 bucket `estceque-backups` (EU,
+objects locked for a year) in `backups.tf`. `upload-backup.sh` copies a backup
+folder into it and checks every file (needs rclone and an API token with
+"Workers R2 Storage: Edit"). See
+[the backup of the old www.estceque.org](docs/backup-estceque-org.md).
+
 ## Sharing a recording from Direct Podcast to Direct Montage
 
 The apps are on different domains, and browsers keep each site's storage
@@ -150,3 +158,6 @@ Both sites are set up the same way for search engines and link previews:
 - [Migration from Vercel to Cloudflare](docs/migration-vercel-to-cloudflare.md):
   what was done, and what is left
 - [Direct Social](docs/task-direct-social.md): goals, architecture, progress
+- [estceque.org site](docs/task-estceque-site.md): goals, architecture, progress
+- [Backup of the old www.estceque.org](docs/backup-estceque-org.md): what
+  was saved before replacing the site, where it is, what is missing

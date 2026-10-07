@@ -1,0 +1,40 @@
+name: estceque
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'apps/estceque/**'
+      - '.github/workflows/estceque.yml'
+  # Every day: new Ausha episodes and map changes appear without a commit.
+  schedule:
+    - cron: '17 5 * * *'
+  workflow_dispatch:
+
+concurrency:
+  group: estceque
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: apps/estceque
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+          cache-dependency-path: apps/estceque/package-lock.json
+      - run: npm ci
+      # Latest episodes and map; if Ausha or Framacarte is down, the committed
+      # snapshot in data/ is used.
+      - run: npm run fetch || echo "::warning::content fetch failed, using the committed snapshot"
+      - run: npm run build
+      - name: Deploy to Cloudflare
+        run: npx wrangler deploy
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}

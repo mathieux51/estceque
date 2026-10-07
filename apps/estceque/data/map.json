@@ -1,0 +1,76 @@
+{
+ "title": "L'oreille voyageuse",
+ "url": "https://framacarte.org/fr/map/l-oreille-voyageuse_239008",
+ "intro": [
+  "Des voix, des histoires, des mondes à découvrir...",
+  "L'oreille voyageuse est une cartographie sonore et plurilingue en français langue-monde née d’une écriture collective au Département d'Études de Français Langue Étrangère (DEFLE) à la Cité des Langues Étrangères, du Français et des Francophonies (CLEFF) de l'Université Bordeaux Montaigne.",
+  "L’objectif est de créer un espace de rencontre des langues et des cultures à travers la production de podcasts pédagogiques.",
+  "L’interculturalité devient ainsi une source d’enrichissement.",
+  "Pour écouter, il vous suffit de cliquer sur l'épingle📍puis sur lecture ▶️ ."
+ ],
+ "places": [
+  {
+   "name": "Histoire de la forêt du village. Le conte de Chenqian, Aliya & Moudou",
+   "longitude": -17.448177,
+   "latitude": 14.693784,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276293"
+  },
+  {
+   "name": "Héros de l’ombre et de l’eau",
+   "longitude": 30.5241361,
+   "latitude": 50.4500336,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276285"
+  },
+  {
+   "name": "L'aigle et la montagne. Un cente de Malaz et Adriana",
+   "longitude": 86.92521,
+   "latitude": 27.9880614,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276289"
+  },
+  {
+   "name": "La Dent Cassée",
+   "longitude": -66.9146008,
+   "latitude": 10.5060934,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276282"
+  },
+  {
+   "name": "Le conte de Son Tinh & Thuy Tinh",
+   "longitude": 105.842285,
+   "latitude": 21.0845,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276294"
+  },
+  {
+   "name": "Le tué tué",
+   "longitude": 127.265625,
+   "latitude": 52.908902,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276287"
+  },
+  {
+   "name": "Les échos de Loulan",
+   "longitude": 131.484375,
+   "latitude": -20.303418,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276281"
+  },
+  {
+   "name": "Les trois moines",
+   "longitude": -70.0119607,
+   "latitude": -32.6531487,
+   "text": "",
+   "player": "https://audioblog.arteradio.com/embed/276288"
+  },
+  {
+   "name": "DEFLE - CLEFF",
+   "longitude": -0.619456,
+   "latitude": 44.795861,
+   "text": "La Cité des Langues Étrangères, du Français et des Francophonies (CLEFF) de l'Université Bordeaux Montaigne accueille les étudiantes, les étudiants et les publics de tous horizons et de toutes nationalités, et répond à la demande des adultes en formation continue et des entreprises en matière de formation linguistique et interculturelle ainsi qu’en matière de traduction.\nhttps://www.u-bordeaux-montaigne.fr/fr/formations/cleff-cite-des-langues.html\nCette composante abrite le Département d'Études de Français Langue Étrangère (DEFLE)\nhttps://defle.u-bordeaux-montaigne.fr/fr/index.html",
+   "player": null
+  }
+ ]
+}
