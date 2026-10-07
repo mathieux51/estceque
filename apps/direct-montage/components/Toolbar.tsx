@@ -82,7 +82,7 @@ function ToolButton({
       disabled={disabled}
       aria-label={description}
       title={shortcut ? `${description} (${shortcut})` : description}
-      className='flex h-9 min-w-9 touch-manipulation items-center justify-center gap-1.5 rounded-md bg-gray-700 px-2.5 text-sm text-gray-100 transition-colors hover:bg-gray-600 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-gray-700'
+      className='flex h-9 min-w-9 touch-manipulation items-center justify-center gap-1.5 rounded-lg border border-grey/50 bg-white/10 px-2.5 text-sm text-grey transition-colors hover:bg-white/20 disabled:cursor-not-allowed disabled:opacity-40 disabled:hover:bg-white/10'
     >
       {children}
       {showLabel !== 'never' && (
@@ -99,7 +99,7 @@ const Group = ({ children }: { children: ReactNode }) => (
 )
 
 const Divider = () => (
-  <span className='hidden h-6 w-px bg-gray-600 sm:block' aria-hidden='true' />
+  <span className='hidden h-6 w-px bg-white/10 sm:block' aria-hidden='true' />
 )
 
 export default function Toolbar(props: ToolbarProps) {
@@ -125,18 +125,22 @@ export default function Toolbar(props: ToolbarProps) {
               onClick={props.onTogglePlay}
               disabled={props.duration <= 0}
               title={props.playing ? 'Pause (Espace)' : 'Lire (Espace)'}
-              className='flex h-9 w-28 touch-manipulation items-center justify-center gap-2 rounded-md bg-green-600 px-4 text-sm font-medium text-white transition-colors hover:bg-green-700 disabled:cursor-not-allowed disabled:opacity-40'
+              className='flex h-9 w-28 touch-manipulation items-center justify-center gap-2 rounded-lg bg-white px-4 text-sm font-medium text-brand transition-colors hover:bg-grey hover:text-white disabled:cursor-not-allowed disabled:opacity-40'
             >
               {props.playing ? <PauseIcon /> : <PlayIcon />}
               {props.playing ? 'Pause' : 'Lire'}
             </button>
           </Group>
-          <div className='text-sm text-gray-300 tabular-nums'>
-            <span ref={props.timeRef} hidden={!props.playing} />
-            <span hidden={props.playing}>
-              {formatTime(props.cursorTime, 2)}
+          {/* The font has no equal-width digits: a fixed-width box keeps the
+              meter next to it from shaking while the time runs. */}
+          <div className='whitespace-nowrap font-display text-base text-grey'>
+            <span className='inline-block w-[8.5ch] text-right'>
+              <span ref={props.timeRef} hidden={!props.playing} />
+              <span hidden={props.playing}>
+                {formatTime(props.cursorTime, 2)}
+              </span>
             </span>
-            <span className='text-gray-500'>
+            <span className='text-grey/70'>
               {' '}
               / {formatTime(props.duration, 2)}
             </span>
@@ -250,7 +254,7 @@ export default function Toolbar(props: ToolbarProps) {
         </Group>
         <Divider />
         <Group>
-          <label className='flex items-center gap-1.5 text-sm text-gray-300'>
+          <label className='flex items-center gap-1.5 text-sm text-grey'>
             Fondu
             <input
               type='number'
@@ -261,7 +265,7 @@ export default function Toolbar(props: ToolbarProps) {
               onChange={(event) =>
                 props.onFadeSecondsChange(event.target.value)
               }
-              className='h-9 w-16 rounded-md border border-gray-600 bg-gray-900 px-2 text-right text-white outline-none focus:border-blue-400'
+              className='h-9 w-16 rounded-lg border border-grey/40 bg-deep px-2 text-right text-grey outline-none focus:border-grey'
               aria-label='Durée du fondu en secondes'
             />
             s
@@ -287,7 +291,7 @@ export default function Toolbar(props: ToolbarProps) {
         </Group>
       </div>
 
-      <p className='min-h-5 text-xs text-gray-400 tabular-nums'>
+      <p className='min-h-5 text-xs text-grey/70 tabular-nums'>
         {props.selectionInfo}
       </p>
     </div>
