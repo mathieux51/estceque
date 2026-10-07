@@ -49,7 +49,7 @@ npm install
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+3. Open [http://localhost:3001](http://localhost:3001) in your browser
 
 ## Usage
 
@@ -96,7 +96,7 @@ direct-montage/
 │   │   └── types.ts
 │   ├── editorState.ts    # Reducer with undo/redo
 │   ├── projectDB.ts      # IndexedDB project storage
-│   └── sharedDB.ts       # Files shared by Direct Podcast
+│   └── shareReceiver.ts  # Recordings sent by Direct Podcast (postMessage)
 └── public/               # Static assets
 ```
 

@@ -9,7 +9,7 @@ import Header from './Header'
 import filename from '../helpers/filename'
 import { toError } from '../helpers/errors'
 import packageJSON from '../package.json'
-import { saveSharedAudioFile } from '../lib/sharedDB'
+import { shareToMontage } from '../lib/shareToMontage'
 import {
   saveLocalRecording,
   getLatestLocalRecording,
@@ -700,39 +700,26 @@ function Main() {
 
   const [isPreparingShare, setIsPreparingShare] = React.useState(false)
 
-  const handleShareToMontage = async (
-    e: React.MouseEvent<HTMLAnchorElement>
-  ) => {
-    if (!lastRecording) {
-      e.preventDefault()
-      return
-    }
+  const handleShareToMontage = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault()
+    if (!lastRecording) return
 
     if (isPreparingShare) {
-      e.preventDefault()
       alert('Préparation du partage en cours, veuillez patienter...')
       return
     }
 
-    e.preventDefault()
+    // Direct Montage opens in a new tab, which must happen during the click.
     setIsPreparingShare(true)
-
-    try {
-      // Save audio data to shared IndexedDB
-      const arrayBuffer = await lastRecording.blob.arrayBuffer()
-      await saveSharedAudioFile(
-        lastRecording.filename,
-        lastRecording.blob.type,
-        arrayBuffer
-      )
-
-      // Navigate to montage app
-      window.location.href = '/montage?sharing=true'
-    } catch (error) {
-      alert('Erreur lors de la préparation du partage. Veuillez réessayer.')
-    } finally {
-      setIsPreparingShare(false)
-    }
+    shareToMontage(lastRecording)
+      .catch((error) => {
+        alert(
+          error instanceof Error && error.message === 'blocked'
+            ? "Le navigateur a bloqué l'ouverture de Direct Montage. Autorisez les fenêtres pop-up pour ce site puis réessayez."
+            : "Direct Montage n'a pas reçu l'enregistrement. Veuillez réessayer."
+        )
+      })
+      .finally(() => setIsPreparingShare(false))
   }
 
   if (error) {

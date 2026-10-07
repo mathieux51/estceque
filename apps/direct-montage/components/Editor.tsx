@@ -39,7 +39,7 @@ import {
   saveStoredSource,
   type StoredSource,
 } from '@/lib/projectDB'
-import { clearSharedAudioFiles, getLatestSharedAudioFile } from '@/lib/sharedDB'
+import { receiveSharedFile } from '@/lib/shareReceiver'
 import { clampView, fitView, zoomView, type TimelineView } from '@/lib/view'
 
 const SAVE_ERROR =
@@ -261,9 +261,13 @@ export default function Editor() {
       const params = new URLSearchParams(window.location.search)
       if (params.get('sharing') === 'true') {
         try {
-          const shared = await getLatestSharedAudioFile()
-          await clearSharedAudioFiles()
-          if (shared) {
+          setBusy('Réception de l’enregistrement de Direct Podcast…')
+          const shared = await receiveSharedFile()
+          if (!shared) {
+            setMessage(
+              'Aucun enregistrement reçu de Direct Podcast. Relancez le partage depuis Direct Podcast.'
+            )
+          } else {
             const item = {
               id: createId('src'),
               name: shared.filename,
