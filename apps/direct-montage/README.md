@@ -1,6 +1,9 @@
 # Direct Montage
 
-A simple multitrack audio editor in the browser, in the spirit of Audacity.
+A simple multitrack audio editor in the browser, in the spirit of Audacity,
+on [directmontage.fr](https://directmontage.fr).
+
+Part of the [estceque monorepo](../../README.md).
 
 ## Features
 
@@ -27,9 +30,12 @@ A simple multitrack audio editor in the browser, in the spirit of Audacity.
 
 ## Tech Stack
 
-- **Next.js 15** with App Router
+- **Next.js 15** with App Router, built as a static site (`output: 'export'`)
+- **Cloudflare Workers** to serve it (`worker/`, `wrangler.jsonc`)
 - **TypeScript**
-- **Tailwind CSS**
+- **Tailwind CSS**, with Direct Podcast's palette as tokens in
+  `app/globals.css` (`brand`, `deep`, `grey`, `danger`, `success`, `warning`);
+  Roboto for text, Antipasto for the title and the timer
 - **Web Audio API** for decoding and playback, canvas for the waveforms
 - **wasm-media-encoders** (LAME compiled to WebAssembly) for MP3 export, loaded
   only when exporting
@@ -50,6 +56,22 @@ npm run dev
 ```
 
 3. Open [http://localhost:3001](http://localhost:3001) in your browser
+
+## Build and deploy
+
+```bash
+npm run build       # static site in out/
+npx wrangler dev    # serve it with its Worker, as in production
+```
+
+Pushing to `main` deploys it to Cloudflare (`.github/workflows/direct-montage.yml`
+at the root of the monorepo). The Worker (`worker/index.ts`) redirects
+`www.directmontage.fr` and the old `montage.directpodcast.fr`.
+
+SEO: title, description, canonical URL, Open Graph / Twitter tags and
+structured data are in `metadata` in `app/layout.tsx`; the share image,
+`robots.txt`, `sitemap.xml` and web manifest are in `public/`. See the SEO
+section of the [monorepo README](../../README.md#seo).
 
 ## Usage
 
@@ -86,6 +108,7 @@ direct-montage/
 │   ├── Timeline.tsx      # Canvas timeline: tracks, regions, gestures
 │   ├── Toolbar.tsx
 │   ├── LevelMeter.tsx    # Playback peak meter with the -12 dB mark
+│   ├── Footer.tsx        # Licence badge and credit, as on Direct Podcast
 │   └── AudioUpload.tsx
 ├── lib/
 │   ├── audio/
@@ -97,7 +120,9 @@ direct-montage/
 │   ├── editorState.ts    # Reducer with undo/redo
 │   ├── projectDB.ts      # IndexedDB project storage
 │   └── shareReceiver.ts  # Recordings sent by Direct Podcast (postMessage)
-└── public/               # Static assets
+├── public/               # Static assets
+├── worker/               # Cloudflare Worker serving the static build
+└── wrangler.jsonc
 ```
 
 ## Notes

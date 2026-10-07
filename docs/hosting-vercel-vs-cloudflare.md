@@ -11,6 +11,8 @@ deployed from GitHub Actions, with domains and DNS managed with Terraform
 (OpenTofu). Direct Podcast lives on `directpodcast.fr`, Direct Montage on
 `directmontage.fr`.
 
+Done on 2026-10-07; see [the migration notes](migration-vercel-to-cloudflare.md).
+
 ## Why Cloudflare for these two apps
 
 - **Neither app needs a server.** Recording, editing and export all run in the

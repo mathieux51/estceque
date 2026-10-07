@@ -1,5 +1,8 @@
 # Migration from Vercel to Cloudflare
 
+**Status: done on 2026-10-07.** Both sites run on Cloudflare and nothing is
+left on Vercel. Remaining follow-ups are at the end of this document.
+
 ## Objective
 
 Serve Direct Podcast on `directpodcast.fr` and Direct Montage on
@@ -49,7 +52,9 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
   local for now (`infra/cloudflare`, gitignored); move it to a remote backend
   (GCS or R2) before several people run it.
 - **OpenTofu** is used to run the Terraform configuration.
-- **Staging first:** the production domains only move with `cutover = true`.
+- **Staging first:** the production domains only moved with `cutover = true`.
+  The staging addresses (`next.directpodcast.fr`, `next.directmontage.fr`)
+  still point to the same Workers, so today they show production.
   Mail records (Cloudflare Email Routing for directpodcast.fr, Gandi for
   directmontage.fr) are never touched.
 

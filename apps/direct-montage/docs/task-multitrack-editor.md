@@ -112,3 +112,17 @@ editor:
   faster than the JavaScript port), loaded only when exporting MP3.
 - The meter is a peak meter (instant rise, slow fall, 1.5 s peak hold), since
   the goal is avoiding saturation and placing peaks around -12 dB.
+
+## Round 3: monorepo, own domain, design (2026-10-07)
+
+- [x] Footer with the Creative Commons BY-NC-ND badge and "D'après une idée
+      originale de Blandine Schmidt", as on Direct Podcast; project name no
+      longer bold
+- [x] Moved into the `estceque` monorepo (history kept) and to
+      `directmontage.fr` on Cloudflare Workers; recordings from Direct Podcast
+      now arrive through postMessage (`lib/shareReceiver.ts`)
+- [x] Level meter no longer shakes: the running time has a fixed-width box
+      (the Antipasto font has no equal-width digits)
+- [x] Design aligned with Direct Podcast's design system: shared palette
+      tokens, grey text, Roboto body text, Podcast-style buttons and cards,
+      timeline in brand blues
