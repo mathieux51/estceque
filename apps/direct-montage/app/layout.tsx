@@ -1,4 +1,4 @@
-import type { Metadata } from 'next'
+import type { Metadata, Viewport } from 'next'
 import localFont from 'next/font/local'
 import { Roboto } from 'next/font/google'
 import './globals.css'
@@ -33,48 +33,34 @@ const roboto = Roboto({
   variable: '--font-roboto',
 })
 
+const siteURL = 'https://directmontage.fr'
+const title = 'Direct Montage : montage audio en ligne, gratuit'
+const description =
+  'Montez vos podcasts dans le navigateur : plusieurs pistes, couper, copier, coller, fondus, volume, vumètre, export WAV et MP3. Gratuit, sans inscription, vos sons restent sur votre appareil.'
+
 export const metadata: Metadata = {
-  title: 'Direct Montage',
-  description:
-    "Application d'édition audio avec visualisation de forme d'onde, analyse de fréquence, découpage et contrôle de gain",
-  keywords: [
-    'édition audio',
-    'montage audio',
-    "forme d'onde",
-    'découpage audio',
-    'gain audio',
-    'visualisation audio',
-    'editeur audio web',
-  ],
-  authors: [{ name: 'Direct Montage' }],
-  creator: 'Direct Montage',
-  publisher: 'Direct Montage',
-  robots: {
-    index: true,
-    follow: true,
-    googleBot: {
-      index: true,
-      follow: true,
-      'max-video-preview': -1,
-      'max-image-preview': 'large',
-      'max-snippet': -1,
-    },
-  },
+  metadataBase: new URL(siteURL),
+  title,
+  description,
+  applicationName: 'Direct Montage',
+  alternates: { canonical: '/' },
+  robots: { index: true, follow: true },
   openGraph: {
-    title: 'Direct Montage',
-    description:
-      "Application d'édition audio avec visualisation de forme d'onde, analyse de fréquence, découpage et contrôle de gain",
-    url: 'https://direct-montage.vercel.app',
+    title,
+    description,
+    url: '/',
     siteName: 'Direct Montage',
     locale: 'fr_FR',
     type: 'website',
+    images: [
+      { url: '/og-image.png', width: 1200, height: 630, alt: 'Direct Montage' },
+    ],
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'Direct Montage',
-    description:
-      "Application d'édition audio avec visualisation de forme d'onde, analyse de fréquence, découpage et contrôle de gain",
-    creator: '@directmontage',
+    title,
+    description,
+    images: ['/og-image.png'],
   },
   icons: {
     icon: [
@@ -89,6 +75,25 @@ export const metadata: Metadata = {
   manifest: '/site.webmanifest',
 }
 
+export const viewport: Viewport = {
+  themeColor: '#005064',
+}
+
+// Structured data for search engines, like Direct Podcast's.
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Direct Montage',
+  url: siteURL,
+  description,
+  inLanguage: 'fr',
+  applicationCategory: 'MultimediaApplication',
+  operatingSystem: 'Tous (navigateur web)',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+  license: 'https://creativecommons.org/licenses/by-nc-nd/4.0/',
+}
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -97,6 +102,10 @@ export default function RootLayout({
   return (
     <html lang='fr'>
       <body className={`${antipasto.variable} ${roboto.variable} antialiased`}>
+        <script
+          type='application/ld+json'
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
         <ErrorBoundary>{children}</ErrorBoundary>
       </body>
     </html>

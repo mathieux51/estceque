@@ -15,7 +15,14 @@ const worker = {
       url.hostname = 'directmontage.fr'
       return Response.redirect(url.toString(), 301)
     }
-    return env.ASSETS.fetch(request)
+    const response = await env.ASSETS.fetch(request)
+    // next.* shows the same site as production: keep it out of search results.
+    if (url.hostname.startsWith('next.')) {
+      const copy = new Response(response.body, response)
+      copy.headers.set('X-Robots-Tag', 'noindex')
+      return copy
+    }
+    return response
   },
 }
 

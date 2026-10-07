@@ -63,7 +63,7 @@ function App(props: AppProps) {
     <>
       <Head>
         <meta name='viewport' content='width=device-width, initial-scale=1' />
-        <title>Direct podcast</title>
+        <title>Direct Podcast : enregistrer un podcast en ligne, gratuit</title>
       </Head>
       <ThemeProvider theme={theme}>
         <GlobalStyle />

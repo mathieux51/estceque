@@ -9,6 +9,25 @@ import Document, {
 
 import { ServerStyleSheet } from 'styled-components'
 
+const siteURL = 'https://directpodcast.fr'
+const title = 'Direct Podcast : enregistrer un podcast en ligne, gratuit'
+const description =
+  "Je clique, j'autorise l'accès à mon micro, je parle et lorsque j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement. Le fichier sonore se télécharge automatiquement."
+
+// Structured data for search engines (same shape as Direct Montage's).
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'WebApplication',
+  name: 'Direct Podcast',
+  url: siteURL,
+  description,
+  inLanguage: 'fr',
+  applicationCategory: 'MultimediaApplication',
+  operatingSystem: 'Tous (navigateur web)',
+  isAccessibleForFree: true,
+  offers: { '@type': 'Offer', price: '0', priceCurrency: 'EUR' },
+}
+
 class MyDocument extends Document {
   static async getInitialProps(ctx: DocumentContext) {
     const sheet = new ServerStyleSheet()
@@ -103,23 +122,23 @@ class MyDocument extends Document {
           <link rel='mask-icon' href='/safari-pinned-tab.svg' color='#005064' />
           <meta name='msapplication-TileColor' content='#005064' />
           <meta name='theme-color' content='#005064' />
-          <meta
-            name='description'
-            content="Je clique, j'autorise l'accès à mon micro, je parle et lorsque j’ai terminé, je clique une seconde fois pour arrêter mon enregistrement. Le fichier sonore se télécharge automatiquement."
-          />
+          <meta name='description' content={description} />
+          <meta property='og:type' content='website' />
+          <meta property='og:site_name' content='Direct Podcast' />
+          <meta property='og:locale' content='fr_FR' />
+          <meta property='og:title' content={title} />
+          <meta property='og:description' content={description} />
+          <meta property='og:image' content={`${siteURL}/og-image.png`} />
+          <meta property='og:image:width' content='1200' />
+          <meta property='og:image:height' content='630' />
+          <meta name='twitter:card' content='summary_large_image' />
+          <meta name='twitter:title' content={title} />
+          <meta name='twitter:description' content={description} />
+          <meta name='twitter:image' content={`${siteURL}/og-image.png`} />
           <script
             type='application/ld+json'
-            dangerouslySetInnerHTML={{
-              __html: `
-            {
-              "@context": "https://schema.org/",
-              "@type": "WebSite",
-              "name": "direct podcast",
-              "url": "https://directpodcast.fr"
-            }
-            `,
-            }}
-          ></script>
+            dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+          />
         </Head>
         <body>
           <Main />

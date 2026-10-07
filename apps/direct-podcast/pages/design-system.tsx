@@ -1,4 +1,5 @@
 import React from 'react'
+import Head from 'next/head'
 import styled from 'styled-components'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
@@ -292,6 +293,10 @@ const DesignSystemPage = () => {
 
   return (
     <Container>
+      <Head>
+        {/* Utility page: keep it out of search results. */}
+        <meta name='robots' content='noindex' />
+      </Head>
       <Header showMp3Toggle={false} />
       <Main>
         <Title>Design System</Title>

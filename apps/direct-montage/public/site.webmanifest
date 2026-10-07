@@ -1,28 +1,14 @@
 {
   "name": "Direct Montage",
   "short_name": "Direct Montage",
-  "description": "Application d'édition audio avec visualisation de forme d'onde, analyse de fréquence, découpage et contrôle de gain",
+  "description": "Montage audio multipiste dans le navigateur, gratuit et sans inscription.",
+  "lang": "fr",
   "start_url": "/",
   "display": "standalone",
-  "theme_color": "#000000",
-  "background_color": "#000000",
-  "orientation": "portrait-primary",
+  "theme_color": "#005064",
+  "background_color": "#005064",
   "icons": [
-    {
-      "src": "/favicon-16x16.png",
-      "sizes": "16x16",
-      "type": "image/png"
-    },
-    {
-      "src": "/favicon-32x32.png",
-      "sizes": "32x32",
-      "type": "image/png"
-    },
-    {
-      "src": "/apple-touch-icon.png",
-      "sizes": "180x180",
-      "type": "image/png",
-      "purpose": "any maskable"
-    }
+    { "src": "/android-chrome-192x192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "/android-chrome-512x512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }

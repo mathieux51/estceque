@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import Head from 'next/head'
 import styled from 'styled-components'
 import theme from '../styles/theme'
 import Header from '../components/Header'
@@ -481,6 +482,10 @@ const RecoveryPage = () => {
 
   return (
     <Container>
+      <Head>
+        {/* Utility page: keep it out of search results. */}
+        <meta name='robots' content='noindex' />
+      </Head>
       <Header showMp3Toggle={false} />
       <Main>
         <HomeLink href='/'>← Retour à l&apos;enregistrement</HomeLink>

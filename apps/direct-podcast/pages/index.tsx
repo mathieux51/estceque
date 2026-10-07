@@ -1,6 +1,7 @@
 import React from 'react'
 import * as Sentry from '@sentry/browser'
 import adapter from 'webrtc-adapter'
+import Head from 'next/head'
 import Main from '../components/Main'
 import isServer from '../helpers/isServer'
 import packageJSON from '../package.json'
@@ -28,6 +29,10 @@ if (!isServer) {
 function Index() {
   return (
     <React.StrictMode>
+      <Head>
+        <link rel='canonical' href='https://directpodcast.fr/' />
+        <meta property='og:url' content='https://directpodcast.fr/' />
+      </Head>
       <Main />
     </React.StrictMode>
   )
