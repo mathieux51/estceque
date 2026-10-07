@@ -48,7 +48,7 @@ const EDGE_PX = 28
 const DOUBLE_TAP_MS = 350
 const VOLUME_WIDTH = 118
 const VOLUME_HEIGHT = 34
-const MUTED_COLOR = '#6b7280'
+const MUTED_COLOR = '#7d837c'
 const PLAYHEAD_COLOR = '#ebcb8b'
 /** -12 dBFS as a linear level, shown as guide lines on every track. */
 const GUIDE_LEVEL = Math.pow(10, -12 / 20)
@@ -801,13 +801,13 @@ export default function Timeline(props: TimelineProps) {
 
   return (
     <div ref={rootRef} className='select-none'>
-      <div className='flex overflow-hidden rounded-md border border-gray-700 bg-gray-900'>
+      <div className='flex overflow-hidden rounded-lg border border-grey/30 bg-deep'>
         <div
-          className='shrink-0 border-r border-gray-700'
+          className='shrink-0 border-r border-grey/30'
           style={{ width: headerWidth }}
         >
           <div
-            className='flex items-end border-b border-gray-700 bg-[#0b1220] px-3 pb-1 text-[11px] uppercase tracking-wide text-gray-500'
+            className='flex items-end border-b border-grey/30 bg-[#002f3c] px-3 pb-1 text-[11px] uppercase tracking-wide text-grey/70'
             style={{ height: RULER_HEIGHT }}
           >
             Pistes
@@ -851,7 +851,7 @@ export default function Timeline(props: TimelineProps) {
           />
           {volumePosition && (
             <div
-              className='absolute z-10 flex items-stretch overflow-hidden rounded-md border border-gray-500 bg-gray-950/85 shadow-lg'
+              className='absolute z-10 flex items-stretch overflow-hidden rounded-lg border border-grey/60 bg-deep/90 shadow-lg'
               style={{
                 left: volumePosition.left,
                 top: volumePosition.top,
@@ -864,11 +864,11 @@ export default function Timeline(props: TimelineProps) {
                 onClick={() => props.onGain(-1)}
                 aria-label='Baisser le volume de la région'
                 title='Volume -1 dB (flèche bas)'
-                className='flex w-9 touch-manipulation items-center justify-center text-gray-100 hover:bg-gray-700 active:bg-gray-600'
+                className='flex w-9 touch-manipulation items-center justify-center text-grey hover:bg-white/20 active:bg-white/30'
               >
                 <TriangleDownIcon size={16} />
               </button>
-              <span className='flex flex-1 items-center justify-center border-x border-gray-700 text-xs text-gray-100 tabular-nums'>
+              <span className='flex flex-1 items-center justify-center border-x border-grey/30 text-xs text-grey tabular-nums'>
                 {props.gainLabel}
               </span>
               <button
@@ -876,7 +876,7 @@ export default function Timeline(props: TimelineProps) {
                 onClick={() => props.onGain(1)}
                 aria-label='Monter le volume de la région'
                 title='Volume +1 dB (flèche haut)'
-                className='flex w-9 touch-manipulation items-center justify-center text-gray-100 hover:bg-gray-700 active:bg-gray-600'
+                className='flex w-9 touch-manipulation items-center justify-center text-grey hover:bg-white/20 active:bg-white/30'
               >
                 <TriangleUpIcon size={16} />
               </button>
@@ -920,8 +920,8 @@ function TrackHeader({
 }) {
   return (
     <div
-      className={`relative flex flex-col justify-between border-b border-gray-700 py-1.5 pl-3 pr-1.5 ${
-        selected ? 'bg-gray-700/70' : 'bg-gray-800'
+      className={`relative flex flex-col justify-between border-b border-grey/30 py-1.5 pl-3 pr-1.5 ${
+        selected ? 'bg-white/15' : 'bg-white/5'
       }`}
       style={{ height }}
       onClick={(event) => {
@@ -936,7 +936,7 @@ function TrackHeader({
         key={track.name}
         defaultValue={track.name}
         aria-label='Nom de la piste'
-        className='w-full truncate rounded bg-transparent px-1 py-0.5 text-sm text-white outline-none focus:bg-gray-900'
+        className='w-full truncate rounded bg-transparent px-1 py-0.5 text-sm text-grey outline-none focus:bg-deep'
         onBlur={(event) => {
           const name = event.target.value.trim()
           if (name && name !== track.name) onRename(name)
@@ -961,8 +961,8 @@ function TrackHeader({
           title={track.muted ? 'Réactiver la piste' : 'Rendre la piste muette'}
           className={`flex h-8 touch-manipulation items-center gap-1 rounded px-2 text-xs transition-colors ${
             track.muted
-              ? 'bg-[#ebcb8b] text-gray-900 hover:bg-[#f0d6a3]'
-              : 'bg-gray-700 text-gray-200 hover:bg-gray-600'
+              ? 'bg-warning text-deep hover:bg-warning/80'
+              : 'bg-white/10 text-grey hover:bg-white/20'
           }`}
         >
           {track.muted ? <MutedIcon size={15} /> : <SpeakerIcon size={15} />}
@@ -973,7 +973,7 @@ function TrackHeader({
           onClick={onRemove}
           aria-label='Supprimer la piste'
           title='Supprimer la piste'
-          className='flex h-8 w-8 touch-manipulation items-center justify-center rounded text-gray-400 transition-colors hover:bg-gray-700 hover:text-red-300'
+          className='flex h-8 w-8 touch-manipulation items-center justify-center rounded text-grey/70 transition-colors hover:bg-white/20 hover:text-danger'
         >
           <TrashIcon size={15} />
         </button>
@@ -1031,9 +1031,9 @@ function Scrollbar({
       onPointerCancel={() => (drag.current = null)}
       aria-hidden='true'
     >
-      <div className='h-2.5 w-full rounded-full bg-gray-700/60' />
+      <div className='h-2.5 w-full rounded-full bg-white/10' />
       <div
-        className='absolute h-2.5 rounded-full bg-gray-400 hover:bg-gray-300'
+        className='absolute h-2.5 rounded-full bg-grey hover:bg-white'
         style={{ left: thumbLeft, width: thumbWidth }}
       />
     </div>
@@ -1111,7 +1111,7 @@ function drawTimeline(canvas: HTMLCanvasElement, scene: Scene) {
 
 function drawRuler(ctx: CanvasRenderingContext2D, scene: Scene) {
   const { view, width, selection } = scene
-  ctx.fillStyle = '#0b1220'
+  ctx.fillStyle = '#002f3c'
   ctx.fillRect(0, 0, width, RULER_HEIGHT)
 
   const showSelection = selection && !scene.activeClipId
@@ -1131,11 +1131,13 @@ function drawRuler(ctx: CanvasRenderingContext2D, scene: Scene) {
     const t = i * minor
     const x = Math.round((t - view.scroll) * view.pxPerSec) + 0.5
     const isMajor = Math.abs(t / major - Math.round(t / major)) < 1e-6
-    ctx.fillStyle = isMajor ? '#6b7280' : '#374151'
+    ctx.fillStyle = isMajor
+      ? 'rgba(171, 177, 170, 0.7)'
+      : 'rgba(171, 177, 170, 0.3)'
     const tick = isMajor ? 9 : 4
     ctx.fillRect(x - 0.5, RULER_HEIGHT - tick, 1, tick)
     if (isMajor) {
-      ctx.fillStyle = '#9ca3af'
+      ctx.fillStyle = '#abb1aa'
       ctx.fillText(formatTime(t, decimals), x + 4, 13)
     }
   }
@@ -1150,7 +1152,7 @@ function drawRuler(ctx: CanvasRenderingContext2D, scene: Scene) {
     ctx.closePath()
     ctx.fill()
   }
-  ctx.fillStyle = '#374151'
+  ctx.fillStyle = 'rgba(171, 177, 170, 0.3)'
   ctx.fillRect(0, RULER_HEIGHT - 1, width, 1)
 }
 
@@ -1172,9 +1174,9 @@ function drawLane(
 ) {
   const top = RULER_HEIGHT + index * scene.laneHeight
   const selected = scene.selection?.trackIds.includes(track.id) ?? false
-  ctx.fillStyle = selected ? '#1a2436' : index % 2 === 0 ? '#111827' : '#131b2a'
+  ctx.fillStyle = selected ? '#0d5466' : index % 2 === 0 ? '#003a49' : '#00404f'
   ctx.fillRect(0, top, scene.width, scene.laneHeight)
-  ctx.fillStyle = '#273244'
+  ctx.fillStyle = 'rgba(171, 177, 170, 0.18)'
   ctx.fillRect(0, top + scene.laneHeight - 1, scene.width, 1)
   // The dragged region is drawn last, on top of the others.
   const clips = scene.activeClipId
@@ -1264,7 +1266,7 @@ function drawClip(
   const name = source ? baseName(source.name) : 'Audio indisponible'
   const gain =
     clip.gain === 0 ? '' : `   ${clip.gain > 0 ? '+' : ''}${clip.gain} dB`
-  const ink = selected ? '#0b1220' : '#f3f4f6'
+  const ink = selected ? '#003a49' : '#ffffff'
   const grouped = clip.groupId && (scene.groupSizes.get(clip.groupId) ?? 0) > 1
   let textX = Math.max(x0, 0) + 9
   if (grouped) {
@@ -1277,7 +1279,7 @@ function drawClip(
   // Grips at both ends of the top bar: drag them to resize the region.
   if (x1 - x0 > 28) {
     ctx.fillStyle = selected
-      ? 'rgba(11, 18, 32, 0.55)'
+      ? 'rgba(0, 58, 73, 0.6)'
       : 'rgba(255, 255, 255, 0.5)'
     for (const x of [x0 + 3, x0 + 6, x1 - 4, x1 - 7]) {
       ctx.fillRect(Math.round(x), top + 5, 1, CLIP_HEADER - 10)
@@ -1341,7 +1343,7 @@ function drawWaveform(
     else ctx.fillRect(x, yTop, 1, Math.max(1, yBottom - yTop))
   }
   // Samples pushed past full scale by the volume are drawn in red.
-  ctx.fillStyle = '#f87171'
+  ctx.fillStyle = '#bf616a'
   for (let i = 0; i < clipped.length; i += 3) {
     ctx.fillRect(
       clipped[i],

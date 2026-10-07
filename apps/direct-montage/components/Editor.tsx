@@ -626,22 +626,22 @@ export default function Editor() {
       {(busy || message) && (
         <div className='fixed inset-x-0 bottom-4 z-40 flex flex-col items-center gap-2 px-4'>
           {busy && (
-            <div className='flex items-center gap-3 rounded-md bg-gray-950/95 px-4 py-2 text-sm text-white shadow-lg'>
-              <span className='h-4 w-4 animate-spin rounded-full border-2 border-gray-500 border-t-white' />
+            <div className='flex items-center gap-3 rounded-lg bg-deep/95 px-4 py-2 text-sm text-grey shadow-lg'>
+              <span className='h-4 w-4 animate-spin rounded-full border-2 border-grey/60 border-t-white' />
               {busy}
             </div>
           )}
           {message && (
             <div
               role='alert'
-              className='flex max-w-lg items-start gap-3 rounded-md bg-red-900/95 px-4 py-2 text-sm text-red-50 shadow-lg'
+              className='flex max-w-lg items-start gap-3 rounded-lg bg-danger px-4 py-2 text-sm text-grey shadow-lg'
             >
               <span>{message}</span>
               <button
                 type='button'
                 onClick={() => setMessage(null)}
                 aria-label='Fermer'
-                className='shrink-0 rounded p-0.5 hover:bg-red-800'
+                className='shrink-0 rounded p-0.5 hover:bg-danger-dark'
               >
                 <CloseIcon size={16} />
               </button>
@@ -654,8 +654,8 @@ export default function Editor() {
 
   if (!ready) {
     return (
-      <div className='rounded-lg bg-gray-800 p-8 text-center shadow-lg'>
-        <div className='animate-pulse text-lg text-white'>
+      <div className='rounded-lg bg-white/5 p-8 text-center shadow-lg'>
+        <div className='animate-pulse text-lg text-grey'>
           {busy ?? 'Chargement du projet…'}
         </div>
       </div>
@@ -673,7 +673,7 @@ export default function Editor() {
 
   return (
     <div
-      className='relative space-y-4 rounded-lg bg-gray-800 p-3 shadow-lg sm:p-6'
+      className='relative space-y-4 rounded-lg border border-grey/40 bg-white/5 p-3 shadow-lg backdrop-blur sm:p-6'
       onDragOver={onDragOver}
       onDragLeave={onDragLeave}
       onDrop={onDrop}
@@ -685,7 +685,7 @@ export default function Editor() {
           onChange={(event) =>
             dispatch({ type: 'rename', name: event.target.value })
           }
-          className='min-w-0 flex-1 basis-48 rounded bg-transparent py-1 text-xl font-normal text-white outline-none transition-all focus:bg-gray-700 focus:px-2'
+          className='min-w-0 flex-1 basis-48 rounded bg-transparent py-1 text-xl font-normal text-grey outline-none transition-all focus:bg-deep focus:px-2'
           placeholder='Nom du projet'
           aria-label='Nom du projet'
         />
@@ -693,7 +693,7 @@ export default function Editor() {
           <button
             type='button'
             onClick={() => fileInput.current?.click()}
-            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-md bg-gray-700 px-3 text-sm text-white transition-colors hover:bg-gray-600'
+            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-lg border border-grey/50 bg-white/10 px-3 text-sm text-grey transition-colors hover:bg-white/20'
           >
             <AudioFileIcon size={16} />
             Ajouter un fichier son
@@ -701,7 +701,7 @@ export default function Editor() {
           <button
             type='button'
             onClick={addBlankTrack}
-            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-md bg-gray-700 px-3 text-sm text-white transition-colors hover:bg-gray-600'
+            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-lg border border-grey/50 bg-white/10 px-3 text-sm text-grey transition-colors hover:bg-white/20'
           >
             <AddTrackIcon size={16} />
             Ajouter une piste vierge
@@ -711,7 +711,7 @@ export default function Editor() {
             onClick={() => exportMix('wav')}
             disabled={busy !== null}
             title='WAV 24 bits, 48 kHz'
-            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-md bg-indigo-600 px-3 text-sm text-white transition-colors hover:bg-indigo-700 disabled:opacity-50'
+            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-lg bg-white px-3 text-sm font-medium text-brand transition-colors hover:bg-grey hover:text-white disabled:opacity-50'
           >
             <DownloadIcon size={16} />
             Exporter WAV (HD)
@@ -721,7 +721,7 @@ export default function Editor() {
             onClick={() => exportMix('mp3')}
             disabled={busy !== null}
             title='MP3 320 kbit/s, 48 kHz'
-            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-md bg-indigo-600 px-3 text-sm text-white transition-colors hover:bg-indigo-700 disabled:opacity-50'
+            className='flex h-9 touch-manipulation items-center gap-1.5 rounded-lg bg-white px-3 text-sm font-medium text-brand transition-colors hover:bg-grey hover:text-white disabled:opacity-50'
           >
             <DownloadIcon size={16} />
             Exporter MP3 (HD)
@@ -729,7 +729,7 @@ export default function Editor() {
           <button
             type='button'
             onClick={newProject}
-            className='h-9 touch-manipulation rounded-md bg-gray-600 px-3 text-sm text-white transition-colors hover:bg-gray-500'
+            className='h-9 touch-manipulation rounded-lg border border-grey/50 bg-white/10 px-3 text-sm text-grey transition-colors hover:bg-white/20'
           >
             Nouveau projet
           </button>
@@ -821,14 +821,14 @@ export default function Editor() {
         <button
           type='button'
           onClick={() => fileInput.current?.click()}
-          className='flex h-40 w-full items-center justify-center rounded-md border-2 border-dashed border-gray-600 text-sm text-gray-300 transition-colors hover:border-gray-400'
+          className='flex h-40 w-full items-center justify-center rounded-lg border-2 border-dashed border-grey/40 text-sm text-grey transition-colors hover:border-grey'
         >
           Aucune piste. Touchez ici ou glissez des fichiers audio pour en
           ajouter.
         </button>
       )}
 
-      <p className='text-xs leading-relaxed text-gray-400'>
+      <p className='text-xs leading-relaxed text-grey/70'>
         <span className='md:hidden'>
           Glissez sur une piste pour sélectionner. Faites glisser la barre du
           haut d&apos;une région pour la déplacer, ses extrémités pour la
@@ -846,7 +846,7 @@ export default function Editor() {
       </p>
 
       {draggingFiles && (
-        <div className='pointer-events-none absolute inset-0 z-30 flex items-center justify-center rounded-lg border-2 border-dashed border-blue-400 bg-gray-900/80 text-lg text-white'>
+        <div className='pointer-events-none absolute inset-0 z-30 flex items-center justify-center rounded-lg border-2 border-dashed border-grey bg-deep/80 text-lg text-grey'>
           Déposez les fichiers pour ajouter des pistes
         </div>
       )}
@@ -869,18 +869,18 @@ function ShareDialog({
       aria-modal='true'
       aria-labelledby='share-title'
     >
-      <div className='w-full max-w-md space-y-4 rounded-lg bg-gray-800 p-6 shadow-xl'>
-        <h2 id='share-title' className='text-xl text-white'>
+      <div className='w-full max-w-md space-y-4 rounded-lg bg-white/5 p-6 shadow-xl'>
+        <h2 id='share-title' className='text-xl text-grey'>
           Fichier reçu de Direct Podcast
         </h2>
-        <p className='break-words text-sm text-gray-300'>
+        <p className='break-words text-sm text-grey'>
           « {fileName} ». Un projet est déjà ouvert : que voulez-vous faire ?
         </p>
         <div className='flex flex-col gap-2'>
           <button
             type='button'
             onClick={() => onAnswer('add')}
-            className='rounded-md bg-blue-600 px-4 py-2 text-white transition-colors hover:bg-blue-700'
+            className='rounded-lg bg-white px-4 py-2 font-medium text-brand transition-colors hover:bg-grey hover:text-white'
             autoFocus
           >
             Ajouter comme nouvelle piste
@@ -888,14 +888,14 @@ function ShareDialog({
           <button
             type='button'
             onClick={() => onAnswer('replace')}
-            className='rounded-md bg-gray-600 px-4 py-2 text-white transition-colors hover:bg-gray-500'
+            className='rounded-lg border border-grey/50 bg-white/10 px-4 py-2 text-grey transition-colors hover:bg-white/20'
           >
             Commencer un nouveau projet
           </button>
           <button
             type='button'
             onClick={() => onAnswer(null)}
-            className='px-4 py-2 text-sm text-gray-400 hover:text-gray-200'
+            className='px-4 py-2 text-sm text-grey/70 hover:text-white'
           >
             Ignorer
           </button>

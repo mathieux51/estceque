@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import localFont from 'next/font/local'
+import { Roboto } from 'next/font/google'
 import './globals.css'
 import ErrorBoundary from '@/components/ErrorBoundary'
 
@@ -23,6 +24,13 @@ const antipasto = localFont({
   ],
   variable: '--font-antipasto',
   fallback: ['system-ui', 'sans-serif'],
+})
+
+// Body text, like Direct Podcast; Antipasto is kept for titles and the timer.
+const roboto = Roboto({
+  subsets: ['latin'],
+  weight: ['400', '500', '700'],
+  variable: '--font-roboto',
 })
 
 export const metadata: Metadata = {
@@ -88,7 +96,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang='fr'>
-      <body className={`${antipasto.variable} antialiased`}>
+      <body className={`${antipasto.variable} ${roboto.variable} antialiased`}>
         <ErrorBoundary>{children}</ErrorBoundary>
       </body>
     </html>

@@ -23,7 +23,7 @@ function Icon({
   )
 }
 
-type IconProps = { size?: number }
+type IconProps = { size?: number; className?: string }
 
 export const PlayIcon = (p: IconProps) => (
   <Icon {...p}>

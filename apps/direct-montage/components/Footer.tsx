@@ -1,7 +1,7 @@
 /** Same bottom line as Direct Podcast: licence badge and credit. */
 export default function Footer() {
   return (
-    <footer className='mt-8 flex flex-col items-center gap-2 text-[15px] text-[#abb1aa]'>
+    <footer className='mt-8 flex flex-col items-center gap-2 text-[15px] text-grey'>
       <div className='flex items-center gap-4'>
         <a
           rel='license'

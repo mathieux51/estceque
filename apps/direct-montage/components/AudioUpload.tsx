@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { isAudioFile } from '@/lib/files'
+import { AudioFileIcon } from './icons'
 
 interface AudioUploadProps {
   onFilesSelect: (files: File[]) => void
@@ -37,7 +38,7 @@ export default function AudioUpload({ onFilesSelect }: AudioUploadProps) {
 
   return (
     <label
-      className='block relative border-2 border-dashed border-gray-500 rounded-lg p-8 text-center cursor-pointer hover:border-gray-400 transition-colors bg-gray-800'
+      className='block relative border-2 border-dashed border-grey/60 rounded-lg p-8 text-center cursor-pointer hover:border-grey transition-colors bg-white/5'
       onDrop={handleDrop}
       onDragOver={handleDragOver}
     >
@@ -48,28 +49,18 @@ export default function AudioUpload({ onFilesSelect }: AudioUploadProps) {
         className='absolute inset-0 w-full h-full opacity-0 cursor-pointer'
         aria-label='Sélectionner des fichiers audio'
       />
-      <svg
-        className='mx-auto h-12 w-12 text-gray-300 pointer-events-none'
-        stroke='currentColor'
-        fill='none'
-        viewBox='0 0 48 48'
-        aria-hidden='true'
-      >
-        <path
-          d='M28 8H12a4 4 0 00-4 4v20m32-12v8m0 0v8a4 4 0 01-4 4H12a4 4 0 01-4-4v-4m32-4l-3.172-3.172a4 4 0 00-5.656 0L28 28M8 32l9.172-9.172a4 4 0 015.656 0L28 28m0 0l4 4m4-24h8m-4-4v8m-12 4h.02'
-          strokeWidth={2}
-          strokeLinecap='round'
-          strokeLinejoin='round'
-        />
-      </svg>
-      <p className='mt-2 text-sm text-gray-300 pointer-events-none'>
+      <AudioFileIcon
+        size={48}
+        className='mx-auto text-grey pointer-events-none'
+      />
+      <p className='mt-2 text-sm text-grey pointer-events-none'>
         Cliquez pour charger ou glissez-déposez
       </p>
-      <p className='text-xs text-gray-400 pointer-events-none'>
+      <p className='text-xs text-grey/70 pointer-events-none'>
         Fichiers audio uniquement. Plusieurs fichiers = plusieurs pistes.
       </p>
       {error && (
-        <p className='mt-2 text-sm text-red-400 pointer-events-none'>{error}</p>
+        <p className='mt-2 text-sm text-danger pointer-events-none'>{error}</p>
       )}
     </label>
   )

@@ -6,12 +6,12 @@ export const MIN_GAIN_DB = -40
 export const MAX_GAIN_DB = 20
 
 export const TRACK_COLORS = [
-  '#60a5fa',
+  '#88c0d0',
   '#a3be8c',
   '#ebcb8b',
   '#d08770',
   '#b48ead',
-  '#88c0d0',
+  '#81a1c1',
 ]
 
 let idCounter = 0

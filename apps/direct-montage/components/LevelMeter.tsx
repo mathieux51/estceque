@@ -89,7 +89,7 @@ export default function LevelMeter({
       aria-label='Vumètre (niveau de lecture)'
       data-level={MIN_DB}
     >
-      <span className='text-xs text-gray-400'>Niveau</span>
+      <span className='text-xs text-grey/70'>Niveau</span>
       <div className='relative min-w-0 flex-1 pb-3.5' aria-hidden='true'>
         {[0, 1].map((channel) => (
           <div
@@ -101,7 +101,7 @@ export default function LevelMeter({
               ref={(element) => {
                 masks.current[channel] = element
               }}
-              className='absolute inset-y-0 right-0 bg-gray-900'
+              className='absolute inset-y-0 right-0 bg-deep'
               style={{ width: '100%' }}
             />
             <div
@@ -114,7 +114,7 @@ export default function LevelMeter({
           </div>
         ))}
         <div
-          className='absolute top-0 h-[18px] w-0.5 -translate-x-1/2 bg-[#ebcb8b]'
+          className='absolute top-0 h-[18px] w-0.5 -translate-x-1/2 bg-warning'
           style={{ left: `${position(TARGET_DB) * 100}%` }}
         />
         {TICKS.map((db) => (
@@ -122,10 +122,10 @@ export default function LevelMeter({
             key={db}
             className={`absolute bottom-0 -translate-x-1/2 text-[10px] leading-none tabular-nums ${
               db === TARGET_DB
-                ? 'font-semibold text-[#ebcb8b]'
+                ? 'font-semibold text-warning'
                 : db < -24
-                  ? 'hidden text-gray-500 md:inline'
-                  : 'text-gray-500'
+                  ? 'hidden text-grey/70 md:inline'
+                  : 'text-grey/70'
             }`}
             style={{ left: `${position(db) * 100}%` }}
           >
@@ -143,7 +143,7 @@ export default function LevelMeter({
             : 'Aucune saturation'
         }
         className={`h-5 touch-manipulation rounded px-1.5 text-[10px] font-semibold tracking-wide transition-colors ${
-          clipped ? 'bg-[#bf616a] text-white' : 'bg-gray-700 text-gray-400'
+          clipped ? 'bg-danger text-grey' : 'bg-white/10 text-grey/70'
         }`}
       >
         SAT

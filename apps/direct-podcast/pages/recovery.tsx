@@ -1,5 +1,6 @@
 import React, { useState } from 'react'
 import styled from 'styled-components'
+import theme from '../styles/theme'
 import Header from '../components/Header'
 import Footer from '../components/Footer'
 import {
@@ -236,11 +237,11 @@ const HomeLink = styled.a`
 `
 
 const ErrorMessage = styled.div`
-  background: rgba(220, 53, 69, 0.1);
-  color: #dc3545;
+  background: rgba(191, 97, 106, 0.1);
+  color: ${(props) => props.theme.red};
   padding: 0.75rem;
   border-radius: 4px;
-  border: 1px solid rgba(220, 53, 69, 0.3);
+  border: 1px solid rgba(191, 97, 106, 0.3);
   margin-bottom: 1rem;
   font-size: 0.875rem;
   word-wrap: break-word;
@@ -494,7 +495,7 @@ const RecoveryPage = () => {
               style={{
                 background: 'none',
                 border: 'none',
-                color: '#dc3545',
+                color: theme.red,
                 cursor: 'pointer',
                 float: 'right',
                 fontSize: '16px',
@@ -521,7 +522,7 @@ const RecoveryPage = () => {
           </SectionTitle>
           {recordings.length > 0 ? (
             <>
-              <InfoText style={{ color: '#999', fontSize: '12px' }}>
+              <InfoText style={{ color: theme.grey, fontSize: '12px' }}>
                 Certains fichiers peuvent être des récupérations automatiques
                 incorrectes. Utilisez le bouton &quot;Supprimer tous les
                 enregistrements&quot; pour nettoyer et recommencer.
@@ -546,7 +547,7 @@ const RecoveryPage = () => {
               </RecordingList>
             </>
           ) : (
-            <p style={{ color: '#999' }}>
+            <p style={{ color: theme.grey }}>
               Aucun enregistrement complété trouvé
             </p>
           )}
@@ -556,7 +557,7 @@ const RecoveryPage = () => {
           <SectionTitle>Sessions Incomplètes ({sessions.length})</SectionTitle>
           {sessions.length > 0 ? (
             <>
-              <p style={{ marginBottom: '1rem', color: '#999' }}>
+              <p style={{ marginBottom: '1rem', color: theme.grey }}>
                 Ces sessions peuvent être des enregistrements interrompus par un
                 crash
               </p>
@@ -583,7 +584,9 @@ const RecoveryPage = () => {
               </RecordingList>
             </>
           ) : (
-            <p style={{ color: '#999' }}>Aucune session incomplète trouvée</p>
+            <p style={{ color: theme.grey }}>
+              Aucune session incomplète trouvée
+            </p>
           )}
         </Section>
 
