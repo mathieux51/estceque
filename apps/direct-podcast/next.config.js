@@ -11,13 +11,8 @@
 //   },
 // })
 // )
+// Built as a static site (served by Cloudflare). "/recuperation" is a page
+// that re-exports "/recovery", since rewrites don't exist in a static export.
 module.exports = {
-  async rewrites() {
-    return [
-      {
-        source: '/recuperation',
-        destination: '/recovery',
-      },
-    ]
-  },
+  output: 'export',
 }

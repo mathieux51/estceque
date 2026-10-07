@@ -1,8 +1,8 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  // basePath removed - handled by proxy from direct-podcast
-  assetPrefix: process.env.NODE_ENV === 'production' ? '/montage' : '',
+  // Built as a static site, served by Cloudflare on directmontage.fr.
+  output: 'export',
   reactStrictMode: false,
   webpack: (config, { isServer }) => {
     config.experiments = {
