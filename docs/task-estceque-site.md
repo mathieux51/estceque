@@ -44,8 +44,13 @@ association "Est-ce que t'entends ce que je vois ?":
       with daily rebuild
 - [x] Browser checks (desktop, mobile): search, filters, players, map
 - [x] Staging: Worker deployed, `next.estceque.org` attached (noindex)
-- [ ] Cutover: `tofu apply -var estceque_cutover=true` (removes the Blogger
-      and Gandi web records, attaches estceque.org and www.estceque.org)
+- [x] Cutover (2026-10-07): Blogger and Gandi web records removed,
+      estceque.org and www.estceque.org attached; `estceque_cutover` now
+      defaults to true. Checked: pages, sitemap, http and www redirects, old
+      blog redirects, no noindex, certificate, MX and TXT records intact.
+      Subdomains other than www and next no longer resolve (the Blogger
+      wildcard is gone)
+- [x] HTTP to HTTPS redirect in the Worker (the zone has "Always Use HTTPS" off)
 - [ ] After cutover: Search Console (new sitemap), Ausha website link
 
 ## Decisions
@@ -66,5 +71,6 @@ association "Est-ce que t'entends ce que je vois ?":
 
 ## Next Steps
 
-- Build the items above, deploy to `next.estceque.org`, then switch the
-  domains.
+- Submit https://estceque.org/sitemap.xml in Google Search Console.
+- Change the website link in Ausha to https://estceque.org/.
+- Add the registered address and publication director to the legal page.

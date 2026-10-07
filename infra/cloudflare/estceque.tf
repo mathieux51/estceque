@@ -8,9 +8,9 @@
 # here and stay as they are.
 
 variable "estceque_cutover" {
-  description = "Serve estceque.org and www.estceque.org from the estceque Worker instead of Blogger."
+  description = "Serve estceque.org and www.estceque.org from the estceque Worker instead of Blogger (switched on 2026-10-07)."
   type        = bool
-  default     = false
+  default     = true
 }
 
 locals {
