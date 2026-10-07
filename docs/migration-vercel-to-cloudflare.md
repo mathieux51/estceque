@@ -22,11 +22,13 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
 - [x] Terraform (`infra/cloudflare`): staging domains, `cutover` flag for the
       production domains; `tofu plan` checked: 5 records to import unchanged,
       2 staging domains to add, nothing destroyed
-- [ ] **Blocked:** the Cloudflare API token lacks write permissions (see Issues)
-- [ ] First deploy of both Workers (CI or `npx wrangler deploy`)
-- [ ] `tofu apply` (staging domains `next.directpodcast.fr`,
-      `next.directmontage.fr`)
-- [ ] Test on staging, including sharing between the two staging domains
+- [x] 2026-10-07: Token permissions extended (Workers Scripts edit); first
+      deploy of both Workers with `npx wrangler deploy`
+- [x] `tofu apply`: staging domains `next.directpodcast.fr` and
+      `next.directmontage.fr` live (5 records imported, 2 domains added)
+- [x] Tested on staging: both sites, `/recuperation`, the `/montage` redirect,
+      and sharing a real recording from next.directpodcast.fr to
+      next.directmontage.fr
 - [ ] Cutover (see below), then archive the old repositories and Vercel projects
 
 ## Decisions
@@ -53,30 +55,24 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
 
 ## Issues
 
-- The token in `~/.zshenv` (`CLOUDFLARE_API_TOKEN`) can read the zones, DNS and
-  Worker scripts, but `wrangler deploy` fails with "No access to the specified
-  resource", and R2 and Worker routes are refused. It needs, for account
-  `9a229e2731ac55032b7668065e27deb0`:
-  - Account: **Workers Scripts: Edit**, **Account Settings: Read**
-  - Zones directpodcast.fr and directmontage.fr: **DNS: Edit**, **Workers
-    Routes: Edit**, **Zone: Read**
+- The token (`CLOUDFLARE_API_TOKEN` in `~/.zshenv`, also a repository secret)
+  can deploy Workers and attach domains, but only reads DNS ("DNS: Edit" was
+  not offered). The cutover deletes the Vercel/Gandi web records, so it will
+  need a token that can edit DNS on both zones; otherwise delete those five
+  records by hand in the dashboard just before step 5.
 - Direct Podcast is on Next.js 14.0.3, which has critical advisories for
   server-side features. Static export removes the server, but the dependency
   should still be upgraded.
 
 ## Next steps
 
-1. Give the token the permissions above (same token, so CI keeps working).
-2. Deploy: push to `main`, or run the workflows by hand ("Run workflow").
-3. `cd infra/cloudflare && tofu init && tofu apply` for the staging domains.
-4. Test `https://next.directpodcast.fr` and `https://next.directmontage.fr`,
-   including "Partager vers Direct Montage".
-5. Cutover (a few seconds of downtime between the two commands):
+1. Check that the deploy workflows pass with the updated secrets.
+2. Cutover (a few seconds of downtime between the two commands):
    ```bash
    tofu apply -var cutover=true -target=cloudflare_dns_record.replaced
    tofu apply -var cutover=true
    ```
    Then set `default = true` for `cutover` in `main.tf` and commit.
-6. Once production is verified: disable the Vercel deploy workflows, archive
+3. Once production is verified: disable the Vercel deploy workflows, archive
    `mathieux51/direct-podcast` and `mathieux51/direct-montage`, delete the
    Vercel projects.
