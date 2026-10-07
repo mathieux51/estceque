@@ -25,9 +25,9 @@ variable "account_id" {
 }
 
 variable "cutover" {
-  description = "Serve the production domains from the Cloudflare Workers instead of Vercel/Gandi."
+  description = "Serve the production domains from the Cloudflare Workers instead of Vercel/Gandi (done on 2026-10-07)."
   type        = bool
-  default     = false
+  default     = true
 }
 
 locals {

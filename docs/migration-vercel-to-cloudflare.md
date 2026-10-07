@@ -29,7 +29,7 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
 - [x] Tested on staging: both sites, `/recuperation`, the `/montage` redirect,
       and sharing a real recording from next.directpodcast.fr to
       next.directmontage.fr
-- [ ] Cutover (see below), then archive the old repositories and Vercel projects
+- [x] Cutover (2026-10-07)
 
 ## Decisions
 
@@ -56,23 +56,23 @@ Sharing a recording from Direct Podcast to Direct Montage must keep working.
 ## Issues
 
 - The token (`CLOUDFLARE_API_TOKEN` in `~/.zshenv`, also a repository secret)
-  can deploy Workers and attach domains, but only reads DNS ("DNS: Edit" was
-  not offered). The cutover deletes the Vercel/Gandi web records, so it will
-  need a token that can edit DNS on both zones; otherwise delete those five
-  records by hand in the dashboard just before step 5.
+  deploys Workers, attaches domains and could delete the old DNS records,
+  even though "DNS: Edit" was not offered when it was updated.
 - Direct Podcast is on Next.js 14.0.3, which has critical advisories for
   server-side features. Static export removes the server, but the dependency
   should still be upgraded.
 
 ## Next steps
 
-1. Check that the deploy workflows pass with the updated secrets.
-2. Cutover (a few seconds of downtime between the two commands):
-   ```bash
-   tofu apply -var cutover=true -target=cloudflare_dns_record.replaced
-   tofu apply -var cutover=true
-   ```
-   Then set `default = true` for `cutover` in `main.tf` and commit.
-3. Once production is verified: disable the Vercel deploy workflows, archive
-   `mathieux51/direct-podcast` and `mathieux51/direct-montage`, delete the
-   Vercel projects.
+- [x] 2026-10-07: Deploy workflows run with the updated secrets
+      (direct-podcast passed)
+- [x] 2026-10-07: Cutover done. Old web records removed, production domains
+      attached; checked `directpodcast.fr`, `/recuperation`, `directmontage.fr`,
+      the redirects (`www`, `/montage`, `montage.directpodcast.fr`), the mail
+      records, and sharing a real recording between the two domains.
+      `cutover` now defaults to `true`.
+- [x] Old repositories archived on GitHub (read-only, reversible)
+- [ ] Delete the Vercel projects `direct-podcast` and `direct-montage` once
+      nothing points to them (irreversible, so left for a manual decision)
+- [ ] Move the Terraform state to a remote backend
+- [ ] Upgrade Direct Podcast's dependencies (Next.js 14.0.3)
