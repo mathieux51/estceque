@@ -33,6 +33,7 @@ import {
 } from '@/lib/view'
 import {
   MutedIcon,
+  RecordIcon,
   SpeakerIcon,
   TrashIcon,
   TriangleDownIcon,
@@ -100,6 +101,11 @@ export interface TimelineProps {
   onToggleMute: (trackId: string) => void
   onRemoveTrack: (trackId: string) => void
   onRenameTrack: (trackId: string, name: string) => void
+  /** Track being recorded on, and where the take starts; null when not recording. */
+  recording: { trackId: string; start: number } | null
+  /** Microphone level during a recording (linear, 1 = full scale). */
+  getInputLevel: () => number
+  onToggleRecording: (trackId: string) => void
 }
 
 type Point = { x: number; y: number }
@@ -165,12 +171,14 @@ export default function Timeline(props: TimelineProps) {
   const rootRef = useRef<HTMLDivElement>(null)
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const playheadRef = useRef<HTMLDivElement>(null)
+  const takeRef = useRef<HTMLDivElement>(null)
+  const takeLevelRef = useRef<HTMLDivElement>(null)
   const [rootWidth, setRootWidth] = useState(0)
   const [preview, setPreview] = useState<Preview | null>(null)
   const [font, setFont] = useState('sans-serif')
 
   const compact = rootWidth > 0 && rootWidth < 640
-  const headerWidth = compact ? 92 : 148
+  const headerWidth = compact ? 108 : 176
   const laneHeight = compact ? 84 : 100
   // Width of the grips at both ends of a region's top bar.
   const grip = compact ? 14 : 8
@@ -725,6 +733,10 @@ export default function Timeline(props: TimelineProps) {
   }, [])
 
   // Playhead: moved every frame without re-rendering; the view follows it page by page.
+  const { recording, getInputLevel } = props
+  const recordingLane = recording
+    ? project.tracks.findIndex((track) => track.id === recording.trackId)
+    : -1
   useEffect(() => {
     const element = playheadRef.current
     if (!element) return
@@ -732,6 +744,8 @@ export default function Timeline(props: TimelineProps) {
       element.style.display = 'none'
       return
     }
+    const takeElement = takeRef.current
+    const levelElement = takeLevelRef.current
     let frame = 0
     let previousX: number | null = null
     const tick = () => {
@@ -754,11 +768,28 @@ export default function Timeline(props: TimelineProps) {
       previousX = x
       element.style.display = x >= -2 && x <= w ? 'block' : 'none'
       element.style.transform = `translateX(${Math.round(x) - 1}px)`
+      // The take being recorded grows from its start to the playhead.
+      if (takeElement && recording) {
+        const view = viewRef.current
+        const left = Math.max(
+          0,
+          (recording.start - view.scroll) * view.pxPerSec
+        )
+        const right = Math.min(w, x)
+        takeElement.style.left = `${left}px`
+        takeElement.style.width = `${Math.max(0, right - left)}px`
+        if (levelElement) {
+          const db = 20 * Math.log10(Math.max(getInputLevel(), 1e-5))
+          const ratio = Math.max(0, Math.min(1, (db + 60) / 60))
+          levelElement.style.width = `${ratio * 100}%`
+          levelElement.style.background = db > -1 ? '#bf616a' : '#a3be8c'
+        }
+      }
       frame = requestAnimationFrame(tick)
     }
     frame = requestAnimationFrame(tick)
     return () => cancelAnimationFrame(frame)
-  }, [playing, getPlayhead, setView])
+  }, [playing, getPlayhead, setView, recording, getInputLevel])
 
   // Where the ▼/▲ volume buttons sit: centred in the visible part of the
   // selection, under the region header bar so they never cover a drag handle.
@@ -821,6 +852,11 @@ export default function Timeline(props: TimelineProps) {
               selected={selection?.trackIds.includes(track.id) ?? false}
               onSelectTrack={() => selectWholeTrack(track)}
               onToggleMute={() => props.onToggleMute(track.id)}
+              recording={recording?.trackId === track.id}
+              recordDisabled={
+                recording !== null && recording.trackId !== track.id
+              }
+              onToggleRecording={() => props.onToggleRecording(track.id)}
               onRemove={() => props.onRemoveTrack(track.id)}
               onRename={(name) => props.onRenameTrack(track.id, name)}
             />
@@ -844,6 +880,31 @@ export default function Timeline(props: TimelineProps) {
             // track headers or the volume buttons.
             onClick={() => undefined}
           />
+          {recording && recordingLane >= 0 && (
+            <div
+              ref={takeRef}
+              data-testid='take-preview'
+              className='pointer-events-none absolute overflow-hidden rounded border border-danger bg-danger/30'
+              style={{
+                top: RULER_HEIGHT + recordingLane * laneHeight + LANE_PADDING,
+                height: laneHeight - 2 * LANE_PADDING,
+                left: 0,
+                width: 0,
+              }}
+            >
+              <span className='absolute left-1.5 top-1 flex items-center gap-1 whitespace-nowrap text-[11px] font-medium text-white'>
+                <span className='h-2 w-2 animate-pulse rounded-full bg-danger' />
+                Enregistrement
+              </span>
+              <div className='absolute inset-x-1.5 bottom-1.5 h-1.5 overflow-hidden rounded bg-deep/70'>
+                <div
+                  ref={takeLevelRef}
+                  className='h-full'
+                  style={{ width: 0 }}
+                />
+              </div>
+            </div>
+          )}
           <div
             ref={playheadRef}
             className='pointer-events-none absolute left-0 top-0 w-0.5'
@@ -906,6 +967,9 @@ function TrackHeader({
   selected,
   onSelectTrack,
   onToggleMute,
+  recording,
+  recordDisabled,
+  onToggleRecording,
   onRemove,
   onRename,
 }: {
@@ -915,6 +979,9 @@ function TrackHeader({
   selected: boolean
   onSelectTrack: () => void
   onToggleMute: () => void
+  recording: boolean
+  recordDisabled: boolean
+  onToggleRecording: () => void
   onRemove: () => void
   onRename: (name: string) => void
 }) {
@@ -953,13 +1020,41 @@ function TrackHeader({
       <div className='flex items-center gap-1'>
         <button
           type='button'
+          onClick={onToggleRecording}
+          disabled={recordDisabled}
+          aria-pressed={recording}
+          aria-label={
+            recording
+              ? "Arrêter l'enregistrement"
+              : 'Enregistrer sur cette piste'
+          }
+          title={
+            recording
+              ? "Arrêter l'enregistrement (Espace)"
+              : 'Enregistrer sur cette piste, à partir du curseur (casque conseillé)'
+          }
+          className={`flex h-8 touch-manipulation items-center gap-1 rounded px-1.5 text-xs transition-colors disabled:opacity-40 ${
+            recording
+              ? 'bg-danger text-white hover:bg-danger-dark'
+              : 'bg-white/10 text-danger hover:bg-white/20'
+          }`}
+        >
+          <RecordIcon size={15} className={recording ? 'animate-pulse' : ''} />
+          {!compact && (
+            <span className={recording ? 'text-white' : 'text-grey'}>
+              {recording ? 'Stop' : 'Rec'}
+            </span>
+          )}
+        </button>
+        <button
+          type='button'
           onClick={onToggleMute}
           aria-pressed={track.muted}
           aria-label={
             track.muted ? 'Réactiver la piste' : 'Rendre la piste muette'
           }
           title={track.muted ? 'Réactiver la piste' : 'Rendre la piste muette'}
-          className={`flex h-8 touch-manipulation items-center gap-1 rounded px-2 text-xs transition-colors ${
+          className={`flex h-8 touch-manipulation items-center gap-1 rounded px-1.5 text-xs transition-colors ${
             track.muted
               ? 'bg-warning text-deep hover:bg-warning/80'
               : 'bg-white/10 text-grey hover:bg-white/20'
@@ -973,7 +1068,7 @@ function TrackHeader({
           onClick={onRemove}
           aria-label='Supprimer la piste'
           title='Supprimer la piste'
-          className='flex h-8 w-8 touch-manipulation items-center justify-center rounded text-grey/70 transition-colors hover:bg-white/20 hover:text-danger'
+          className={`flex h-8 ${compact ? 'w-7' : 'w-8'} touch-manipulation items-center justify-center rounded text-grey/70 transition-colors hover:bg-white/20 hover:text-danger`}
         >
           <TrashIcon size={15} />
         </button>

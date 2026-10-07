@@ -14,7 +14,13 @@ import {
   trimClip,
   ungroupSelection,
 } from './audio/edit'
-import type { ClipboardData, Project, Selection, Track } from './audio/types'
+import type {
+  Clip,
+  ClipboardData,
+  Project,
+  Selection,
+  Track,
+} from './audio/types'
 
 export interface EditorState {
   name: string
@@ -54,6 +60,7 @@ export type EditorAction =
   | { type: 'split' }
   | { type: 'gain'; delta: number }
   | { type: 'fade'; edge: 'in' | 'out'; seconds: number }
+  | { type: 'recordTake'; trackId: string; trackName: string; clip: Clip }
 
 export const emptyEditorState: EditorState = {
   name: '',
@@ -346,5 +353,29 @@ export function editorReducer(
             setFade(project, selection, action.edge, action.seconds)
           )
         : state
+
+    case 'recordTake': {
+      // A take goes in like a paste: if it lands inside a region, the rest of
+      // that region moves right to make room. If its track was deleted during
+      // the recording, it gets a new one.
+      const { clip } = action
+      const index = project.tracks.findIndex(
+        (track) => track.id === action.trackId
+      )
+      const pasted = insertClipboard(
+        project,
+        index < 0 ? project.tracks.length : index,
+        clip.start,
+        {
+          duration: clip.duration,
+          tracks: [{ name: action.trackName, clips: [{ ...clip, start: 0 }] }],
+        }
+      )
+      return commit(state, pasted.project, {
+        trackIds: pasted.trackIds,
+        start: clip.start,
+        end: clip.start + clip.duration,
+      })
+    }
   }
 }

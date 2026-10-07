@@ -200,3 +200,9 @@ export const AddTrackIcon = (p: IconProps) => (
     <path d='M3 6h18M3 12h10M3 18h8M17 14v8M13 18h8' />
   </Icon>
 )
+
+export const RecordIcon = (p: IconProps) => (
+  <Icon {...p} stroke='none'>
+    <circle cx='12' cy='12' r='7' fill='currentColor' />
+  </Icon>
+)

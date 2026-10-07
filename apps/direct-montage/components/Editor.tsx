@@ -25,6 +25,7 @@ import {
 } from '@/lib/audio/edit'
 import { PlaybackEngine, PROJECT_SAMPLE_RATE } from '@/lib/audio/engine'
 import { mixdownToMp3, mixdownToWav } from '@/lib/audio/mixdown'
+import { TakeRecorder, takeToWav } from '@/lib/audio/recorder'
 import { SourceStore } from '@/lib/audio/sources'
 import type { Project, Selection, Track } from '@/lib/audio/types'
 import { editorReducer, emptyEditorState } from '@/lib/editorState'
@@ -91,6 +92,16 @@ export default function Editor() {
   const stateRef = useRef(state)
   const playback = useRef<{ to: number; range: boolean } | null>(null)
   const timeRef = useRef<HTMLSpanElement>(null)
+  // Recording on a track: other tracks play meanwhile, from the same point.
+  const [recording, setRecording] = useState<{
+    trackId: string
+    start: number
+  } | null>(null)
+  const take = useRef<{
+    recorder: TakeRecorder
+    trackId: string
+    from: number
+  } | null>(null)
   const fileInput = useRef<HTMLInputElement>(null)
 
   useLayoutEffect(() => {
@@ -368,6 +379,10 @@ export default function Editor() {
   )
 
   const togglePlay = useCallback(() => {
+    if (take.current) {
+      void stopRecordingRef.current()
+      return
+    }
     if (playback.current) {
       stopPlayback(true)
       return
@@ -385,7 +400,8 @@ export default function Editor() {
 
   const seek = useCallback(
     (time: number) => {
-      if (!playback.current) return
+      // Jumping would break the timing of the take being recorded.
+      if (!playback.current || take.current) return
       startPlayback(time, projectDuration(stateRef.current.project), false)
     },
     [startPlayback]
@@ -414,12 +430,110 @@ export default function Editor() {
   // An edit or a mute during playback is heard right away.
   useEffect(() => {
     const current = playback.current
-    if (!current || !engine.playing) return
+    // During a recording, playback keeps going untouched (its timing places the take).
+    if (!current || !engine.playing || take.current) return
     const to = current.range ? current.to : projectDuration(project)
     startPlayback(engine.position(), to, current.range)
   }, [project, engine, startPlayback])
 
-  useEffect(() => () => engine.stop(), [engine])
+  useEffect(
+    () => () => {
+      take.current?.recorder.cancel()
+      engine.stop()
+    },
+    [engine]
+  )
+
+  // Recording
+
+  const startRecording = async (trackId: string) => {
+    const context = engine.getContext()
+    // resume() must start inside the click/tap handler for mobile browsers.
+    void context.resume()
+    if (playback.current) stopPlayback(false)
+    const { selection: active, project: current } = stateRef.current
+    const from = active?.start ?? 0
+    let recorder: TakeRecorder
+    try {
+      recorder = await TakeRecorder.open(context)
+    } catch {
+      setMessage(
+        "Impossible d'accéder au micro. Autorisez-le dans votre navigateur, puis réessayez."
+      )
+      return
+    }
+    take.current = { recorder, trackId, from }
+    playback.current = { to: Infinity, range: false }
+    dispatch({
+      type: 'select',
+      selection: { trackIds: [trackId], start: from, end: from },
+    })
+    setRecording({ trackId, start: from })
+    setPlaying(true)
+    try {
+      await engine.play(current, (id) => store.get(id)?.buffer, from, Infinity)
+    } catch {
+      setMessage('La lecture est impossible dans ce navigateur.')
+    }
+  }
+
+  const stopRecording = async () => {
+    const active = take.current
+    if (!active) return
+    take.current = null
+    const recorded = await active.recorder.stop()
+    // Where the first sample sits on the timeline, as the performer heard it.
+    const at = engine.timelineAt(recorded.startTime) - recorded.inputLatency
+    engine.stop()
+    playback.current = null
+    setPlaying(false)
+    setRecording(null)
+
+    // Keep what was recorded from the cursor on (the microphone opens a
+    // little before playback starts).
+    const skip = Math.max(0, active.from - at)
+    const length = recorded.samples.length / recorded.sampleRate - skip
+    if (length < 0.05) return
+    const track = stateRef.current.project.tracks.find(
+      (item) => item.id === active.trackId
+    )
+    const trackName = track?.name ?? 'Enregistrement'
+    const takes = stateRef.current.project.tracks
+      .flatMap((item) => item.clips)
+      .map((clip) => store.get(clip.sourceId)?.name ?? '')
+      .filter((name) => name.startsWith(`${trackName} - prise `)).length
+    const source: StoredSource = {
+      id: createId('src'),
+      name: `${trackName} - prise ${takes + 1}.wav`,
+      type: 'audio/wav',
+      data: takeToWav(recorded.samples, recorded.sampleRate),
+    }
+    setBusy('Enregistrement de la prise…')
+    try {
+      const duration = await decodeSource(store, engine, source)
+      await saveStoredSource(source).catch(() => setMessage(SAVE_ERROR))
+      const clip = {
+        ...createClip(source.id, duration),
+        start: Math.max(0, at + skip),
+        offset: skip,
+        duration: duration - skip,
+      }
+      dispatch({ type: 'recordTake', trackId: active.trackId, trackName, clip })
+    } catch {
+      setMessage("La prise n'a pas pu être enregistrée.")
+    } finally {
+      setBusy(null)
+    }
+  }
+  const stopRecordingRef = useRef(stopRecording)
+  useLayoutEffect(() => {
+    stopRecordingRef.current = stopRecording
+  })
+
+  const toggleRecording = (trackId: string) => {
+    if (take.current) void stopRecording()
+    else void startRecording(trackId)
+  }
 
   // View
 
@@ -585,6 +699,11 @@ export default function Editor() {
       )
     ) {
       return
+    }
+    if (take.current) {
+      take.current.recorder.cancel()
+      take.current = null
+      setRecording(null)
     }
     stopPlayback(false)
     store.clear()
@@ -810,6 +929,9 @@ export default function Editor() {
           }
           onGain={(delta) => dispatch({ type: 'gain', delta })}
           onToggleMute={(trackId) => dispatch({ type: 'toggleMute', trackId })}
+          recording={recording}
+          getInputLevel={() => take.current?.recorder.level() ?? 0}
+          onToggleRecording={toggleRecording}
           onRemoveTrack={(trackId) =>
             dispatch({ type: 'removeTrack', trackId })
           }
@@ -833,15 +955,18 @@ export default function Editor() {
           Glissez sur une piste pour sélectionner. Faites glisser la barre du
           haut d&apos;une région pour la déplacer, ses extrémités pour la
           rallonger ou la raccourcir. Touchez deux fois une région pour la
-          sélectionner. Deux doigts pour zoomer et défiler.
+          sélectionner. Deux doigts pour zoomer et défiler. Rec enregistre sur
+          la piste à partir du curseur (casque conseillé).
         </span>
         <span className='hidden md:inline'>
           Glissez sur une piste pour sélectionner (Maj+clic pour étendre),
           faites glisser la barre du haut d&apos;une région pour la déplacer et
           ses extrémités pour la rallonger ou la raccourcir, double-cliquez pour
-          sélectionner une région entière. Raccourcis : Espace lecture,
-          Ctrl+X/C/V couper/copier/coller, Suppr supprimer, S scinder, Ctrl+G
-          grouper, ↑/↓ volume, Ctrl+Z annuler.
+          sélectionner une région entière. Rec enregistre le micro sur la piste
+          à partir du curseur pendant la lecture des autres pistes (casque
+          conseillé). Raccourcis : Espace lecture, Ctrl+X/C/V
+          couper/copier/coller, Suppr supprimer, S scinder, Ctrl+G grouper, ↑/↓
+          volume, Ctrl+Z annuler.
         </span>
       </p>
 

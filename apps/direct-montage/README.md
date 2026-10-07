@@ -21,6 +21,9 @@ Part of the [estceque monorepo](../../README.md).
 - **Level meter**: peak meter during playback with the -12 dB mark, dashed
   -12 dB guides on every track, and a SAT light when the mix saturates (red
   waveform columns show where a region's volume pushes it past full scale)
+- **Record** on a track: its Rec button records the microphone from the
+  cursor while the other tracks play (overdub), with a live level; Stop or
+  Space ends the take, which lands on the track like a paste
 - **Mute** per track
 - **Undo/redo** for every edit
 - **Export** of the mix as WAV (HD, 24-bit / 48 kHz) or MP3 (HD, 320 kbit/s /
@@ -90,7 +93,10 @@ section of the [monorepo README](../../README.md#seo).
 6. **Volume and fades**: use ▼/▲ on the selection, or type a fade length and
    press Entrée (fade in) or Sortie (fade out). Watch the meter and the -12 dB
    guides while adjusting.
-7. **Export**: "Exporter WAV (HD)" or "Exporter MP3 (HD)" downloads the mix of
+7. **Record**: put the cursor where the take should start and press Rec on a
+   track. The other tracks play while you record; press Stop (or Space) to
+   finish. Use headphones, so the playback is not recorded too.
+8. **Export**: "Exporter WAV (HD)" or "Exporter MP3 (HD)" downloads the mix of
    the unmuted tracks.
 
 Keyboard: Space play/pause, Ctrl/⌘+X/C/V cut/copy/paste, Delete delete,
@@ -114,6 +120,7 @@ direct-montage/
 │   ├── audio/
 │   │   ├── edit.ts       # Pure edit operations (split, cut, paste, move...)
 │   │   ├── engine.ts     # Web Audio playback
+│   │   ├── recorder.ts   # Microphone takes (AudioWorklet, raw PCM)
 │   │   ├── mixdown.ts    # Export mix to WAV (24-bit) or MP3 (320 kbit/s)
 │   │   ├── peaks.ts      # Waveform summaries
 │   │   └── types.ts
@@ -130,5 +137,9 @@ direct-montage/
 - Editing is non-destructive: regions point into the original audio, which is
   only mixed down on export.
 - All processing happens in the browser; audio never leaves the device.
+- Takes are recorded uncompressed (no echo cancellation, noise suppression or
+  automatic gain) in the same audio clock as playback, and placed on the
+  timeline with the browser's reported input and output latency. If a take
+  sounds slightly early or late, drag it by its top bar.
 - Long recordings are fully decoded in memory, so very long files can be heavy
   on phones.

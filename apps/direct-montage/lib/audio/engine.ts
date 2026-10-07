@@ -97,6 +97,16 @@ export class PlaybackEngine {
     this.playing = true
   }
 
+  /**
+   * Where the timeline was, as heard, at a given time of the audio context.
+   * Used to place a recording made while playing.
+   */
+  timelineAt(contextTime: number): number {
+    const latency =
+      this.context?.outputLatency || this.context?.baseLatency || 0
+    return this.startPosition + contextTime - this.startTime - latency
+  }
+
   /** Current playback position on the timeline, in seconds. */
   position(): number {
     if (!this.playing || !this.context) return this.startPosition

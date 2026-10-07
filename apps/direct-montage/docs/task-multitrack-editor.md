@@ -126,3 +126,31 @@ editor:
 - [x] Design aligned with Direct Podcast's design system: shared palette
       tokens, grey text, Roboto body text, Podcast-style buttons and cards,
       timeline in brand blues
+- [x] SEO aligned with Direct Podcast: canonical URL, Open Graph / Twitter
+      tags with a share image, structured data, sitemap and robots.txt on
+      `directmontage.fr`
+
+## Round 4: recording on a track (2026-10-07)
+
+- [x] Rec button on each track header (red dot; "Rec" / "Stop" on wide
+      screens). Records the microphone from the cursor while the other tracks
+      play; Stop or Space ends the take
+- [x] Live take preview on the track, growing to the playhead, with the
+      microphone level (green, red near 0 dB)
+- [x] Raw capture with an AudioWorklet in the playback AudioContext (no echo
+      cancellation, noise suppression or auto gain), stored as 24-bit WAV in
+      IndexedDB as "<track> - prise N.wav"
+- [x] Placement: context frame of the first sample, minus the input latency
+      and the output latency; audio captured before the cursor is trimmed.
+      The take is inserted like a paste (a region under the cursor is split
+      and its end moves right)
+- [x] Seeking and edits restarting playback are blocked while recording, so
+      the timing stays exact
+- [x] Browser test (Chrome, fake microphone), desktop and mobile widths
+
+Decisions:
+- Raw PCM instead of MediaRecorder: lossless, and timed by the same clock as
+  playback, which MediaRecorder cannot give.
+- The microphone is never played back (no monitoring), so there is no
+  feedback through speakers. Headphones are recommended so playback is not
+  recorded into the take.
