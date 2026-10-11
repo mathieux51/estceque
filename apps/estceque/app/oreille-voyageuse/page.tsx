@@ -1,3 +1,5 @@
+import Image from 'next/image'
+import { Fragment } from 'react'
 import { pageMetadata } from '@/lib/seo'
 import ArteRadioPlayer from '@/components/ArteRadioPlayer'
 import JsonLd from '@/components/JsonLd'
@@ -30,12 +32,33 @@ export default function SoundMap() {
           sameAs: map.url,
         }}
       />
-      <section className='space-y-3'>
-        <h1 className='title text-4xl'>L&apos;oreille voyageuse</h1>
-        {map.intro.map((paragraph) => (
-          <p key={paragraph} className='max-w-3xl'>
-            {paragraph}
-          </p>
+      {/*
+        On wide screens the cover sits right of the text, beside the space the
+        text leaves within the map's width. On phones everything stacks in
+        source order, which puts the cover after the subtitle.
+      */}
+      <section className='grid gap-x-10 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:items-start'>
+        <h1 className='title text-4xl md:col-start-1'>
+          L&apos;oreille voyageuse
+        </h1>
+        {map.intro.map((paragraph, i) => (
+          <Fragment key={paragraph}>
+            <p className='max-w-3xl md:col-start-1'>{paragraph}</p>
+            {i === 0 && (
+              <Image
+                src='/oreille-voyageuse.jpg'
+                alt="Affiche de L'oreille voyageuse : cartographie sonore et plurilingue en français langue-monde, podcasts réalisés au DEFLE (Département d'Études de Français Langue Étrangère) à la CLEFF, Université Bordeaux Montaigne."
+                width={1200}
+                height={1200}
+                sizes='(min-width: 768px) 22rem, 100vw'
+                priority
+                className='my-2 w-full max-w-sm justify-self-center rounded-lg border border-grey/40 shadow-lg md:col-start-2 md:my-0 md:max-w-none md:[grid-row:1/span_var(--rows)]'
+                style={
+                  { '--rows': map.intro.length + 1 } as React.CSSProperties
+                }
+              />
+            )}
+          </Fragment>
         ))}
       </section>
       <MapEmbed height={560} />
