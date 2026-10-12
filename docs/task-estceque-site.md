@@ -77,6 +77,23 @@ association "Est-ce que t'entends ce que je vois ?":
 - [ ] Links to Blandine Schmidt's public profiles (thesis, LinkedIn...) in her
       structured data, if she wants them
 
+## Search Console follow-up (2026-10-12)
+
+Google's first report listed old Blogger addresses (crawled before the
+switch): `?m=1` mobile copies ("Alternate page with proper canonical tag"),
+`http://estceque.org/` ("Page with redirect", which is expected) and old posts
+and archives ("Crawled - currently not indexed").
+
+- [x] One step for every address: http, www, Blogger parameters (`?m=1`...)
+      and missing final slashes are fixed by a single 301 (they took two)
+- [x] Old posts, archives and static pages without an equivalent answer
+      410 Gone with an explanatory page (`/ancien-blog/`, noindex) instead of
+      a redirect to the home page, which Google treats as a soft 404
+- [x] Old addresses with an equivalent keep a 301: contact page, search and
+      labels, feeds
+- [x] Tests for these answers (`worker/index.test.ts`, `npm test`), run in CI
+- [ ] In Search Console: "Validate fix" on the three reports once deployed
+
 ## Decisions
 
 - Projects are defined in code (`lib/projects.ts`), matched on episode titles:

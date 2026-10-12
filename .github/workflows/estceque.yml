@@ -29,6 +29,7 @@ jobs:
           cache: npm
           cache-dependency-path: apps/estceque/package-lock.json
       - run: npm ci
+      - run: npm test
       # Latest episodes and map; if Ausha or Framacarte is down, the committed
       # snapshot in data/ is used.
       - run: npm run fetch || echo "::warning::content fetch failed, using the committed snapshot"
