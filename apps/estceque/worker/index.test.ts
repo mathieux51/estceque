@@ -5,7 +5,8 @@ import { route } from './index'
 
 const redirect = (from: string, to: string) =>
   assert.deepEqual(route(from), { kind: 'redirect', location: to }, from)
-const gone = (from: string) => assert.deepEqual(route(from), { kind: 'gone' }, from)
+const gone = (from: string) =>
+  assert.deepEqual(route(from), { kind: 'gone' }, from)
 const serve = (from: string) => assert.equal(route(from).kind, 'serve', from)
 
 test('old blog posts and archives are gone, in one step from any host', () => {
@@ -22,28 +23,64 @@ test('old blog posts and archives are gone, in one step from any host', () => {
 })
 
 test('old blog addresses with an equivalent redirect to it in one step', () => {
-  redirect('http://www.estceque.org/p/contact.html?m=1', 'https://estceque.org/#contact')
-  redirect('http://www.estceque.org/p/recherche.html?m=1', 'https://estceque.org/podcasts/')
-  redirect('http://www.estceque.org/feeds/posts/default', 'https://feed.ausha.co/bz3KNSqWZ7nP')
-  redirect('https://estceque.org/search/label/radio', 'https://estceque.org/podcasts/?q=radio')
-  redirect('http://www.estceque.org/search?q=velo&m=1', 'https://estceque.org/podcasts/?q=velo')
+  redirect(
+    'http://www.estceque.org/p/contact.html?m=1',
+    'https://estceque.org/#contact'
+  )
+  redirect(
+    'http://www.estceque.org/p/recherche.html?m=1',
+    'https://estceque.org/podcasts/'
+  )
+  redirect(
+    'http://www.estceque.org/feeds/posts/default',
+    'https://feed.ausha.co/bz3KNSqWZ7nP'
+  )
+  redirect(
+    'https://estceque.org/search/label/radio',
+    'https://estceque.org/podcasts/?q=radio'
+  )
+  redirect(
+    'http://www.estceque.org/search?q=velo&m=1',
+    'https://estceque.org/podcasts/?q=velo'
+  )
 })
 
 test('http, www, Blogger parameters and missing slashes: one redirect', () => {
   redirect('http://www.estceque.org/?m=1', 'https://estceque.org/')
   redirect('https://estceque.org/?m=1', 'https://estceque.org/')
   redirect('http://estceque.org/', 'https://estceque.org/')
-  redirect('https://www.estceque.org/podcasts/?q=radio', 'https://estceque.org/podcasts/?q=radio')
-  redirect('http://www.estceque.org/ateliers?m=1', 'https://estceque.org/ateliers/')
-  redirect('https://estceque.org/ateliers', 'https://estceque.org/ateliers/')
+  redirect(
+    'https://www.estceque.org/podcasts/?q=radio',
+    'https://estceque.org/podcasts/?q=radio'
+  )
+  redirect(
+    'https://estceque.org/espace-scolaire',
+    'https://estceque.org/espace-scolaire/'
+  )
+})
+
+test('renamed pages redirect in one step', () => {
+  redirect(
+    'https://estceque.org/ateliers/',
+    'https://estceque.org/espace-scolaire/'
+  )
+  redirect(
+    'https://estceque.org/ateliers',
+    'https://estceque.org/espace-scolaire/'
+  )
+  redirect(
+    'http://www.estceque.org/ateliers/?m=1',
+    'https://estceque.org/espace-scolaire/'
+  )
 })
 
 test('pages of the new site are served as they are', () => {
   serve('https://estceque.org/')
-  serve('https://estceque.org/ateliers/')
+  serve('https://estceque.org/espace-scolaire/')
+  serve('https://estceque.org/studio/')
   serve('https://estceque.org/podcasts/?q=radio&public=college')
   serve('https://estceque.org/sitemap.xml')
   serve('https://estceque.org/llms.txt')
   serve('https://next.estceque.org/podcasts/')
-  serve('http://localhost:8787/ateliers/')
+  serve('http://localhost:8787/espace-scolaire/')
 })

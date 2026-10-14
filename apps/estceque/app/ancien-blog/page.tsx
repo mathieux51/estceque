@@ -23,7 +23,7 @@ export default function OldBlog() {
         <Link className='btn-primary' href='/podcasts/'>
           Écouter les podcasts
         </Link>
-        <Link className='btn' href='/ateliers/'>
+        <Link className='btn' href='/espace-scolaire/'>
           Les ateliers radio et podcast
         </Link>
         <Link className='btn' href='/'>

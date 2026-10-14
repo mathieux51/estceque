@@ -1,10 +1,53 @@
 import Image from 'next/image'
-import { Fragment } from 'react'
+import { MapPin } from 'lucide-react'
 import { pageMetadata } from '@/lib/seo'
 import ArteRadioPlayer from '@/components/ArteRadioPlayer'
 import JsonLd from '@/components/JsonLd'
 import MapEmbed from '@/components/MapEmbed'
 import { SITE_URL, map } from '@/lib/content'
+
+const DEFLE_URL = 'https://defle.u-bordeaux-montaigne.fr/fr/index.html'
+const CLEFF_URL =
+  'https://www.u-bordeaux-montaigne.fr/fr/formations/cleff-cite-des-langues.html'
+
+/** Links the DEFLE and the CLEFF wherever their names appear in a text. */
+function LinkInstitutions({ text }: { text: string }) {
+  const names: [RegExp, string][] = [
+    [
+      /D[ée]partement d.[ÉE]tudes de Fran[çc]ais Langue [ÉE]trang[èe]re|DEFLE/,
+      DEFLE_URL,
+    ],
+    [
+      /Cit[ée] des Langues [ÉE]trang[èe]res, du Fran[çc]ais et des Francophonies|CLEFF/,
+      CLEFF_URL,
+    ],
+  ]
+  const parts: React.ReactNode[] = []
+  let rest = text
+  const done = new Set<string>()
+  while (rest) {
+    let first: { index: number; match: string; url: string } | null = null
+    for (const [pattern, url] of names) {
+      if (done.has(url)) continue
+      const m = pattern.exec(rest)
+      if (m && (!first || m.index < first.index))
+        first = { index: m.index, match: m[0], url }
+    }
+    if (!first) {
+      parts.push(rest)
+      break
+    }
+    parts.push(rest.slice(0, first.index))
+    parts.push(
+      <a key={first.url} className='link' href={first.url}>
+        {first.match}
+      </a>
+    )
+    done.add(first.url)
+    rest = rest.slice(first.index + first.match.length)
+  }
+  return <>{parts}</>
+}
 
 const description =
   "L'oreille voyageuse : une carte sonore et plurilingue de contes en français langue-monde, créés en podcast au DEFLE de l'Université Bordeaux Montaigne. Cliquez sur une épingle pour écouter."
@@ -41,25 +84,46 @@ export default function SoundMap() {
         <h1 className='title text-4xl md:col-start-1'>
           L&apos;oreille voyageuse
         </h1>
-        {map.intro.map((paragraph, i) => (
-          <Fragment key={paragraph}>
-            <p className='max-w-3xl md:col-start-1'>{paragraph}</p>
-            {i === 0 && (
-              <Image
-                src='/oreille-voyageuse.jpg'
-                alt="Affiche de L'oreille voyageuse : cartographie sonore et plurilingue en français langue-monde, podcasts réalisés au DEFLE (Département d'Études de Français Langue Étrangère) à la CLEFF, Université Bordeaux Montaigne."
-                width={1200}
-                height={1200}
-                sizes='(min-width: 768px) 22rem, 100vw'
-                priority
-                className='my-2 w-full max-w-sm justify-self-center rounded-lg border border-grey/40 shadow-lg md:col-start-2 md:my-0 md:max-w-none md:[grid-row:1/span_var(--rows)]'
-                style={
-                  { '--rows': map.intro.length + 1 } as React.CSSProperties
-                }
-              />
-            )}
-          </Fragment>
-        ))}
+        <p className='max-w-3xl font-bold text-white md:col-start-1'>
+          Des voix, des histoires, des mondes à découvrir…
+        </p>
+        <Image
+          src='/oreille-voyageuse.jpg'
+          alt="Affiche de L'oreille voyageuse : cartographie sonore et plurilingue en français langue-monde, podcasts réalisés au DEFLE (Département d'Études de Français Langue Étrangère) à la CLEFF, Université Bordeaux Montaigne."
+          width={1200}
+          height={1200}
+          sizes='(min-width: 768px) 22rem, 100vw'
+          priority
+          className='my-2 w-full max-w-sm justify-self-center rounded-lg border border-grey/40 shadow-lg md:col-start-2 md:row-span-6 md:row-start-1 md:my-0 md:max-w-none'
+        />
+        <p className='max-w-3xl md:col-start-1'>
+          L&apos;oreille voyageuse est une cartographie sonore et plurilingue en
+          français langue-monde née d&apos;une écriture collective au{' '}
+          <a className='link' href={DEFLE_URL}>
+            Département d&apos;Études de Français Langue Étrangère
+          </a>{' '}
+          (DEFLE) à la{' '}
+          <a className='link' href={CLEFF_URL}>
+            Cité des Langues Étrangères, du Français et des Francophonies
+          </a>{' '}
+          (CLEFF) de l&apos;Université Bordeaux Montaigne.
+        </p>
+        <p className='max-w-3xl md:col-start-1'>
+          L&apos;objectif est de créer un espace de rencontre des langues et des
+          cultures à travers la production de podcasts pédagogiques.
+        </p>
+        <p className='max-w-3xl md:col-start-1'>
+          L&apos;interculturalité devient ainsi une source
+          d&apos;enrichissement.
+        </p>
+        <p className='max-w-3xl font-bold text-white md:col-start-1'>
+          Pour écouter, il vous suffit de cliquer sur l&apos;épingle{' '}
+          <MapPin
+            aria-label='épingle'
+            className='inline h-5 w-5 -translate-y-0.5 text-warning'
+          />{' '}
+          puis sur lecture ▶️.
+        </p>
       </section>
       <MapEmbed height={560} />
       <p className='text-sm'>
@@ -67,10 +131,9 @@ export default function SoundMap() {
         <a className='link' href={map.url}>
           Framacarte
         </a>
-        , fond de carte © les contributeurs OpenStreetMap.
       </p>
       <section aria-labelledby='contes' className='space-y-4'>
-        <h2 id='contes' className='title text-3xl'>
+        <h2 id='contes' className='title text-3xl uppercase'>
           Les contes à écouter
         </h2>
         <ul className='grid gap-4 md:grid-cols-2'>
@@ -82,11 +145,35 @@ export default function SoundMap() {
           ))}
         </ul>
       </section>
+      <section className='card space-y-3'>
+        <h2 className='font-display text-2xl text-white uppercase'>
+          Un projet porté par Est-ce que t&apos;entends ce que je vois ?
+        </h2>
+        <p>
+          L&apos;oreille voyageuse s&apos;appuie sur l&apos;association « Est-ce
+          que t&apos;entends ce que je vois ? » pour promouvoir et assurer la
+          visibilité des travaux des étudiantes et des étudiants du DEFLE de
+          l&apos;Université Bordeaux Montaigne. Elle a accompagné l&apos;équipe
+          pédagogique dans la scénographie numérique, dans la conception de la
+          cartographie sonore ainsi que dans la composition de l&apos;univers
+          sonore et visuel du projet.
+        </p>
+      </section>
       {others.map((place) => (
         <section key={place.name} className='card space-y-2'>
-          <h2 className='font-display text-2xl text-white'>{place.name}</h2>
+          <h2 className='font-display text-2xl text-white uppercase'>
+            Le DEFLE à la CLEFF de l&apos;Université Bordeaux Montaigne
+          </h2>
           {place.text.split('\n').map((line) => (
-            <p key={line}>{line}</p>
+            <p key={line}>
+              {/^https?:\/\//.test(line) ? (
+                <a className='link break-all' href={line}>
+                  {line.replace(/^https?:\/\/(www\.)?/, '')}
+                </a>
+              ) : (
+                <LinkInstitutions text={line} />
+              )}
+            </p>
           ))}
         </section>
       ))}

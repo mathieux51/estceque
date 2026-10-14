@@ -1,5 +1,6 @@
 import { pageMetadata } from '@/lib/seo'
 import Link from 'next/link'
+import ContactPerson from '@/components/ContactPerson'
 import JsonLd from '@/components/JsonLd'
 import ProjectCard from '@/components/ProjectCard'
 import { CONTACT_EMAIL, SITE_URL, projectsWithEpisodes } from '@/lib/content'
@@ -9,10 +10,38 @@ const description =
   "Ateliers radio, webradio et podcast animés par Blandine Schmidt pour les écoles, collèges, lycées, universités et structures sociales du Sud-Ouest. Éducation aux médias et à l'information par le son, référencés Pass Culture (Adage)."
 
 export const metadata = pageMetadata({
-  title: 'Ateliers radio et podcast avec Blandine Schmidt',
+  title: 'Espace scolaire : ateliers radio et podcast avec Blandine Schmidt',
   description,
-  path: '/ateliers/',
+  path: '/espace-scolaire/',
 })
+
+// Moved here from the home page, with the rest of the former Ateliers page.
+const formats = [
+  {
+    title: 'Webradio scolaire en direct',
+    text: 'Les élèves préparent, animent et enregistrent une émission en conditions de direct : chroniques, interviews, reportages.',
+    examples: ['radio-nautilus', 'radio-alienor', 'la-voix-de-max'],
+  },
+  {
+    title: 'Fiction et docu-fiction sonore',
+    text: "Écrire un scénario, souvent à partir d'archives, le mettre en voix, l'habiller de sons et de musiques.",
+    examples: ['lycee-pablo-picasso', 'super-bousier'],
+  },
+  {
+    title: 'Podcast de savoir',
+    text: 'À l’université, étudiantes, étudiants et doctorants transforment leurs recherches et leurs métiers en podcasts.',
+    examples: ['podcasts-du-savoir', 'radio-alternante', 'traversees'],
+  },
+  {
+    title: "Paroles d'habitants",
+    text: 'Dans les structures sociales et les lieux de vie, chacun prend le micro pour raconter son histoire et son quartier.',
+    examples: [
+      'radio-des-sans-voix',
+      'radio-du-cafe-de-la-route',
+      'frequences-migrantes',
+    ],
+  },
+]
 
 const steps = [
   [
@@ -56,8 +85,11 @@ const faq = [
   },
 ]
 
-export default function Workshops() {
+export default function SchoolSpace() {
   const groups = projectsWithEpisodes()
+  const titles = new Map(
+    groups.map((group) => [group.project.slug, group.project.title])
+  )
   const byAudience = new Map<Audience, typeof groups>()
   for (const group of groups) {
     const list = byAudience.get(group.project.audience) ?? []
@@ -74,26 +106,6 @@ export default function Workshops() {
         data={{
           '@context': 'https://schema.org',
           '@graph': [
-            {
-              '@type': 'Person',
-              '@id': `${SITE_URL}/ateliers/#blandine-schmidt`,
-              name: 'Blandine Schmidt',
-              jobTitle: 'Chargée de projet, ateliers radio et podcast',
-              description:
-                "Docteure en Sciences de l'Information et de la Communication, chargée de projet de l'association et formatrice au CLEMI de l'académie de Bordeaux.",
-              hasCredential: {
-                '@type': 'EducationalOccupationalCredential',
-                credentialCategory: 'degree',
-                name: "Doctorat en Sciences de l'Information et de la Communication",
-              },
-              worksFor: { '@id': `${SITE_URL}/#association` },
-              knowsAbout: [
-                'Radio',
-                'Podcast',
-                'Éducation aux médias et à l’information',
-                'Création sonore',
-              ],
-            },
             {
               '@type': 'Service',
               name: 'Ateliers radio et podcast',
@@ -119,8 +131,11 @@ export default function Workshops() {
       />
 
       <section className='space-y-4'>
-        <h1 className='title text-4xl'>
-          Ateliers radio et podcast avec Blandine Schmidt
+        <h1 className='title text-4xl leading-tight'>
+          Espace scolaire
+          <span className='block text-2xl sm:text-3xl'>
+            Ateliers radio et podcast avec Blandine Schmidt
+          </span>
         </h1>
         <p className='max-w-3xl text-lg'>
           Faire de la radio pour comprendre les médias : l&apos;association
@@ -142,6 +157,35 @@ export default function Workshops() {
         >
           Proposer un atelier
         </a>
+      </section>
+
+      <section aria-labelledby='formats' className='space-y-4'>
+        <h2 id='formats' className='title text-3xl'>
+          Les formats d&apos;ateliers
+        </h2>
+        <div className='grid gap-4 sm:grid-cols-2'>
+          {formats.map((format) => (
+            <div key={format.title} className='card space-y-2'>
+              <h3 className='font-display text-xl text-white'>
+                {format.title}
+              </h3>
+              <p>{format.text}</p>
+              <p className='text-sm'>
+                À écouter :{' '}
+                {format.examples
+                  .filter((slug) => titles.has(slug))
+                  .map((slug, i) => (
+                    <span key={slug}>
+                      {i > 0 && ', '}
+                      <Link className='link' href={`/projets/${slug}/`}>
+                        {titles.get(slug)}
+                      </Link>
+                    </span>
+                  ))}
+              </p>
+            </div>
+          ))}
+        </div>
       </section>
 
       <section aria-labelledby='etapes' className='space-y-4'>
@@ -222,6 +266,7 @@ export default function Workshops() {
           </Link>
         </p>
       </section>
+      <ContactPerson />
     </div>
   )
 }

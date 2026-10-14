@@ -47,6 +47,8 @@ export function legacyTarget(url: URL): string | 'gone' | null {
     const words = query ?? (label ? decodeURIComponent(label) : null)
     return words ? `/podcasts/?q=${encodeURIComponent(words)}` : '/podcasts/'
   }
+  // Renamed pages of this site.
+  if (path === '/ateliers' || path === '/ateliers/') return '/espace-scolaire/'
   if (path === '/p/contact.html') return '/#contact'
   if (path === '/p/recherche.html') return '/podcasts/'
   // Posts (/2010/02/titre.html), archives (/2010/, /2010/02/,

@@ -89,7 +89,7 @@ export default async function ProjectPage({ params }: Params) {
         </div>
       </section>
       <p>
-        <Link className='btn' href='/ateliers/'>
+        <Link className='btn' href='/espace-scolaire/'>
           Organiser un atelier comme celui-ci
         </Link>
       </p>

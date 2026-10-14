@@ -39,6 +39,10 @@ body {
   .title {
     @apply font-display text-white;
   }
+  /* Section titles in capitals and bold, as asked for the home page. */
+  .section-title {
+    @apply font-display text-3xl font-extrabold tracking-wide text-white uppercase;
+  }
   .link {
     @apply text-white underline decoration-grey/60 underline-offset-2 hover:decoration-white;
   }

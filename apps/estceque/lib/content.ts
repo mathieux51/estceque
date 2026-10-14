@@ -1,9 +1,11 @@
 import mapData from '@/data/map.json'
+import playlistData from '@/data/playlists.json'
 import podcastData from '@/data/podcast.json'
 import { OTHER_PROJECT, PROJECTS, projectFor, type Project } from './projects'
 
 export {
   AUSHA_SHOW_ID,
+  BLANDINE,
   CONTACT_EMAIL,
   FACEBOOK_URL,
   INSTAGRAM_URL,
@@ -120,3 +122,17 @@ export function summary(paragraphs: string[], length = 160): string {
   if (text.length <= length) return text
   return `${text.slice(0, length - 1).replace(/\s+\S*$/, '')}…`
 }
+
+export interface Playlist {
+  id: string
+  slug: string
+  name: string
+  description: string
+  image: string | null
+  episodeCount: number
+  createdAt: string
+  ausha: string
+}
+
+/** The show's Ausha playlists, the most recent first. */
+export const playlists: Playlist[] = playlistData

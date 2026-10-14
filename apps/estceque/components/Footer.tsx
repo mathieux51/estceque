@@ -10,8 +10,8 @@ export default function Footer() {
             Est-ce que t&apos;entends ce que je vois ?
           </p>
           <p>
-            Média associatif d&apos;Éducation aux Médias et à l&apos;Information
-            par le son, la radio et le podcast, dans le Sud-Ouest de la France.
+            Média associatif d&apos;expression par le son, la radio et le
+            podcast, dans le Sud-Ouest de la France depuis 2007.
           </p>
         </div>
         <div className='space-y-2'>

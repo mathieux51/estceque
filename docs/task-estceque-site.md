@@ -94,6 +94,13 @@ and archives ("Crawled - currently not indexed").
 - [x] Tests for these answers (`worker/index.test.ts`, `npm test`), run in CI
 - [ ] In Search Console: "Validate fix" on the three reports once deployed
 
+## Product manager changes (2026-10-14)
+
+See [todo-estceque-modifications.md](todo-estceque-modifications.md): new
+home page (services, contact person, ecosystem, playlists), Espace scolaire
+(was Ateliers), new Espace pro & Recherche / Le studio and Espace
+pédagogique pages, and map page fixes.
+
 ## Decisions
 
 - Projects are defined in code (`lib/projects.ts`), matched on episode titles:

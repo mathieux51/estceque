@@ -3,7 +3,9 @@ import Link from 'next/link'
 
 const links = [
   { href: '/podcasts/', label: 'Podcasts' },
-  { href: '/ateliers/', label: 'Ateliers' },
+  { href: '/espace-scolaire/', label: 'Espace scolaire' },
+  { href: '/studio/', label: 'Le studio' },
+  { href: '/espace-pedagogique/', label: 'Pédagogie' },
   { href: '/projets/', label: 'Projets' },
   { href: '/oreille-voyageuse/', label: 'Carte sonore' },
 ]

@@ -1,77 +1,99 @@
 import Image from 'next/image'
 import Link from 'next/link'
 import AushaPlayer from '@/components/AushaPlayer'
-import EpisodeCard from '@/components/EpisodeCard'
-import EpisodeSearch from '@/components/EpisodeSearch'
-import MapEmbed from '@/components/MapEmbed'
+import ContactPerson from '@/components/ContactPerson'
+import PlaylistCard from '@/components/PlaylistCard'
 import ProjectCard from '@/components/ProjectCard'
-import { CONTACT_EMAIL, episodes, projectsWithEpisodes } from '@/lib/content'
-import { searchItems } from '@/lib/search'
+import SocialLinks from '@/components/SocialLinks'
+import {
+  CONTACT_EMAIL,
+  FACEBOOK_URL,
+  INSTAGRAM_URL,
+  episodes,
+  playlists,
+  projectsWithEpisodes,
+} from '@/lib/content'
 
-const formats = [
+const services = [
+  'Studio de production sonore',
+  'Accompagnement & réalisation de podcasts',
+  "Atelier Éducation aux Médias et à l'Information (EMI)",
+  'Studio de radio mobile - plateau radio Live',
+  'Ressources et outils pédagogiques',
+]
+
+// "Notre écosystème": one card per space of the association.
+const ecosystem = [
   {
-    title: 'Webradio scolaire en direct',
-    text: 'Les élèves préparent, animent et enregistrent une émission en conditions de direct : chroniques, interviews, reportages.',
-    examples: ['radio-nautilus', 'radio-alienor', 'la-voix-de-max'],
+    title: 'Espace scolaire',
+    text: 'Ateliers radio et podcast',
+    href: '/espace-scolaire/',
   },
   {
-    title: 'Fiction et docu-fiction sonore',
-    text: "Écrire un scénario, souvent à partir d'archives, le mettre en voix, l'habiller de sons et de musiques.",
-    examples: ['lycee-pablo-picasso', 'super-bousier'],
+    title: 'Espace pro',
+    text: 'Accompagnement & production de podcasts pour les professionnels et les institutions',
+    href: '/studio/#pro',
   },
   {
-    title: 'Podcast de savoir',
-    text: 'À l’université, étudiantes, étudiants et doctorants transforment leurs recherches et leurs métiers en podcasts.',
-    examples: ['podcasts-du-savoir', 'radio-alternante', 'traversees'],
+    title: 'Espace recherche',
+    text: 'Accompagnement & production de podcasts scientifiques et de vulgarisation scientifique',
+    href: '/studio/#recherche',
   },
   {
-    title: "Paroles d'habitants",
-    text: 'Dans les structures sociales et les lieux de vie, chacun prend le micro pour raconter son histoire et son quartier.',
-    examples: [
-      'radio-des-sans-voix',
-      'radio-du-cafe-de-la-route',
-      'frequences-migrantes',
-    ],
+    title: 'Espace pédagogique',
+    text: 'Nos outils & ressources pédagogiques « maison » libres de droits',
+    href: '/espace-pedagogique/',
+  },
+  {
+    title: 'Le studio',
+    text: 'Production de podcasts, accompagnement de projets numériques, création identité sonore, diffusion. Identité sonore, habillage sonore, jingle.',
+    href: '/studio/#studio',
   },
 ]
 
 export default function Home() {
   const groups = projectsWithEpisodes()
-  const titles = new Map(
-    groups.map((group) => [group.project.slug, group.project.title])
-  )
-  const firstYear = episodes[episodes.length - 1]?.publishedAt.slice(0, 4)
 
   return (
     <div className='space-y-16'>
       <section className='grid items-center gap-8 md:grid-cols-[1fr_auto]'>
         <div className='space-y-5'>
-          <p className='text-sm uppercase tracking-wide text-warning'>
-            Radio · Podcast · Éducation aux médias
+          <p className='text-sm font-bold tracking-wide text-warning uppercase'>
+            Radio · Podcast · Éducation aux médias · Recherches · Pédagogie
           </p>
           <h1 className='title text-4xl leading-tight sm:text-5xl'>
             Est-ce que t&apos;entends ce que je vois ?
           </h1>
-          <p className='max-w-2xl text-lg'>
-            Média associatif de proximité d&apos;Éducation aux Médias et à
-            l&apos;Information par le son, la radio et le podcast, implanté dans
-            le Sud-Ouest de la France.
+          <p className='max-w-2xl text-lg text-white'>
+            Média associatif d&apos;expression par le son, la radio et le
+            podcast
           </p>
+          <ul className='max-w-2xl list-disc space-y-1 pl-5'>
+            {services.map((service) => (
+              <li key={service}>{service}</li>
+            ))}
+          </ul>
           <p className='max-w-2xl'>
-            Avec Blandine Schmidt, élèves, étudiants et habitants prennent le
-            micro : webradios scolaires en direct, fictions et docu-fictions,
-            podcasts de savoir, reportages. {episodes.length} épisodes à
-            écouter, de {firstYear} à aujourd&apos;hui.
+            Implanté dans le Sud-Ouest de la France depuis 2007
+            <br />
+            Intervention en France et à l&apos;étranger
+          </p>
+          <p className='max-w-2xl text-sm'>
+            Référencée Adage Pass Culture
+            <br />
+            Chorus Pro
           </p>
           <div className='flex flex-wrap gap-3'>
-            <Link href='/ateliers/' className='btn-primary'>
-              Organiser un atelier radio
+            <Link href='/espace-scolaire/' className='btn-primary'>
+              Réserver un atelier radio - podcast
             </Link>
-            <Link href='/podcasts/' className='btn'>
-              Écouter les podcasts
+            <Link href='/studio/' className='btn'>
+              Être accompagné pour produire son podcast
+            </Link>
+            <Link href='#trouver-un-podcast' className='btn'>
+              Écouter un podcast
             </Link>
           </div>
-          <p className='text-sm'>Référencée Pass Culture (Adage).</p>
         </div>
         <Image
           src='/mascotte-512.jpeg'
@@ -83,64 +105,72 @@ export default function Home() {
         />
       </section>
 
-      <section aria-labelledby='recherche' className='space-y-4'>
-        <h2 id='recherche' className='title text-3xl'>
-          Trouver un podcast
+      <section aria-labelledby='reseaux' className='space-y-3'>
+        <h2 id='reseaux' className='title text-3xl'>
+          Nous suivre sur les réseaux sociaux
         </h2>
-        <EpisodeSearch
-          items={searchItems()}
-          projects={groups.map((g) => ({
-            slug: g.project.slug,
-            title: g.project.title,
-          }))}
-          limit={6}
+        <SocialLinks
+          label="Réseaux sociaux de l'association"
+          links={[
+            { name: 'Facebook', url: FACEBOOK_URL },
+            { name: 'Instagram', url: INSTAGRAM_URL },
+          ]}
         />
       </section>
 
-      <section aria-labelledby='ateliers' className='space-y-6'>
-        <div className='space-y-3'>
-          <h2 id='ateliers' className='title text-3xl'>
-            Ateliers radio et podcast avec Blandine Schmidt
-          </h2>
-          <p className='max-w-3xl'>
-            Blandine Schmidt, docteure en Sciences de l&apos;Information et de
-            la Communication, chargée de projet de l&apos;association et
-            formatrice au CLEMI de l&apos;académie de Bordeaux, accompagne les
-            classes, les universités et les structures sociales de
-            l&apos;écriture à la diffusion : prise de son, interview, mise en
-            ondes, montage et publication en podcast.
-          </p>
-        </div>
-        <div className='grid gap-4 sm:grid-cols-2'>
-          {formats.map((format) => (
-            <div key={format.title} className='card space-y-2'>
-              <h3 className='font-display text-xl text-white'>
-                {format.title}
-              </h3>
-              <p>{format.text}</p>
-              <p className='text-sm'>
-                À écouter :{' '}
-                {format.examples
-                  .filter((slug) => titles.has(slug))
-                  .map((slug, i) => (
-                    <span key={slug}>
-                      {i > 0 && ', '}
-                      <Link className='link' href={`/projets/${slug}/`}>
-                        {titles.get(slug)}
-                      </Link>
-                    </span>
-                  ))}
-              </p>
-            </div>
+      <ContactPerson />
+
+      <section aria-labelledby='ecosysteme' className='space-y-4'>
+        <h2 id='ecosysteme' className='section-title'>
+          Notre écosystème
+        </h2>
+        <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
+          {ecosystem.map((space) => (
+            <Link
+              key={space.href}
+              href={space.href}
+              className='card flex flex-col gap-2 transition-colors hover:border-white'
+            >
+              <span className='font-display text-xl text-white'>
+                {space.title}
+              </span>
+              <span>{space.text}</span>
+              <span className='mt-auto pt-2 text-sm text-white'>
+                Découvrir →
+              </span>
+            </Link>
           ))}
         </div>
-        <Link href='/ateliers/' className='btn-primary'>
-          Découvrir les ateliers
-        </Link>
+      </section>
+
+      <section
+        id='trouver-un-podcast'
+        aria-labelledby='trouver'
+        className='scroll-mt-6 space-y-4'
+      >
+        <h2 id='trouver' className='section-title'>
+          Trouver un podcast
+        </h2>
+        <div className='grid gap-4 md:grid-cols-2'>
+          {playlists.slice(0, 6).map((playlist) => (
+            <PlaylistCard key={playlist.slug} playlist={playlist} />
+          ))}
+        </div>
+        <div className='flex flex-wrap gap-3'>
+          <a
+            className='btn'
+            href='https://podcast.ausha.co/estceque?list=playlists'
+          >
+            Toutes les playlists ({playlists.length})
+          </a>
+          <Link className='btn' href='/podcasts/'>
+            Rechercher parmi les {episodes.length} épisodes
+          </Link>
+        </div>
       </section>
 
       <section aria-labelledby='projets' className='space-y-4'>
-        <h2 id='projets' className='title text-3xl'>
+        <h2 id='projets' className='section-title'>
           Les projets
         </h2>
         <div className='grid gap-4 sm:grid-cols-2 lg:grid-cols-3'>
@@ -154,33 +184,6 @@ export default function Home() {
         </div>
         <Link href='/projets/' className='btn'>
           Tous les projets ({groups.length})
-        </Link>
-      </section>
-
-      <section aria-labelledby='derniers' className='space-y-4'>
-        <h2 id='derniers' className='title text-3xl'>
-          Derniers épisodes
-        </h2>
-        <div className='grid gap-4 md:grid-cols-2'>
-          {episodes.slice(0, 4).map((episode) => (
-            <EpisodeCard key={episode.id} episode={episode} />
-          ))}
-        </div>
-      </section>
-
-      <section aria-labelledby='carte' className='space-y-4'>
-        <h2 id='carte' className='title text-3xl'>
-          L&apos;oreille voyageuse, la carte sonore
-        </h2>
-        <p className='max-w-3xl'>
-          Une cartographie sonore et plurilingue en français langue-monde, née
-          d&apos;une écriture collective au Département d&apos;Études de
-          Français Langue Étrangère de l&apos;Université Bordeaux Montaigne.
-          Cliquez sur une épingle pour écouter un conte.
-        </p>
-        <MapEmbed />
-        <Link href='/oreille-voyageuse/' className='btn'>
-          Tous les contes de la carte
         </Link>
       </section>
 
@@ -207,8 +210,8 @@ export default function Home() {
           Contact
         </h2>
         <p>
-          Un projet d&apos;atelier radio ou podcast dans votre école, votre
-          collège, votre lycée, votre université ou votre structure ?
+          Un atelier radio ou podcast dans votre établissement, un podcast à
+          produire pour votre structure ou votre équipe de recherche ?
           Écrivez-nous.
         </p>
         <a className='btn-primary' href={`mailto:${CONTACT_EMAIL}`}>

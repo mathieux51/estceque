@@ -153,10 +153,73 @@ async function fetchMap() {
   }
 }
 
-const [podcast, map] = await Promise.all([fetchPodcast(), fetchMap()])
+/**
+ * The show's playlists, from its Ausha page: the page embeds them as JSON
+ * objects (name, description, cover, episodes), with no public feed.
+ */
+async function fetchPlaylists() {
+  const page = (
+    await fetchText('https://podcast.ausha.co/estceque?list=playlists')
+  )
+    // The data sits inside a JavaScript string: undo one level of escaping.
+    .replace(/\\(["\\])/g, '$1')
+  const playlists = new Map()
+  let from = 0
+  for (;;) {
+    const start = page.indexOf('{"description":', from)
+    if (start < 0) break
+    // The object ends at its matching brace.
+    let depth = 0
+    let end = start
+    for (; end < page.length; end++) {
+      if (page[end] === '{') depth++
+      else if (page[end] === '}' && --depth === 0) break
+    }
+    from = end + 1
+    let data
+    try {
+      data = JSON.parse(page.slice(start, end + 1))
+    } catch {
+      continue
+    }
+    if (
+      data.showId !== 'bz3KNSqWZ7nP' ||
+      !data.slug ||
+      data.privacy !== 'public'
+    )
+      continue
+    playlists.set(data.slug, {
+      id: data.id,
+      slug: data.slug,
+      name: String(data.name).trim(),
+      description: toParagraphs(data.htmlDescription ?? data.description).join(
+        '\n'
+      ),
+      image: data.imageUrl ?? null,
+      episodeCount: data.episodesCount ?? 0,
+      createdAt: String(data.createdAt ?? '').replace(/^\$D/, ''),
+      ausha: data.siteUrl,
+    })
+  }
+  if (playlists.size === 0)
+    throw new Error('no playlists found on the Ausha page')
+  return [...playlists.values()].sort((a, b) =>
+    b.createdAt.localeCompare(a.createdAt)
+  )
+}
+
+const [podcast, map, playlists] = await Promise.all([
+  fetchPodcast(),
+  fetchMap(),
+  fetchPlaylists(),
+])
 podcast.episodes.sort((a, b) => b.publishedAt.localeCompare(a.publishedAt))
 await writeFile('data/podcast.json', JSON.stringify(podcast, null, 1) + '\n')
 await writeFile('data/map.json', JSON.stringify(map, null, 1) + '\n')
+await writeFile(
+  'data/playlists.json',
+  JSON.stringify(playlists, null, 1) + '\n'
+)
 process.stdout.write(
-  `${podcast.episodes.length} episodes, ${map.places.length} map places\n`
+  `${podcast.episodes.length} episodes, ${playlists.length} playlists, ${map.places.length} map places\n`
 )

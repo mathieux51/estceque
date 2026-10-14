@@ -7,7 +7,8 @@ Monorepo of the Est-ce que association's audio tools:
 - [`apps/direct-montage`](apps/direct-montage): edit it (multitrack editor),
   on [directmontage.fr](https://directmontage.fr)
 - [`apps/estceque`](apps/estceque): the association's site, on
-  [estceque.org](https://estceque.org) (podcasts, ateliers, sound map)
+  [estceque.org](https://estceque.org) (podcasts and playlists, espace
+  scolaire, studio, pedagogy, sound map)
 - [`apps/direct-social`](apps/direct-social) + [`services/social`](services/social):
   Direct Social, a podcast social network (local / Docker only for now)
 

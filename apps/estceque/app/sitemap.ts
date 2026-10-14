@@ -7,7 +7,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
   const latest = episodes[0]?.publishedAt
   return [
     { url: `${SITE_URL}/`, lastModified: latest, priority: 1 },
-    { url: `${SITE_URL}/ateliers/`, priority: 0.9 },
+    { url: `${SITE_URL}/espace-scolaire/`, priority: 0.9 },
+    { url: `${SITE_URL}/studio/`, priority: 0.9 },
+    { url: `${SITE_URL}/espace-pedagogique/`, priority: 0.7 },
     { url: `${SITE_URL}/podcasts/`, lastModified: latest, priority: 0.8 },
     { url: `${SITE_URL}/projets/`, lastModified: latest, priority: 0.7 },
     { url: `${SITE_URL}/oreille-voyageuse/`, priority: 0.6 },

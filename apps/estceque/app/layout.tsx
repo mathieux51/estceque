@@ -6,6 +6,7 @@ import Footer from '@/components/Footer'
 import Header from '@/components/Header'
 import JsonLd from '@/components/JsonLd'
 import {
+  BLANDINE,
   CONTACT_EMAIL,
   FACEBOOK_URL,
   INSTAGRAM_URL,
@@ -37,7 +38,7 @@ const roboto = Roboto({
 })
 
 const description =
-  "Média associatif d'Éducation aux Médias et à l'Information par le son, la radio et le podcast dans le Sud-Ouest. Ateliers radio et podcast animés par Blandine Schmidt, de l'école à l'université."
+  "Média associatif d'expression par le son, la radio et le podcast dans le Sud-Ouest depuis 2007 : studio de production sonore, podcasts, ateliers d'éducation aux médias avec Blandine Schmidt."
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
@@ -71,25 +72,55 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = { themeColor: '#005064' }
 
-// The association, for search engines.
+// The association and its contact person, for search engines.
 const organization = {
   '@context': 'https://schema.org',
-  '@type': 'NGO',
-  '@id': `${SITE_URL}/#association`,
-  name: SITE_NAME,
-  url: SITE_URL,
-  logo: `${SITE_URL}/mascotte.jpeg`,
-  description,
-  email: CONTACT_EMAIL,
-  areaServed: 'Nouvelle-Aquitaine, France',
-  knowsAbout: [
-    'Éducation aux médias et à l’information',
-    'Radio',
-    'Podcast',
-    'Webradio scolaire',
-    'Création sonore',
+  '@graph': [
+    {
+      '@type': 'NGO',
+      '@id': `${SITE_URL}/#association`,
+      name: SITE_NAME,
+      url: SITE_URL,
+      logo: `${SITE_URL}/mascotte.jpeg`,
+      description,
+      email: CONTACT_EMAIL,
+      foundingDate: '2007',
+      areaServed: 'Nouvelle-Aquitaine, France',
+      knowsAbout: [
+        'Éducation aux médias et à l’information',
+        'Radio',
+        'Podcast',
+        'Webradio scolaire',
+        'Création sonore',
+        'Identité sonore',
+      ],
+      employee: { '@id': `${SITE_URL}/#blandine-schmidt` },
+      sameAs: [INSTAGRAM_URL, FACEBOOK_URL, show.ausha],
+    },
+    {
+      '@type': 'Person',
+      '@id': `${SITE_URL}/#blandine-schmidt`,
+      name: BLANDINE.name,
+      jobTitle: 'Chargée de projets',
+      description: BLANDINE.credentials.join('. ') + '.',
+      hasCredential: {
+        '@type': 'EducationalOccupationalCredential',
+        credentialCategory: 'degree',
+        name: "Doctorat en Sciences de l'Information et de la Communication",
+      },
+      affiliation: [
+        { '@type': 'ResearchOrganization', name: 'Laboratoire MICA (UR4426)' },
+      ],
+      worksFor: { '@id': `${SITE_URL}/#association` },
+      knowsAbout: [
+        'Radio',
+        'Podcast',
+        'Éducation aux médias et à l’information',
+        'Création sonore',
+      ],
+      sameAs: [BLANDINE.linkedin, BLANDINE.facebook, BLANDINE.instagram],
+    },
   ],
-  sameAs: [INSTAGRAM_URL, FACEBOOK_URL, show.ausha],
 }
 
 export default function RootLayout({

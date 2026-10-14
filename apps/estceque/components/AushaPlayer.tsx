@@ -6,6 +6,7 @@ import { AUSHA_SHOW_ID } from '@/lib/site'
 type Props =
   | { kind: 'episode'; id: string; title: string; autoLoad?: boolean }
   | { kind: 'show'; title: string; autoLoad?: boolean }
+  | { kind: 'playlist'; slug: string; title: string; autoLoad?: boolean }
 
 const AUSHA_ORIGIN = 'https://player.ausha.co'
 
@@ -26,12 +27,24 @@ type AushaMessage = {
  */
 export default function AushaPlayer(props: Props) {
   const [loaded, setLoaded] = useState(props.autoLoad ?? false)
-  const playerId = props.kind === 'episode' ? `ausha-${props.id}` : 'ausha-show'
+  const playerId =
+    props.kind === 'episode'
+      ? `ausha-${props.id}`
+      : props.kind === 'playlist'
+        ? `ausha-playlist-${props.slug}`
+        : 'ausha-show'
   const [height, setHeight] = useState(props.kind === 'episode' ? 220 : 460)
+  const label = {
+    episode: 'Écouter cet épisode',
+    playlist: 'Écouter la playlist',
+    show: 'Écouter tous les épisodes',
+  }[props.kind]
   const query =
     props.kind === 'episode'
       ? `podcastId=${props.id}&playerId=${playerId}`
-      : `showId=${AUSHA_SHOW_ID}&playlist=true&multishow=true&playerId=${playerId}`
+      : props.kind === 'playlist'
+        ? `showId=${AUSHA_SHOW_ID}&playlistSlug=${props.slug}&playlist=true&playerId=${playerId}`
+        : `showId=${AUSHA_SHOW_ID}&playlist=true&multishow=true&playerId=${playerId}`
 
   useEffect(() => {
     if (!loaded) return
@@ -84,14 +97,7 @@ export default function AushaPlayer(props: Props) {
             <path d='M7 4.5v15a1 1 0 0 0 1.5.86l12-7.5a1 1 0 0 0 0-1.72l-12-7.5A1 1 0 0 0 7 4.5Z' />
           </svg>
         </span>
-        <span className='min-w-0'>
-          <span className='block text-white'>
-            {props.kind === 'episode'
-              ? 'Écouter cet épisode'
-              : 'Écouter tous les épisodes'}
-          </span>
-          <span className='block text-xs'>Lecteur Ausha</span>
-        </span>
+        <span className='min-w-0 text-white'>{label}</span>
       </button>
     )
   }
