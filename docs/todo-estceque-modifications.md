@@ -165,5 +165,6 @@ product manager.
       blue text and links on the page, header and footer stay dark blue
 - [x] Jingle credit under "Un projet porté par...", with links to IzaK Prod
       and estceque.org ("pour le avec le" in the request read as "pour le")
-- The tales are hosted on ArteRadio, which gives no cover per tale: the
-  cards use the project's cover.
+- [x] Each tale card shows its own ArteRadio cover, saved at 160px in
+      `public/contes/<sound id>.jpg` (read from the ArteRadio embed; a new
+      tale without a saved cover falls back to the project's cover)

@@ -57,6 +57,28 @@ function splitTale(name: string) {
     : { title: name, authors: null }
 }
 
+/**
+ * The tale's cover on ArteRadio, saved at 160px in `public/contes/` under the
+ * sound's id (the embed URL ends with it); the project's cover otherwise.
+ */
+function taleCover(player: string) {
+  const id = player.match(/\/embed\/(\d+)/)?.[1]
+  return id && TALE_COVERS.has(id)
+    ? `/contes/${id}.jpg`
+    : '/oreille-voyageuse.jpg'
+}
+
+const TALE_COVERS = new Set([
+  '276281',
+  '276282',
+  '276285',
+  '276287',
+  '276288',
+  '276289',
+  '276293',
+  '276294',
+])
+
 const description =
   "L'oreille voyageuse : une carte sonore et plurilingue de contes en français langue-monde, créés en podcast au DEFLE de l'Université Bordeaux Montaigne. Cliquez sur une épingle pour écouter."
 
@@ -153,7 +175,7 @@ export default function SoundMap() {
                 <div className='flex gap-3'>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src='/oreille-voyageuse-160.jpg'
+                    src={taleCover(place.player!)}
                     alt=''
                     width={80}
                     height={80}
