@@ -51,6 +51,29 @@ body {
   }
 }
 
+/*
+ * Light page (L'oreille voyageuse, colour chosen by the product manager):
+ * dark blue text on light green; header and footer stay dark blue.
+ */
+body:has(.theme-light) {
+  background: #b6dfde;
+}
+body:has(.theme-light) > :is(header, footer) {
+  background: var(--color-deep);
+}
+.theme-light {
+  color: var(--color-deep);
+}
+.theme-light .card {
+  @apply border-brand/25 bg-white/50;
+}
+.theme-light .link {
+  @apply text-brand decoration-brand/50 hover:decoration-brand;
+}
+.theme-light :focus-visible {
+  outline-color: var(--color-brand);
+}
+
 :focus-visible {
   outline: 2px solid var(--color-warning);
   outline-offset: 2px;

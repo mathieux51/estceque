@@ -49,6 +49,14 @@ function LinkInstitutions({ text }: { text: string }) {
   return <>{parts}</>
 }
 
+/** "Le titre. Un conte de A & B" → the title and the authors line. */
+function splitTale(name: string) {
+  const match = name.match(/^(.*?)\.\s+(Un conte .*)$/)
+  return match
+    ? { title: match[1], authors: match[2] }
+    : { title: name, authors: null }
+}
+
 const description =
   "L'oreille voyageuse : une carte sonore et plurilingue de contes en français langue-monde, créés en podcast au DEFLE de l'Université Bordeaux Montaigne. Cliquez sur une épingle pour écouter."
 
@@ -62,7 +70,7 @@ export default function SoundMap() {
   const tales = map.places.filter((place) => place.player)
   const others = map.places.filter((place) => !place.player)
   return (
-    <div className='space-y-10'>
+    <div className='theme-light space-y-10'>
       <JsonLd
         data={{
           '@context': 'https://schema.org',
@@ -81,10 +89,10 @@ export default function SoundMap() {
         source order, which puts the cover after the subtitle.
       */}
       <section className='grid gap-x-10 gap-y-3 md:grid-cols-[minmax(0,1fr)_minmax(0,22rem)] md:items-start'>
-        <h1 className='title text-4xl md:col-start-1'>
+        <h1 className='font-display text-4xl text-brand md:col-start-1'>
           L&apos;oreille voyageuse
         </h1>
-        <p className='max-w-3xl font-bold text-white md:col-start-1'>
+        <p className='max-w-3xl font-bold text-brand md:col-start-1'>
           Des voix, des histoires, des mondes à découvrir…
         </p>
         <Image
@@ -116,11 +124,11 @@ export default function SoundMap() {
           L&apos;interculturalité devient ainsi une source
           d&apos;enrichissement.
         </p>
-        <p className='max-w-3xl font-bold text-white md:col-start-1'>
+        <p className='max-w-3xl font-bold text-brand md:col-start-1'>
           Pour écouter, il vous suffit de cliquer sur l&apos;épingle{' '}
           <MapPin
             aria-label='épingle'
-            className='inline h-5 w-5 -translate-y-0.5 text-warning'
+            className='inline h-5 w-5 -translate-y-0.5 text-brand'
           />{' '}
           puis sur lecture ▶️.
         </p>
@@ -133,20 +141,42 @@ export default function SoundMap() {
         </a>
       </p>
       <section aria-labelledby='contes' className='space-y-4'>
-        <h2 id='contes' className='title text-3xl uppercase'>
+        <h2 id='contes' className='font-display text-3xl text-brand uppercase'>
           Les contes à écouter
         </h2>
+        {/* Same cards as the playlists of the home page. */}
         <ul className='grid gap-4 md:grid-cols-2'>
-          {tales.map((place) => (
-            <li key={place.name} className='card space-y-3'>
-              <h3 className='text-lg text-white'>{place.name}</h3>
-              <ArteRadioPlayer src={place.player!} title={place.name} />
-            </li>
-          ))}
+          {tales.map((place) => {
+            const { title, authors } = splitTale(place.name)
+            return (
+              <li key={place.name} className='card flex flex-col gap-3'>
+                <div className='flex gap-3'>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src='/oreille-voyageuse-160.jpg'
+                    alt=''
+                    width={80}
+                    height={80}
+                    loading='lazy'
+                    className='h-20 w-20 shrink-0 rounded-md object-cover'
+                  />
+                  <div className='min-w-0'>
+                    <h3 className='leading-snug font-bold text-brand'>
+                      {title}
+                    </h3>
+                    {authors && <p className='mt-1 text-sm'>{authors}</p>}
+                  </div>
+                </div>
+                <div className='mt-auto'>
+                  <ArteRadioPlayer src={place.player!} title={place.name} />
+                </div>
+              </li>
+            )
+          })}
         </ul>
       </section>
       <section className='card space-y-3'>
-        <h2 className='font-display text-2xl text-white uppercase'>
+        <h2 className='font-display text-2xl text-brand uppercase'>
           Un projet porté par Est-ce que t&apos;entends ce que je vois ?
         </h2>
         <p>
@@ -158,10 +188,20 @@ export default function SoundMap() {
           cartographie sonore ainsi que dans la composition de l&apos;univers
           sonore et visuel du projet.
         </p>
+        <p>
+          Jingle : musique Julien PERROT (
+          <a className='link' href='https://www.izakprod.com/'>
+            IzaK Prod
+          </a>
+          ) en collaboration avec Blandine Schmidt pour le média associatif{' '}
+          <a className='link' href={`${SITE_URL}/`}>
+            Est-ce que t&apos;entends ce que je vois ?
+          </a>
+        </p>
       </section>
       {others.map((place) => (
         <section key={place.name} className='card space-y-2'>
-          <h2 className='font-display text-2xl text-white uppercase'>
+          <h2 className='font-display text-2xl text-brand uppercase'>
             Le DEFLE à la CLEFF de l&apos;Université Bordeaux Montaigne
           </h2>
           {place.text.split('\n').map((line) => (

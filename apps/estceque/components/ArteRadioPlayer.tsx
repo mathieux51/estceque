@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import PlayButton from './PlayButton'
 
 /** An ArteRadio player for a tale of the map, loaded on demand. */
 export default function ArteRadioPlayer({
@@ -13,9 +14,11 @@ export default function ArteRadioPlayer({
   const [loaded, setLoaded] = useState(false)
   if (!loaded) {
     return (
-      <button type='button' className='btn' onClick={() => setLoaded(true)}>
-        Écouter le conte
-      </button>
+      <PlayButton
+        label='Écouter le conte'
+        title={title}
+        onClick={() => setLoaded(true)}
+      />
     )
   }
   return (

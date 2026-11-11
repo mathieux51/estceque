@@ -155,3 +155,15 @@ product manager.
 - Product manager: review the pages, confirm the answers above, and send
   content for the studio and pedagogy pages if it should go further.
 - Items marked "En stand by" in the sheet (banner, projects).
+
+## Map page follow-up (2026-11-11)
+
+- [x] "Les contes à écouter": cards like the home page playlists (cover,
+      title, authors, same play button); the button is shared by the Ausha
+      and ArteRadio players (`components/PlayButton.tsx`)
+- [x] Page background #B6DFDE (`.theme-light` in `app/globals.css`): dark
+      blue text and links on the page, header and footer stay dark blue
+- [x] Jingle credit under "Un projet porté par...", with links to IzaK Prod
+      and estceque.org ("pour le avec le" in the request read as "pour le")
+- The tales are hosted on ArteRadio, which gives no cover per tale: the
+  cards use the project's cover.
