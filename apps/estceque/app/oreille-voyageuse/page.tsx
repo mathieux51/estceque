@@ -124,7 +124,7 @@ export default function SoundMap() {
           height={1200}
           sizes='(min-width: 768px) 22rem, 100vw'
           priority
-          className='my-2 w-full max-w-sm justify-self-center rounded-lg border border-grey/40 shadow-lg md:col-start-2 md:row-span-6 md:row-start-1 md:my-0 md:max-w-none'
+          className='my-2 w-full max-w-sm justify-self-center rounded-lg border border-grey/40 shadow-lg md:col-start-2 md:row-span-7 md:row-start-1 md:my-0 md:max-w-none'
         />
         <p className='max-w-3xl md:col-start-1'>
           L&apos;oreille voyageuse est une cartographie sonore et plurilingue en
@@ -145,6 +145,9 @@ export default function SoundMap() {
         <p className='max-w-3xl md:col-start-1'>
           L&apos;interculturalité devient ainsi une source
           d&apos;enrichissement.
+        </p>
+        <p className='max-w-3xl md:col-start-1'>
+          Coordination pédagogique : Sandrine Adolf et Blandine Schmidt
         </p>
         <p className='max-w-3xl font-bold text-brand md:col-start-1'>
           Pour écouter, il vous suffit de cliquer sur l&apos;épingle{' '}
